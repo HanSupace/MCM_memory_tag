@@ -198,6 +198,64 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--gold); outl
 .detail-hint { margin-top: 12px !important; font-size: 11px !important; }
 .detail-cta { width: 100%; margin: 28px 0 8px; }
 
+/* Exhibition explore and artwork selection */
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+.featured-exhibition-card { max-width: 720px; }
+.art-fam { background-color: #9e7b54; background-image: radial-gradient(circle at 72% 25%, rgba(232, 194, 118, .92) 0 7%, transparent 7.5%), linear-gradient(135deg, #161616 0 24%, #665442 24% 42%, #211d1a 42% 63%, #b08d5d 63% 78%, #312a24 78%); background-size: cover; background-position: center; }
+.exhibition-explore-section, .artwork-selection-section { padding: 34px 0 118px; }
+.explore-titlebar { min-height: 62px; display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 18px; margin-bottom: 24px; }
+.explore-titlebar h1 { margin: 5px 0 0; font-family: Georgia, "Noto Serif KR", serif; font-size: 31px; line-height: 1; font-weight: 400; letter-spacing: -.045em; }
+.qr-header-button { height: 48px; padding: 0 15px; display: inline-flex; align-items: center; gap: 8px; border: 0; border-radius: 5px; background: var(--ink); color: white; font-size: 12px; font-weight: 800; cursor: pointer; }
+.qr-header-button span { font-size: 23px; line-height: 1; }
+.explore-search { height: 52px; display: flex; align-items: center; gap: 13px; margin-bottom: 14px; padding: 0 18px; border-radius: 7px; background: #e9e4da; }
+.explore-search input { width: 100%; height: 100%; border: 0; outline: 0; background: transparent; color: var(--ink); }
+.explore-search input::placeholder { color: #8c877c; }
+.search-symbol { width: 16px; height: 16px; flex: 0 0 auto; border: 1.5px solid #777167; border-radius: 50%; position: relative; }
+.search-symbol::after { content: ""; position: absolute; width: 6px; height: 1.5px; right: -5px; bottom: -2px; background: #777167; transform: rotate(45deg); }
+.explore-card-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.explore-card-grid .exhibition-art { height: 250px; background-size: cover; background-position: center; }
+.explore-card-grid .exhibition-card-body { background: #ebe5da; }
+.explore-card-action { display: flex; justify-content: space-between; padding-top: 15px; border-top: 1px solid var(--line); font-size: 11px; font-weight: 800; }
+.detail-titlebar { grid-template-columns: 42px 1fr auto; }
+.detail-titlebar > div { text-align: center; }
+.round-back-button { width: 42px; height: 42px; border: 0; background: transparent; font-size: 25px; cursor: pointer; }
+.selected-exhibition-summary { padding: 20px; display: flex; justify-content: space-between; align-items: center; gap: 18px; border-radius: 7px; background: #e9e4da; }
+.selected-exhibition-summary h2 { margin: 0 0 6px; font-family: Georgia, "Noto Serif KR", serif; font-size: 20px; font-weight: 400; }
+.selected-exhibition-summary p { margin: 0; color: var(--muted); font-size: 11px; line-height: 1.5; }
+.artwork-qr-callout { width: 100%; min-height: 82px; margin: 22px 0; padding: 16px 20px; display: grid; grid-template-columns: 28px 1fr auto; align-items: center; gap: 14px; border: 1px dashed #bea77e; border-radius: 7px; background: transparent; text-align: left; cursor: pointer; }
+.qr-outline { color: var(--gold); font-size: 25px; }
+.artwork-qr-callout > span:nth-child(2) { display: grid; gap: 5px; }
+.artwork-qr-callout strong { font-family: Georgia, "Noto Serif KR", serif; font-size: 16px; font-weight: 400; }
+.artwork-qr-callout small { color: var(--muted); font-size: 11px; }
+.artwork-qr-callout > b { color: var(--gold); }
+.artwork-section-heading { margin: 28px 0 14px; display: flex; align-items: flex-end; justify-content: space-between; }
+.artwork-section-heading h2 { margin: 0; font-family: Georgia, "Noto Serif KR", serif; font-size: 18px; font-weight: 400; }
+.artwork-section-heading span { color: var(--muted); font-size: 10px; }
+.artwork-card-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.artwork-card { min-width: 0; padding: 0; overflow: hidden; border: 1px solid transparent; border-radius: 7px; background: #ebe5da; text-align: left; cursor: pointer; transition: border-color .2s, transform .2s; }
+.artwork-card:hover, .artwork-card.selected { border-color: var(--gold); transform: translateY(-2px); }
+.artwork-image { position: relative; height: 270px; display: block; overflow: hidden; background-size: cover; background-position: center; }
+.artwork-image::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,.08), transparent 25%, rgba(0,0,0,.12)); }
+.artwork-image-1 { background: radial-gradient(circle at 50% 48%, #d8493d 0 5%, transparent 5.5%), repeating-linear-gradient(72deg, transparent 0 12px, rgba(255,255,255,.2) 13px 17px), linear-gradient(135deg, #e5c853, #d96556 42%, #4e8d87 68%, #eee0b2); }
+.artwork-image-2 { background: repeating-linear-gradient(12deg, transparent 0 9px, rgba(197,165,110,.12) 10px 11px), linear-gradient(135deg, #191817, #3c3933 50%, #090909); }
+.artwork-image-3 { background: radial-gradient(circle at 54% 36%, #e75e4b 0 3%, transparent 3.5%), linear-gradient(145deg, #767b74 0 22%, #e0d8c7 22% 45%, #52606a 45% 55%, #d6c8af 55%); }
+.artwork-image-4 { background: repeating-linear-gradient(97deg, rgba(255,255,255,.14) 0 2px, transparent 2px 9px), linear-gradient(135deg, #b4aa92, #57564d 47%, #d4c6aa); }
+.artwork-image small, .artwork-image em { position: absolute; z-index: 2; top: 10px; padding: 5px 8px; border-radius: 999px; background: rgba(22,22,19,.42); color: white; font-size: 9px; font-style: normal; }
+.artwork-image small { left: 10px; border-radius: 3px; }
+.artwork-image em { right: 10px; background: #b69a66; }
+.artwork-card-copy { padding: 15px 12px 12px; display: grid; }
+.artwork-card-copy > strong { overflow: hidden; font-family: Georgia, "Noto Serif KR", serif; font-size: 17px; font-weight: 400; text-overflow: ellipsis; white-space: nowrap; }
+.artwork-card-copy > small { margin: 5px 0 13px; color: var(--muted); font-size: 10px; }
+.artwork-card-copy > span { padding: 12px 3px 2px; display: flex; justify-content: space-between; border-top: 1px solid var(--line); font-size: 10px; font-weight: 800; }
+.empty-artworks { padding: 40px 20px; background: #e9e4da; color: var(--muted); text-align: center; }
+.selected-artwork-detail { position: relative; margin-top: 18px; padding: 28px; border: 1px solid #c9b996; background: #f8f5ee; }
+.selected-artwork-detail > button { position: absolute; top: 13px; right: 14px; width: 32px; height: 32px; border: 0; background: transparent; font-size: 22px; cursor: pointer; }
+.selected-artwork-detail h2 { margin: 10px 0 6px; font-family: Georgia, "Noto Serif KR", serif; font-size: 25px; font-weight: 400; }
+.selected-artwork-detail p { color: var(--muted); font-size: 12px; line-height: 1.75; }
+.selected-artwork-meta { color: var(--gold) !important; }
+.artwork-tip { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line); }
+.artwork-tip strong { display: block; margin-bottom: 6px; color: var(--ink); }
+
 @media (max-width: 900px) {
   .login-heading { margin: 45px 0 30px; }
   .login-heading h1 { font-size: 38px; }
@@ -246,6 +304,15 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--gold); outl
   .bottom-nav { bottom: 10px; height: 64px; border-radius: 18px; }
   .exhibition-list-grid { grid-template-columns: 1fr; }
   .detail-title { font-size: 26px; }
+  .featured-exhibition-card { flex-basis: 92%; }
+  .exhibition-explore-section, .artwork-selection-section { padding-top: 24px; }
+  .explore-titlebar h1 { font-size: 25px; }
+  .explore-card-grid { display: grid; margin-right: 0; grid-template-columns: 1fr; overflow: visible; }
+  .explore-card-grid .exhibition-list-card { width: 100%; }
+  .detail-titlebar { grid-template-columns: 38px 1fr 66px; gap: 7px; }
+  .detail-titlebar .qr-header-button { padding: 0 10px; }
+  .selected-exhibition-summary { align-items: flex-start; }
+  .artwork-image { height: 255px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

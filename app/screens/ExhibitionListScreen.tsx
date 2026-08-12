@@ -34,12 +34,18 @@ function formatDateRange(startAt: string, endAt: string) {
   return `${format(startAt)} – ${format(endAt)}`;
 }
 
-export function ExhibitionListScreen({ announce }: { announce: (message: string) => void }) {
+export function ExhibitionListScreen({
+  announce,
+  initialExhibitionId = null,
+}: {
+  announce: (message: string) => void;
+  initialExhibitionId?: string | null;
+}) {
   const [exhibitions, setExhibitions] = useState<ExhibitionSummary[] | null>(null);
   const [error, setError] = useState("");
   const [filter, setFilter] = useState<"all" | ExhibitionStatus>("all");
   const [query, setQuery] = useState("");
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(initialExhibitionId);
 
   useEffect(() => {
     let active = true;
@@ -70,27 +76,36 @@ export function ExhibitionListScreen({ announce }: { announce: (message: string)
 
   const filtered = (exhibitions ?? []).filter((exhibition) => {
     const matchesFilter = filter === "all" || exhibition.status === filter;
-    const matchesQuery = query.trim().length === 0 || exhibition.title.includes(query.trim());
+    const normalizedQuery = query.trim().toLocaleLowerCase("ko");
+    const matchesQuery = normalizedQuery.length === 0
+      || exhibition.title.toLocaleLowerCase("ko").includes(normalizedQuery)
+      || exhibition.venue.toLocaleLowerCase("ko").includes(normalizedQuery);
     return matchesFilter && matchesQuery;
   });
 
   return (
     <div className="home-content">
-      <section className="section-block exhibition-list-section">
-        <div className="section-heading">
+      <section className="exhibition-explore-section">
+        <div className="explore-titlebar">
           <div>
-            <span className="section-kicker">NOW &amp; NEXT</span>
-            <h2>전시</h2>
+            <span className="section-kicker">EXHIBITION</span>
+            <h1>전시 탐색</h1>
           </div>
+          <button type="button" className="qr-header-button" onClick={() => announce("QR 스캔 기능은 다음 단계에서 연결됩니다.")}>
+            <span aria-hidden="true">▦</span> QR
+          </button>
         </div>
 
-        <input
-          type="search"
-          className="search-input"
-          placeholder="전시명으로 검색"
-          value={query}
-          onChange={(event) => setQuery(event.target.value)}
-        />
+        <label className="explore-search">
+          <span aria-hidden="true" className="search-symbol" />
+          <span className="sr-only">전시 검색</span>
+          <input
+            type="search"
+            placeholder="전시명, 장소로 검색"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+          />
+        </label>
 
         <div className="filter-row">
           {FILTERS.map((item) => (
@@ -109,7 +124,7 @@ export function ExhibitionListScreen({ announce }: { announce: (message: string)
         {!error && exhibitions === null && <p>전시를 불러오는 중입니다…</p>}
         {!error && exhibitions !== null && filtered.length === 0 && <p>조건에 맞는 전시가 없습니다.</p>}
 
-        <div className="exhibition-list-grid">
+        <div className="exhibition-list-grid explore-card-grid">
           {filtered.map((exhibition) => (
             <button
               type="button"
@@ -117,7 +132,10 @@ export function ExhibitionListScreen({ announce }: { announce: (message: string)
               key={exhibition.id}
               onClick={() => setSelectedId(exhibition.id)}
             >
-              <div className={`exhibition-art${exhibition.heroImageUrl ? "" : " art-placeholder"}`}>
+              <div
+                className={`exhibition-art${exhibition.heroImageUrl ? "" : " art-placeholder"}`}
+                style={exhibition.heroImageUrl ? { backgroundImage: `url(${exhibition.heroImageUrl})` } : undefined}
+              >
                 <span className={`status-chip${exhibition.status === "upcoming" ? " upcoming" : ""}`}>
                   {STATUS_LABEL[exhibition.status]}
                 </span>
@@ -127,6 +145,7 @@ export function ExhibitionListScreen({ announce }: { announce: (message: string)
                 <p>
                   {exhibition.venue} · {formatDateRange(exhibition.startAt, exhibition.endAt)}
                 </p>
+                <span className="explore-card-action">전시 작품 보기 <b>↗</b></span>
               </div>
             </button>
           ))}

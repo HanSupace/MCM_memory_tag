@@ -10,16 +10,11 @@ import { ProductCurationScreen } from "./screens/ProductCurationScreen";
 import { MyPageScreen } from "./screens/MyPageScreen";
 import type { AuthUser } from "./types";
 
-const navItems = [
-  { key: "홈", Screen: HomeScreen },
-  { key: "전시", Screen: ExhibitionListScreen },
-  { key: "전시회장", Screen: PersonalHallScreen },
-  { key: "맞춤 추천", Screen: ProductCurationScreen },
-  { key: "마이", Screen: MyPageScreen },
-] as const;
+const navItems = ["홈", "전시", "전시회장", "맞춤 추천", "마이"] as const;
 
 function MainShell({ user, onLogout }: { user: AuthUser; onLogout: () => Promise<void> }) {
-  const [activeNav, setActiveNav] = useState<(typeof navItems)[number]["key"]>("홈");
+  const [activeNav, setActiveNav] = useState<(typeof navItems)[number]>("홈");
+  const [initialExhibitionId, setInitialExhibitionId] = useState<string | null>(null);
   const [notice, setNotice] = useState("");
 
   function announce(message: string) {
@@ -27,7 +22,23 @@ function MainShell({ user, onLogout }: { user: AuthUser; onLogout: () => Promise
     window.setTimeout(() => setNotice(""), 2200);
   }
 
-  const ActiveScreen = navItems.find((item) => item.key === activeNav)?.Screen ?? HomeScreen;
+  const screen = activeNav === "홈" ? (
+    <HomeScreen
+      announce={announce}
+      onExploreExhibitions={(exhibitionId) => {
+        setInitialExhibitionId(exhibitionId ?? null);
+        setActiveNav("전시");
+      }}
+    />
+  ) : activeNav === "전시" ? (
+    <ExhibitionListScreen announce={announce} initialExhibitionId={initialExhibitionId} />
+  ) : activeNav === "전시회장" ? (
+    <PersonalHallScreen announce={announce} />
+  ) : activeNav === "맞춤 추천" ? (
+    <ProductCurationScreen announce={announce} />
+  ) : (
+    <MyPageScreen announce={announce} />
+  );
 
   return (
     <main className="home-shell">
@@ -43,11 +54,19 @@ function MainShell({ user, onLogout }: { user: AuthUser; onLogout: () => Promise
         </div>
       </header>
 
-      <ActiveScreen announce={announce} />
+      {screen}
 
       <nav className="bottom-nav" aria-label="주 메뉴">
-        {navItems.map(({ key }, index) => (
-          <button className={activeNav === key ? "active" : ""} type="button" key={key} onClick={() => setActiveNav(key)}>
+        {navItems.map((key, index) => (
+          <button
+            className={activeNav === key ? "active" : ""}
+            type="button"
+            key={key}
+            onClick={() => {
+              if (key === "전시") setInitialExhibitionId(null);
+              setActiveNav(key);
+            }}
+          >
             <span className={`nav-icon nav-${index + 1}`} aria-hidden="true" /><small>{key}</small>
           </button>
         ))}
