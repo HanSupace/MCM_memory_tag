@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
     }
 
     await ensureAuthSchema();
-    const result = await getDb().query<{ id: string; username: string; password_hash: string }>(
+    const result = await getDb().query<{ id: string; username: string; password_hash: string | null }>(
       `SELECT id::text, username, password_hash
        FROM app_users
        WHERE LOWER(username) = LOWER($1)
@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
     );
     const account = result.rows[0];
 
-    if (!account || !(await compare(body.password as string, account.password_hash))) {
+    if (!account?.password_hash || !(await compare(body.password as string, account.password_hash))) {
       return NextResponse.json({ error: "아이디 또는 비밀번호가 올바르지 않습니다." }, { status: 401 });
     }
 
