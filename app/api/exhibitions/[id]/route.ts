@@ -49,7 +49,7 @@ function getTypeScriptExhibition(id: string) {
       artistName: artwork.artistName,
       productionYear: null,
       material: artwork.material ?? artwork.type,
-      imageUrl: null,
+      imageUrl: artwork.imageUrl ?? null,
       description: artwork.description,
       appreciationPoints: [artwork.interpretation, ...artwork.viewingTips].join("\n"),
     }));
@@ -149,7 +149,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
             artistName: artwork.artistName,
             productionYear: null,
             material: artwork.material ?? artwork.type,
-            imageUrl: null,
+            imageUrl: artwork.imageUrl ?? null,
             description: artwork.description,
             appreciationPoints: [artwork.interpretation, ...artwork.viewingTips].join("\n"),
           }))

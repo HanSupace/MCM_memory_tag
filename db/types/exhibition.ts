@@ -39,6 +39,7 @@ export type ArtworkSeed = {
   slug: string;
   title: string;
   artistName: string;
+  imageUrl?: string;
   collaborator?: string;
   series?: string;
   type: string;

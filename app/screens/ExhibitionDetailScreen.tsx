@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
+import Image from "next/image";
 
 type ExhibitionStatus = "upcoming" | "ongoing" | "ended";
 
@@ -76,7 +77,85 @@ export function ExhibitionDetailScreen({
     };
   }, [exhibitionId]);
 
+  useLayoutEffect(() => {
+    if (!selectedArtworkId) return;
+
+    const root = document.documentElement;
+    const previousScrollBehavior = root.style.scrollBehavior;
+    root.style.scrollBehavior = "auto";
+    root.scrollTop = 0;
+    document.body.scrollTop = 0;
+    window.scrollTo(0, 0);
+
+    const frame = window.requestAnimationFrame(() => {
+      root.style.scrollBehavior = previousScrollBehavior;
+    });
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      root.style.scrollBehavior = previousScrollBehavior;
+    };
+  }, [selectedArtworkId]);
+
   const selectedArtwork = exhibition?.artworks.find((artwork) => artwork.id === selectedArtworkId) ?? null;
+
+  if (exhibition && selectedArtwork) {
+    return (
+      <div className="home-content">
+        <section className="artwork-detail-screen">
+          <header className="artwork-detail-header">
+            <button
+              type="button"
+              className="round-back-button"
+              onClick={() => setSelectedArtworkId(null)}
+              aria-label="작품 목록으로 돌아가기"
+            >
+              ←
+            </button>
+            <div>
+              <span className="section-kicker">ARTWORK</span>
+              <h1>작품 상세</h1>
+            </div>
+            <span aria-hidden="true" />
+          </header>
+
+          <div
+            className="artwork-detail-hero"
+            style={selectedArtwork.imageUrl ? { backgroundImage: `url(${selectedArtwork.imageUrl})` } : undefined}
+            role="img"
+            aria-label={`${selectedArtwork.title} 작품 사진`}
+          />
+
+          <div className="artwork-detail-heading">
+            <span className="section-kicker">SELECTED ARTWORK</span>
+            <h2>{selectedArtwork.title}</h2>
+            <p>{selectedArtwork.artistName ?? "작가 미상"}</p>
+          </div>
+
+          <div className="artwork-detail-meta-grid">
+            <div><small>전시</small><strong>{exhibition.title}</strong></div>
+            <div><small>위치</small><strong>{exhibition.venue}</strong></div>
+            {selectedArtwork.productionYear && <div><small>제작 연도</small><strong>{selectedArtwork.productionYear}</strong></div>}
+            {selectedArtwork.material && <div><small>유형·재료</small><strong>{selectedArtwork.material}</strong></div>}
+          </div>
+
+          <article className="artwork-description-card">
+            <span className="section-kicker">ABOUT THE WORK</span>
+            <h3>작품 소개</h3>
+            <p>{selectedArtwork.description ?? "등록된 작품 설명이 없습니다."}</p>
+          </article>
+
+          {selectedArtwork.appreciationPoints && (
+            <article className="artwork-description-card appreciation-card">
+              <span className="section-kicker">VIEWING GUIDE</span>
+              <h3>감상 포인트</h3>
+              <p>{selectedArtwork.appreciationPoints}</p>
+            </article>
+          )}
+        </section>
+      </div>
+    );
+  }
 
   return (
     <div className="home-content">
@@ -121,14 +200,21 @@ export function ExhibitionDetailScreen({
                 {exhibition.artworks.map((artwork, index) => (
                   <button
                     type="button"
-                    className={`artwork-card${selectedArtworkId === artwork.id ? " selected" : ""}`}
+                    className="artwork-card"
                     key={artwork.exhibitionArtworkId}
                     onClick={() => setSelectedArtworkId(artwork.id)}
                   >
                     <span
-                      className={`artwork-image artwork-image-${(index % 4) + 1}`}
-                      style={artwork.imageUrl ? { backgroundImage: `url(${artwork.imageUrl})` } : undefined}
+                      className={`artwork-image${artwork.imageUrl ? " has-image" : ` artwork-image-${(index % 4) + 1}`}`}
                     >
+                      {artwork.imageUrl && (
+                        <Image
+                          src={artwork.imageUrl}
+                          alt={`${artwork.title} 작품`}
+                          fill
+                          sizes="(max-width: 640px) 50vw, 560px"
+                        />
+                      )}
                       <small>{String(index + 1).padStart(2, "0")}</small>
                     </span>
                     <span className="artwork-card-copy">
@@ -141,18 +227,6 @@ export function ExhibitionDetailScreen({
               </div>
             )}
 
-            {selectedArtwork && (
-              <article className="selected-artwork-detail" aria-live="polite">
-                <button type="button" onClick={() => setSelectedArtworkId(null)} aria-label="작품 상세 닫기">×</button>
-                <span className="section-kicker">SELECTED ARTWORK</span>
-                <h2>{selectedArtwork.title}</h2>
-                <p className="selected-artwork-meta">
-                  {[selectedArtwork.artistName, selectedArtwork.productionYear, selectedArtwork.material].filter(Boolean).join(" · ")}
-                </p>
-                <p>{selectedArtwork.description ?? "등록된 작품 설명이 없습니다."}</p>
-                {selectedArtwork.appreciationPoints && <p className="artwork-tip"><strong>감상 포인트</strong>{selectedArtwork.appreciationPoints}</p>}
-              </article>
-            )}
           </>
         )}
       </section>

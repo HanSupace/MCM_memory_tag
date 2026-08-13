@@ -234,27 +234,38 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--gold); outl
 .artwork-card-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
 .artwork-card { min-width: 0; padding: 0; overflow: hidden; border: 1px solid transparent; border-radius: 7px; background: #ebe5da; text-align: left; cursor: pointer; transition: border-color .2s, transform .2s; }
 .artwork-card:hover, .artwork-card.selected { border-color: var(--gold); transform: translateY(-2px); }
-.artwork-image { position: relative; height: 270px; display: block; overflow: hidden; background-size: cover; background-position: center; }
-.artwork-image::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,.08), transparent 25%, rgba(0,0,0,.12)); }
+.artwork-image { position: relative; width: 100%; height: auto; aspect-ratio: 4 / 3; display: grid; place-items: center; overflow: hidden; background-color: #d7d0c4; }
+.artwork-image::after { content: ""; position: absolute; inset: 0; border: 1px solid rgba(22,22,19,.08); pointer-events: none; }
+.artwork-image.has-image { background: #d7d0c4; }
+.artwork-image img { width: 100%; height: 100%; display: block; object-fit: contain; object-position: center; }
 .artwork-image-1 { background: radial-gradient(circle at 50% 48%, #d8493d 0 5%, transparent 5.5%), repeating-linear-gradient(72deg, transparent 0 12px, rgba(255,255,255,.2) 13px 17px), linear-gradient(135deg, #e5c853, #d96556 42%, #4e8d87 68%, #eee0b2); }
 .artwork-image-2 { background: repeating-linear-gradient(12deg, transparent 0 9px, rgba(197,165,110,.12) 10px 11px), linear-gradient(135deg, #191817, #3c3933 50%, #090909); }
 .artwork-image-3 { background: radial-gradient(circle at 54% 36%, #e75e4b 0 3%, transparent 3.5%), linear-gradient(145deg, #767b74 0 22%, #e0d8c7 22% 45%, #52606a 45% 55%, #d6c8af 55%); }
 .artwork-image-4 { background: repeating-linear-gradient(97deg, rgba(255,255,255,.14) 0 2px, transparent 2px 9px), linear-gradient(135deg, #b4aa92, #57564d 47%, #d4c6aa); }
-.artwork-image small, .artwork-image em { position: absolute; z-index: 2; top: 10px; padding: 5px 8px; border-radius: 999px; background: rgba(22,22,19,.42); color: white; font-size: 9px; font-style: normal; }
+.artwork-image small { position: absolute; z-index: 2; top: 10px; padding: 5px 8px; border-radius: 3px; background: rgba(22,22,19,.42); color: white; font-size: 9px; }
 .artwork-image small { left: 10px; border-radius: 3px; }
-.artwork-image em { right: 10px; background: #b69a66; }
 .artwork-card-copy { padding: 15px 12px 12px; display: grid; }
 .artwork-card-copy > strong { overflow: hidden; font-family: Georgia, "Noto Serif KR", serif; font-size: 17px; font-weight: 400; text-overflow: ellipsis; white-space: nowrap; }
 .artwork-card-copy > small { margin: 5px 0 13px; color: var(--muted); font-size: 10px; }
 .artwork-card-copy > span { padding: 12px 3px 2px; display: flex; justify-content: space-between; border-top: 1px solid var(--line); font-size: 10px; font-weight: 800; }
 .empty-artworks { padding: 40px 20px; background: #e9e4da; color: var(--muted); text-align: center; }
-.selected-artwork-detail { position: relative; margin-top: 18px; padding: 28px; border: 1px solid #c9b996; background: #f8f5ee; }
-.selected-artwork-detail > button { position: absolute; top: 13px; right: 14px; width: 32px; height: 32px; border: 0; background: transparent; font-size: 22px; cursor: pointer; }
-.selected-artwork-detail h2 { margin: 10px 0 6px; font-family: Georgia, "Noto Serif KR", serif; font-size: 25px; font-weight: 400; }
-.selected-artwork-detail p { color: var(--muted); font-size: 12px; line-height: 1.75; }
-.selected-artwork-meta { color: var(--gold) !important; }
-.artwork-tip { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line); }
-.artwork-tip strong { display: block; margin-bottom: 6px; color: var(--ink); }
+.artwork-detail-screen { padding: 28px 0 128px; }
+.artwork-detail-header { min-height: 66px; display: grid; grid-template-columns: 48px 1fr 48px; align-items: center; margin-bottom: 24px; border-bottom: 1px solid var(--line); }
+.artwork-detail-header > div { text-align: center; }
+.artwork-detail-header h1 { margin: 5px 0 16px; font-family: Georgia, "Noto Serif KR", serif; font-size: 27px; line-height: 1; font-weight: 400; }
+.artwork-detail-hero { width: 100%; aspect-ratio: 16 / 10; border-radius: 8px; background-color: #dedbd4; background-size: cover; background-position: center; box-shadow: 0 18px 42px rgba(28, 24, 18, .13); }
+.artwork-detail-heading { padding: 30px 4px 24px; border-bottom: 1px solid var(--line); }
+.artwork-detail-heading h2 { margin: 10px 0 7px; font-family: Georgia, "Noto Serif KR", serif; font-size: clamp(32px, 5vw, 54px); line-height: 1.08; font-weight: 400; letter-spacing: -.05em; }
+.artwork-detail-heading p { margin: 0; color: var(--gold); font-size: 14px; font-weight: 700; }
+.artwork-detail-meta-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin: 24px 0; border-top: 1px solid var(--ink); }
+.artwork-detail-meta-grid > div { min-width: 0; padding: 20px 16px; display: grid; gap: 8px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.artwork-detail-meta-grid > div:nth-child(even) { border-right: 0; }
+.artwork-detail-meta-grid small { color: var(--muted); font-size: 9px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+.artwork-detail-meta-grid strong { overflow-wrap: anywhere; font-family: Georgia, "Noto Serif KR", serif; font-size: 16px; font-weight: 400; line-height: 1.45; }
+.artwork-description-card { margin-top: 20px; padding: 30px; border: 1px solid var(--line); border-radius: 8px; background: rgba(255,255,255,.3); }
+.artwork-description-card h3 { margin: 10px 0 18px; font-family: Georgia, "Noto Serif KR", serif; font-size: 25px; font-weight: 400; }
+.artwork-description-card p { margin: 0; color: #625f58; font-size: 14px; line-height: 1.9; white-space: pre-line; }
+.appreciation-card { background: #e9e2d5; }
 
 @media (max-width: 900px) {
   .login-heading { margin: 45px 0 30px; }
@@ -312,7 +323,16 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--gold); outl
   .detail-titlebar { grid-template-columns: 38px 1fr 66px; gap: 7px; }
   .detail-titlebar .qr-header-button { padding: 0 10px; }
   .selected-exhibition-summary { align-items: flex-start; }
-  .artwork-image { height: 255px; }
+  .artwork-image { height: auto; aspect-ratio: 4 / 3; }
+  .artwork-detail-screen { padding-top: 10px; }
+  .artwork-detail-header { margin: 0 -16px 22px; padding: 0 12px; background: rgba(244,241,233,.96); position: sticky; top: 68px; z-index: 15; }
+  .artwork-detail-header h1 { font-size: 22px; }
+  .artwork-detail-hero { margin: 0 -8px; width: calc(100% + 16px); aspect-ratio: 4 / 3; }
+  .artwork-detail-heading { padding-top: 25px; }
+  .artwork-detail-heading h2 { font-size: 36px; }
+  .artwork-detail-meta-grid { grid-template-columns: 1fr; }
+  .artwork-detail-meta-grid > div { border-right: 0; }
+  .artwork-description-card { padding: 24px 20px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
