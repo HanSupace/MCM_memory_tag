@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 import { getUserBySessionToken, SESSION_COOKIE_NAME } from "../../../../lib/auth";
 import { getDb } from "../../../../lib/db";
+import { artworks as seedArtworks } from "../../../../db/seeds";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -59,7 +60,45 @@ function buildSystemPrompt(artwork: ArtworkRow, sources: SourceRow[]) {
     .join("\n");
 }
 
+function loadSeedArtworkContext(exhibitionArtworkId: string) {
+  const seedArtwork = seedArtworks.find((artwork) => artwork.id === exhibitionArtworkId);
+  if (!seedArtwork) return null;
+
+  const sourceBody = [
+    seedArtwork.summary,
+    seedArtwork.description,
+    seedArtwork.titleMeaning,
+    seedArtwork.interpretation,
+    ...seedArtwork.viewingTips,
+    ...seedArtwork.facts,
+    ...seedArtwork.tmi,
+  ]
+    .filter((value): value is string => Boolean(value))
+    .join("\n");
+
+  return {
+    artwork: {
+      title: seedArtwork.title,
+      artist_name: seedArtwork.artistName,
+      production_year: null,
+      material: seedArtwork.material ?? seedArtwork.type,
+      description: seedArtwork.description,
+      appreciation_points: [seedArtwork.interpretation, ...seedArtwork.viewingTips].join("\n"),
+    },
+    sources: [{
+      source_type: "official_seed",
+      source_info: `${seedArtwork.source.label} (${seedArtwork.source.url})`,
+      body: sourceBody,
+    }],
+    persistentExhibitionArtworkId: null,
+  };
+}
+
 async function loadArtworkContext(exhibitionArtworkId: string) {
+  const seedContext = loadSeedArtworkContext(exhibitionArtworkId);
+  if (seedContext) return seedContext;
+  if (!/^\d+$/.test(exhibitionArtworkId)) return null;
+
   const db = getDb();
 
   const artworkResult = await db.query<ArtworkRow & { artwork_id: string }>(
@@ -83,7 +122,7 @@ async function loadArtworkContext(exhibitionArtworkId: string) {
     [artwork.artwork_id],
   );
 
-  return { artwork, sources: sourcesResult.rows };
+  return { artwork, sources: sourcesResult.rows, persistentExhibitionArtworkId: exhibitionArtworkId };
 }
 
 export async function GET(request: NextRequest) {
@@ -94,8 +133,12 @@ export async function GET(request: NextRequest) {
     }
 
     const exhibitionArtworkId = request.nextUrl.searchParams.get("exhibitionArtworkId");
-    if (!exhibitionArtworkId || !/^\d+$/.test(exhibitionArtworkId)) {
+    if (!exhibitionArtworkId || (!/^\d+$/.test(exhibitionArtworkId) && !loadSeedArtworkContext(exhibitionArtworkId))) {
       return NextResponse.json({ error: "작품 정보가 올바르지 않습니다." }, { status: 400 });
+    }
+
+    if (loadSeedArtworkContext(exhibitionArtworkId)) {
+      return NextResponse.json({ messages: [] }, { headers: { "Cache-Control": "no-store" } });
     }
 
     const result = await getDb().query<ConversationRow>(
@@ -138,7 +181,7 @@ export async function POST(request: NextRequest) {
     const question = typeof body.question === "string" ? body.question.trim() : "";
     const sharePersonalization = body.sharePersonalization === true;
 
-    if (!exhibitionArtworkId || !/^\d+$/.test(exhibitionArtworkId)) {
+    if (!exhibitionArtworkId || (!/^\d+$/.test(exhibitionArtworkId) && !loadSeedArtworkContext(exhibitionArtworkId))) {
       return NextResponse.json({ error: "작품 정보가 올바르지 않습니다." }, { status: 400 });
     }
     if (!question) {
@@ -151,25 +194,26 @@ export async function POST(request: NextRequest) {
     }
 
     const db = getDb();
-    const historyResult = await db.query<ConversationRow>(
-      `SELECT role, content, created_at
-       FROM docent_conversations
-       WHERE user_id = $1 AND exhibition_artwork_id = $2
-       ORDER BY created_at DESC
-       LIMIT $3`,
-      [user.id, exhibitionArtworkId, HISTORY_LIMIT],
-    );
-    const history = historyResult.rows.reverse();
+    const history = context.persistentExhibitionArtworkId
+      ? (await db.query<ConversationRow>(
+          `SELECT role, content, created_at
+           FROM docent_conversations
+           WHERE user_id = $1 AND exhibition_artwork_id = $2
+           ORDER BY created_at DESC
+           LIMIT $3`,
+          [user.id, context.persistentExhibitionArtworkId, HISTORY_LIMIT],
+        )).rows.reverse()
+      : [];
 
     if (!process.env.OPENAI_API_KEY) {
       return NextResponse.json({ error: "AI 도슨트 설정이 완료되지 않았습니다." }, { status: 500 });
     }
 
     const openai = new OpenAI();
-    const completion = await openai.chat.completions.create({
-      model: process.env.OPENAI_MODEL || "gpt-5.6-luna",
-      messages: [
-        { role: "system", content: buildSystemPrompt(context.artwork, context.sources) },
+    const completion = await openai.responses.create({
+      model: process.env.OPENAI_MODEL || "gpt-5-mini",
+      instructions: buildSystemPrompt(context.artwork, context.sources),
+      input: [
         ...history.map((message) => ({
           role: message.role === "assistant" ? ("assistant" as const) : ("user" as const),
           content: message.content,
@@ -177,16 +221,18 @@ export async function POST(request: NextRequest) {
         { role: "user", content: question },
       ],
     });
-    const answer = completion.choices[0]?.message?.content?.trim();
+    const answer = completion.output_text.trim();
     if (!answer) {
       return NextResponse.json({ error: "AI 도슨트 응답을 받지 못했습니다." }, { status: 502 });
     }
 
-    await db.query(
-      `INSERT INTO docent_conversations (user_id, exhibition_artwork_id, role, content, share_personalization)
-       VALUES ($1, $2, 'user', $3, $4), ($1, $2, 'assistant', $5, $4)`,
-      [user.id, exhibitionArtworkId, question, sharePersonalization, answer],
-    );
+    if (context.persistentExhibitionArtworkId) {
+      await db.query(
+        `INSERT INTO docent_conversations (user_id, exhibition_artwork_id, role, content, share_personalization)
+         VALUES ($1, $2, 'user', $3, $4), ($1, $2, 'assistant', $5, $4)`,
+        [user.id, context.persistentExhibitionArtworkId, question, sharePersonalization, answer],
+      );
+    }
 
     return NextResponse.json({ answer, sharePersonalization });
   } catch (error) {
@@ -203,8 +249,12 @@ export async function DELETE(request: NextRequest) {
     }
 
     const exhibitionArtworkId = request.nextUrl.searchParams.get("exhibitionArtworkId");
-    if (!exhibitionArtworkId || !/^\d+$/.test(exhibitionArtworkId)) {
+    if (!exhibitionArtworkId || (!/^\d+$/.test(exhibitionArtworkId) && !loadSeedArtworkContext(exhibitionArtworkId))) {
       return NextResponse.json({ error: "작품 정보가 올바르지 않습니다." }, { status: 400 });
+    }
+
+    if (loadSeedArtworkContext(exhibitionArtworkId)) {
+      return NextResponse.json({ ok: true });
     }
 
     await getDb().query("DELETE FROM docent_conversations WHERE user_id = $1 AND exhibition_artwork_id = $2", [
