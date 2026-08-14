@@ -14,7 +14,8 @@
  *   새로 추가된 항목만 반영되고 기존 데이터는 중복 생성되지 않는다.
  *
  * 알려진 한계 (카탈로그 원본에 없는 값에 대한 가정):
- *   - 운영 시간: 카탈로그에 시간 정보가 없어 10:00~18:00(KST)로 임시 지정한다.
+ *   - 운영 시간: 카탈로그에 값이 있으면 operating_hours에 저장하고, 없으면 비워둔다.
+ *   - 전시 시작/종료 시각: 날짜만 제공된 경우 각각 10:00/18:00(KST)로 임시 지정한다.
  *   - collect_identifier(QR/NFC 식별값): 실물 QR이 없어 작품 slug를 임시값으로 사용한다.
  *   - hero_image_url / image_url: 카탈로그에 이미지가 없어 비워둔다 (이슈 #20 참고).
  *   - published: 큐레이션된 공식 콘텐츠이므로 true로 등록한다.
@@ -79,8 +80,8 @@ async function findOrCreateExhibition(db: Pool, seed: ExhibitionSeed): Promise<{
   if (existing.rows[0]) return { id: existing.rows[0].id, created: false };
 
   const inserted = await db.query<{ id: string }>(
-    `INSERT INTO exhibitions (title, description, venue, start_at, end_at, status, published)
-     VALUES ($1, $2, $3, $4, $5, $6, true)
+    `INSERT INTO exhibitions (title, description, venue, start_at, end_at, operating_hours, status, published)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, true)
      RETURNING id`,
     [
       seed.title,
@@ -88,6 +89,7 @@ async function findOrCreateExhibition(db: Pool, seed: ExhibitionSeed): Promise<{
       seed.venue,
       toTimestamp(seed.startDate, "10:00:00"),
       toTimestamp(seed.endDate, "18:00:00"),
+      seed.operatingHours ?? null,
       seed.status,
     ],
   );
