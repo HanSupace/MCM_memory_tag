@@ -10,15 +10,26 @@ type FeaturedExhibition = {
   status: "upcoming" | "ongoing" | "ended";
 };
 
-const fallbackExhibition: FeaturedExhibition = {
-  id: "exhibition-fam-2022",
-  title: "F.A.M: Fashion & Art at MCM HAUS",
-  venue: "MCM HAUS 청담",
-  heroImageUrl: null,
-  startAt: "2022-08-31",
-  endAt: "2022-09-30",
-  status: "ended",
-};
+const fallbackExhibitions: FeaturedExhibition[] = [
+  {
+    id: "exhibition-fam-2022",
+    title: "F.A.M: Fashion & Art at MCM HAUS",
+    venue: "MCM HAUS 청담",
+    heroImageUrl: null,
+    startAt: "2022-08-31",
+    endAt: "2022-09-30",
+    status: "ended",
+  },
+  {
+    id: "exhibition-wearable-casa-2024",
+    title: "MCM 웨어러블 카사 컬렉션",
+    venue: "MCM HAUS 플래그십 스토어",
+    heroImageUrl: "/artworks/wearable-casa/chatty-sofa.png",
+    startAt: "2024-09-03",
+    endAt: "2024-10-06",
+    status: "ended",
+  },
+];
 
 const statusLabel = { upcoming: "예정", ongoing: "진행 중", ended: "종료" } as const;
 
@@ -70,7 +81,7 @@ export function HomeScreen({
   announce: (message: string) => void;
   onExploreExhibitions: (exhibitionId?: string) => void;
 }) {
-  const [featuredExhibition, setFeaturedExhibition] = useState(fallbackExhibition);
+  const [featuredExhibitions, setFeaturedExhibitions] = useState(fallbackExhibitions);
 
   useEffect(() => {
     let active = true;
@@ -78,10 +89,14 @@ export function HomeScreen({
       .then(async (response) => {
         if (!response.ok) return null;
         const data = await response.json() as { exhibitions?: FeaturedExhibition[] };
-        return data.exhibitions?.[0] ?? null;
+        return data.exhibitions?.slice(0, 2).map((exhibition) => (
+          exhibition.id === "exhibition-wearable-casa-2024" && !exhibition.heroImageUrl
+            ? { ...exhibition, heroImageUrl: "/artworks/wearable-casa/chatty-sofa.png" }
+            : exhibition
+        )) ?? null;
       })
-      .then((exhibition) => {
-        if (active && exhibition) setFeaturedExhibition(exhibition);
+      .then((exhibitions) => {
+        if (active && exhibitions?.length) setFeaturedExhibitions(exhibitions);
       })
       .catch(() => undefined);
     return () => { active = false; };
@@ -104,23 +119,25 @@ export function HomeScreen({
           <button type="button" onClick={() => onExploreExhibitions()}>전체 보기</button>
         </div>
         <div className="exhibition-grid">
-            <article className="exhibition-card featured-exhibition-card">
+          {featuredExhibitions.map((exhibition, index) => (
+            <article className="exhibition-card featured-exhibition-card" key={exhibition.id}>
               <div
                 className="exhibition-art art-fam"
-                style={featuredExhibition.heroImageUrl ? { backgroundImage: `url(${featuredExhibition.heroImageUrl})` } : undefined}
+                style={exhibition.heroImageUrl ? { backgroundImage: `url(${exhibition.heroImageUrl})` } : undefined}
               >
-                <span className="exhibition-number">01</span>
-                <span className={`status-chip ${featuredExhibition.status === "upcoming" ? "upcoming" : ""}`}>
-                  {statusLabel[featuredExhibition.status]}
+                <span className="exhibition-number">{String(index + 1).padStart(2, "0")}</span>
+                <span className={`status-chip ${exhibition.status === "upcoming" ? "upcoming" : ""}`}>
+                  {statusLabel[exhibition.status]}
                 </span>
                 <div className="art-plane plane-a" /><div className="art-plane plane-b" />
               </div>
               <div className="exhibition-card-body">
-                <h3>{featuredExhibition.title}</h3>
-                <p>{formatDate(featuredExhibition.startAt)} – {formatDate(featuredExhibition.endAt)} · {featuredExhibition.venue}</p>
-                <button type="button" onClick={() => onExploreExhibitions(featuredExhibition.id)}>탐색하기<span>↗</span></button>
+                <h3>{exhibition.title}</h3>
+                <p>{formatDate(exhibition.startAt)} – {formatDate(exhibition.endAt)} · {exhibition.venue}</p>
+                <button type="button" onClick={() => onExploreExhibitions(exhibition.id)}>탐색하기<span>↗</span></button>
               </div>
             </article>
+          ))}
         </div>
       </section>
 
