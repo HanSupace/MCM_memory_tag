@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { ConnectedKeyring, KeyringConnectPanel } from "../components/KeyringConnectPanel";
 
 type FeaturedExhibition = {
   id: string;
@@ -82,6 +83,8 @@ export function HomeScreen({
   onExploreExhibitions: (exhibitionId?: string) => void;
 }) {
   const [featuredExhibitions, setFeaturedExhibitions] = useState(fallbackExhibitions);
+  const [keyring, setKeyring] = useState<ConnectedKeyring | null>(null);
+  const [showKeyringPanel, setShowKeyringPanel] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -97,6 +100,21 @@ export function HomeScreen({
       })
       .then((exhibitions) => {
         if (active && exhibitions?.length) setFeaturedExhibitions(exhibitions);
+      })
+      .catch(() => undefined);
+    return () => { active = false; };
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+    fetch("/api/keyrings", { cache: "no-store" })
+      .then(async (response) => {
+        if (!response.ok) return null;
+        const data = await response.json() as { keyring?: ConnectedKeyring | null };
+        return data.keyring ?? null;
+      })
+      .then((value) => {
+        if (active) setKeyring(value);
       })
       .catch(() => undefined);
     return () => { active = false; };
@@ -161,10 +179,26 @@ export function HomeScreen({
           <span className="section-kicker light">MCM NFC EXPERIENCE</span>
           <h2>기억을 시작하는<br />나만의 키링</h2>
           <p>NFC 키링을 연결하면 전시 방문 인증과 작품 수집이 시작됩니다.</p>
-          <div className="keyring-state"><i />연결된 키링이 없습니다.</div>
-          <button type="button" onClick={() => announce("키링 연결 화면은 다음 단계에서 제공됩니다.")}>키링 연결하기<span>→</span></button>
+          <div className="keyring-state">
+            <i />
+            {keyring ? `연결된 키링: ${keyring.keyringCode}` : "연결된 키링이 없습니다."}
+          </div>
+          <button type="button" onClick={() => setShowKeyringPanel(true)}>
+            {keyring ? "키링 관리" : "키링 연결하기"}<span>→</span>
+          </button>
         </div>
       </section>
+
+      {showKeyringPanel && (
+        <KeyringConnectPanel
+          announce={announce}
+          onClose={() => setShowKeyringPanel(false)}
+          onConnected={(connected) => {
+            setKeyring(connected);
+            setShowKeyringPanel(false);
+          }}
+        />
+      )}
 
       <section className="section-block contents-section">
         <div className="section-heading">
