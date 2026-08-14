@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getUserBySessionToken, SESSION_COOKIE_NAME } from "../../../../../lib/auth";
-import { getDb } from "../../../../../lib/db";
+import { ensureGallerySchema, getDb } from "../../../../../lib/db";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -14,6 +14,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   if (!/^\d+$/.test(id)) return NextResponse.json({ error: "잘못된 사진 ID입니다." }, { status: 400 });
 
   try {
+    await ensureGallerySchema();
     const result = await getDb().query<{ image_data: Buffer; mime_type: string | null }>(
       `SELECT image_data, mime_type
        FROM gallery_photos
