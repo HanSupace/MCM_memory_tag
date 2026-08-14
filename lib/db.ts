@@ -17,6 +17,9 @@ function createPool() {
 
   const config: PoolConfig = {
     max: Number(process.env.PGPOOL_MAX ?? 5),
+    // Workers 런타임에서는 이전 요청에서 생성한 TCP 연결을 다음 요청이
+    // 재사용하면 요청이 멈출 수 있다. 사용이 끝난 연결은 즉시 교체한다.
+    maxUses: 1,
     idleTimeoutMillis: 30_000,
     connectionTimeoutMillis: 8_000,
   };

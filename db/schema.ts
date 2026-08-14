@@ -207,6 +207,22 @@ export const docentSources = pgTable(
   (table) => [index("docent_sources_artwork_id_idx").on(table.artworkId)],
 );
 
+export const docentConversations = pgTable(
+  "docent_conversations",
+  {
+    id: bigserial("id", { mode: "bigint" }).primaryKey(),
+    userId: bigint("user_id", { mode: "bigint" }).notNull().references(() => users.id, { onDelete: "cascade" }),
+    exhibitionArtworkId: bigint("exhibition_artwork_id", { mode: "bigint" }).notNull().references(() => exhibitionArtworks.id, { onDelete: "cascade" }),
+    // user | assistant
+    role: varchar("role", { length: 20 }).notNull(),
+    content: text("content").notNull(),
+    // 취향 리포트 등 개인화 근거로 이 메시지를 활용해도 되는지 여부 (고객이 대화창에서 선택)
+    sharePersonalization: boolean("share_personalization").notNull().default(false),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [index("docent_conversations_user_artwork_idx").on(table.userId, table.exhibitionArtworkId)],
+);
+
 // ---------------------------------------------------------------------------
 // 취향 프로필 / 제품 추천
 // ---------------------------------------------------------------------------
