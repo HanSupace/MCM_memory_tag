@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useState } from "react";
 import Image from "next/image";
 import { AiDocentPanel } from "../components/AiDocentPanel";
+import { VisitVerificationPanel } from "../components/VisitVerificationPanel";
 
 type ExhibitionStatus = "upcoming" | "ongoing" | "ended";
 
@@ -56,7 +57,13 @@ export function ExhibitionDetailScreen({
   const [exhibition, setExhibition] = useState<ExhibitionDetail | null>(null);
   const [error, setError] = useState("");
   const [selectedArtworkId, setSelectedArtworkId] = useState<string | null>(null);
+  const [showVisitPanel, setShowVisitPanel] = useState(false);
   const [showDocentPanel, setShowDocentPanel] = useState(false);
+
+  function handleVisitVerified() {
+    setExhibition((current) => (current ? { ...current, visited: true } : current));
+    setShowVisitPanel(false);
+  }
 
   useEffect(() => {
     let active = true;
@@ -212,6 +219,14 @@ export function ExhibitionDetailScreen({
               <span className="status-chip static">{STATUS_LABEL[exhibition.status]}</span>
             </div>
 
+            {!exhibition.visited && (
+              <button type="button" className="artwork-qr-callout" onClick={() => setShowVisitPanel(true)}>
+                <span className="qr-outline" aria-hidden="true">📱</span>
+                <span><strong>방문 인증하기</strong><small>키링 태그, QR 또는 테스트 버튼으로 방문을 인증하세요</small></span>
+                <b aria-hidden="true">↗</b>
+              </button>
+            )}
+
             <button type="button" className="artwork-qr-callout" onClick={() => announce("전시장 작품 QR을 스캔해 주세요.")}>
               <span className="qr-outline" aria-hidden="true">▦</span>
               <span><strong>작품 QR로 바로 찾기</strong><small>전시장에서 작품 옆 QR을 스캔하세요</small></span>
@@ -258,6 +273,16 @@ export function ExhibitionDetailScreen({
           </>
         )}
       </section>
+
+      {showVisitPanel && exhibition && (
+        <VisitVerificationPanel
+          exhibitionId={exhibition.id}
+          exhibitionTitle={exhibition.title}
+          announce={announce}
+          onClose={() => setShowVisitPanel(false)}
+          onVerified={handleVisitVerified}
+        />
+      )}
     </div>
   );
 }
