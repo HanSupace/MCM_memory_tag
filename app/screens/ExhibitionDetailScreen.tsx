@@ -119,24 +119,41 @@ export function ExhibitionDetailScreen({
             <span aria-hidden="true" />
           </header>
 
-          <div
-            className="artwork-detail-hero"
-            style={selectedArtwork.imageUrl ? { backgroundImage: `url(${selectedArtwork.imageUrl})` } : undefined}
-            role="img"
-            aria-label={`${selectedArtwork.title} 작품 사진`}
-          />
+          <div className={`artwork-detail-hero${selectedArtwork.imageUrl ? " has-image" : ""}`}>
+            {selectedArtwork.imageUrl && (
+              <Image
+                className="artwork-detail-hero-image"
+                src={selectedArtwork.imageUrl}
+                alt=""
+                fill
+                priority
+                sizes="(max-width: 640px) 100vw, 1120px"
+              />
+            )}
+            <div className="artwork-detail-hero-shade" aria-hidden="true" />
+            <div className="artwork-detail-hero-copy">
+              <span className="section-kicker">SELECTED ARTWORK</span>
+              <h2>{selectedArtwork.title}</h2>
+              <p>{selectedArtwork.artistName ?? "작가 미상"}</p>
 
-          <div className="artwork-detail-heading">
-            <span className="section-kicker">SELECTED ARTWORK</span>
-            <h2>{selectedArtwork.title}</h2>
-            <p>{selectedArtwork.artistName ?? "작가 미상"}</p>
+              <dl className="artwork-detail-meta-grid">
+                <div><dt>전시</dt><dd>{exhibition.title}</dd></div>
+                <div><dt>위치</dt><dd>{exhibition.venue}</dd></div>
+                {selectedArtwork.productionYear && <div><dt>제작 연도</dt><dd>{selectedArtwork.productionYear}</dd></div>}
+                {selectedArtwork.material && <div><dt>유형·재료</dt><dd>{selectedArtwork.material}</dd></div>}
+              </dl>
+            </div>
           </div>
 
-          <div className="artwork-detail-meta-grid">
-            <div><small>전시</small><strong>{exhibition.title}</strong></div>
-            <div><small>위치</small><strong>{exhibition.venue}</strong></div>
-            {selectedArtwork.productionYear && <div><small>제작 연도</small><strong>{selectedArtwork.productionYear}</strong></div>}
-            {selectedArtwork.material && <div><small>유형·재료</small><strong>{selectedArtwork.material}</strong></div>}
+          <div className="artwork-detail-actions" aria-label="작품 기능">
+            <button type="button" onClick={() => announce("내 컬렉션 담기 기능은 다음 단계에서 연결됩니다.")}>
+              <span aria-hidden="true">＋</span>
+              내 컬렉션에 담기
+            </button>
+            <button type="button" className="primary" onClick={() => announce("AI 작품 대화 기능은 다음 단계에서 연결됩니다.")}>
+              <span aria-hidden="true">✦</span>
+              AI와 대화하기
+            </button>
           </div>
 
           <article className="artwork-description-card">
