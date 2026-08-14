@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { BrandMark } from "./components/BrandMark";
 import { LoginScreen } from "./screens/LoginScreen";
 import { HomeScreen } from "./screens/HomeScreen";
@@ -23,6 +24,7 @@ const navIconClasses: Record<(typeof navItems)[number], string> = {
 };
 
 function MainShell({ user, onLogout }: { user: AuthUser; onLogout: () => Promise<void> }) {
+  const router = useRouter();
   const [activeNav, setActiveNav] = useState<ScreenKey>("홈");
   const [initialExhibitionId, setInitialExhibitionId] = useState<string | null>(null);
   const [activeExhibitionId, setActiveExhibitionId] = useState<string | null>(null);
@@ -30,11 +32,45 @@ function MainShell({ user, onLogout }: { user: AuthUser; onLogout: () => Promise
   const [galleryExhibitionId, setGalleryExhibitionId] = useState<string | null>(null);
   const [cameraOpenRequest, setCameraOpenRequest] = useState(0);
   const [notice, setNotice] = useState("");
+  const handledVisitLinkRef = useRef(false);
 
   function announce(message: string) {
     setNotice(message);
     window.setTimeout(() => setNotice(""), 2200);
   }
+
+  // NFC 태그·QR이 여는 "/?visit=<exhibitionId>" 링크를 처리한다.
+  // 실물 태그는 이 주소를 열기만 하면 되므로(OS/카메라가 URL을 열어줌),
+  // 여기서 파라미터를 감지해 방문 인증 후 해당 전시로 바로 이동시킨다.
+  useEffect(() => {
+    if (handledVisitLinkRef.current) return;
+
+    const exhibitionId = new URLSearchParams(window.location.search).get("visit");
+    if (!exhibitionId || !/^\d+$/.test(exhibitionId)) return;
+    handledVisitLinkRef.current = true;
+
+    fetch("/api/visits", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ exhibitionId }),
+    })
+      .then(async (response) => {
+        const data = (await response.json()) as { visitedAt?: string; alreadyVisited?: boolean; error?: string };
+        if (!response.ok || !data.visitedAt) {
+          announce(data.error ?? "전시를 찾을 수 없습니다.");
+          return;
+        }
+        announce(data.alreadyVisited ? "이미 방문 인증된 전시입니다." : "방문 인증이 완료되었습니다.");
+        setInitialExhibitionId(exhibitionId);
+        setActiveNav("전시");
+      })
+      .catch(() => {
+        announce("네트워크 오류로 방문 인증에 실패했습니다.");
+      })
+      .finally(() => {
+        router.replace("/");
+      });
+  }, [router]);
 
   const screen = activeNav === "홈" ? (
     <HomeScreen
