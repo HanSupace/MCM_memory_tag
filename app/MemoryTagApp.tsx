@@ -13,13 +13,23 @@ import { GalleryScreen } from "./screens/GalleryScreen";
 import { CameraCaptureButton } from "./components/CameraCaptureButton";
 import type { AuthUser } from "./types";
 
-const navItems = ["홈", "전시", "전시회장", "사진첩", "맞춤 추천", "마이"] as const;
+const navItems = ["홈", "전시", "사진첩", "맞춤 추천", "마이"] as const;
+type ScreenKey = (typeof navItems)[number] | "전시회장";
+const navIconClasses: Record<(typeof navItems)[number], string> = {
+  홈: "nav-1",
+  전시: "nav-2",
+  사진첩: "nav-4",
+  "맞춤 추천": "nav-5",
+  마이: "nav-6",
+};
 
 function MainShell({ user, onLogout }: { user: AuthUser; onLogout: () => Promise<void> }) {
   const router = useRouter();
-  const [activeNav, setActiveNav] = useState<(typeof navItems)[number]>("홈");
+  const [activeNav, setActiveNav] = useState<ScreenKey>("홈");
   const [initialExhibitionId, setInitialExhibitionId] = useState<string | null>(null);
   const [activeExhibitionId, setActiveExhibitionId] = useState<string | null>(null);
+  const [personalHallExhibitionId, setPersonalHallExhibitionId] = useState<string | null>(null);
+  const [galleryExhibitionId, setGalleryExhibitionId] = useState<string | null>(null);
   const [cameraOpenRequest, setCameraOpenRequest] = useState(0);
   const [notice, setNotice] = useState("");
   const handledVisitLinkRef = useRef(false);
@@ -74,12 +84,30 @@ function MainShell({ user, onLogout }: { user: AuthUser; onLogout: () => Promise
     <ExhibitionListScreen
       announce={announce}
       initialExhibitionId={initialExhibitionId}
-      onActiveExhibitionChange={setActiveExhibitionId}
+      onActiveExhibitionChange={(exhibitionId) => {
+        setActiveExhibitionId(exhibitionId);
+        setCameraOpenRequest(0);
+      }}
+      onOpenPersonalHall={(exhibitionId) => {
+        setInitialExhibitionId(exhibitionId);
+        setPersonalHallExhibitionId(exhibitionId);
+        setActiveNav("전시회장");
+      }}
     />
   ) : activeNav === "전시회장" ? (
-    <PersonalHallScreen announce={announce} />
+    <PersonalHallScreen
+      exhibitionId={personalHallExhibitionId}
+      onBack={() => setActiveNav("전시")}
+      announce={announce}
+    />
   ) : activeNav === "사진첩" ? (
-    <GalleryScreen onOpenCamera={() => setCameraOpenRequest((request) => request + 1)} />
+    <GalleryScreen
+      onOpenCamera={() => setCameraOpenRequest((request) => request + 1)}
+      onSelectedExhibitionChange={(exhibitionId) => {
+        setGalleryExhibitionId(exhibitionId);
+        setCameraOpenRequest(0);
+      }}
+    />
   ) : activeNav === "맞춤 추천" ? (
     <ProductCurationScreen announce={announce} />
   ) : (
@@ -102,15 +130,17 @@ function MainShell({ user, onLogout }: { user: AuthUser; onLogout: () => Promise
 
       {screen}
 
-      <CameraCaptureButton
-        key={cameraOpenRequest}
-        activeExhibitionId={activeNav === "전시" ? activeExhibitionId : null}
-        initiallyOpen={cameraOpenRequest > 0}
-        announce={announce}
-      />
+      {(activeNav === "전시" ? activeExhibitionId : activeNav === "사진첩" ? galleryExhibitionId : null) && (
+        <CameraCaptureButton
+          key={cameraOpenRequest}
+          activeExhibitionId={activeNav === "전시" ? activeExhibitionId : galleryExhibitionId}
+          initiallyOpen={cameraOpenRequest > 0}
+          announce={announce}
+        />
+      )}
 
       <nav className="bottom-nav" aria-label="주 메뉴">
-        {navItems.map((key, index) => (
+        {navItems.map((key) => (
           <button
             className={activeNav === key ? "active" : ""}
             type="button"
@@ -118,10 +148,11 @@ function MainShell({ user, onLogout }: { user: AuthUser; onLogout: () => Promise
             onClick={() => {
               if (key === "전시") setInitialExhibitionId(null);
               if (key !== "전시") setActiveExhibitionId(null);
+              if (key !== "사진첩") setGalleryExhibitionId(null);
               setActiveNav(key);
             }}
           >
-            <span className={`nav-icon nav-${index + 1}`} aria-hidden="true" /><small>{key}</small>
+            <span className={`nav-icon ${navIconClasses[key]}`} aria-hidden="true" /><small>{key}</small>
           </button>
         ))}
       </nav>

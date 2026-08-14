@@ -17,7 +17,7 @@
  *   - 운영 시간: 카탈로그에 값이 있으면 operating_hours에 저장하고, 없으면 비워둔다.
  *   - 전시 시작/종료 시각: 날짜만 제공된 경우 각각 10:00/18:00(KST)로 임시 지정한다.
  *   - collect_identifier(QR/NFC 식별값): 실물 QR이 없어 작품 slug를 임시값으로 사용한다.
- *   - hero_image_url / image_url: 카탈로그에 이미지가 없어 비워둔다 (이슈 #20 참고).
+ *   - image_url: 카탈로그의 public 이미지 경로를 저장한다.
  *   - published: 큐레이션된 공식 콘텐츠이므로 true로 등록한다.
  */
 import type { Pool } from "pg";
@@ -111,13 +111,39 @@ async function findOrCreateArtwork(
   artistId: string | null,
 ): Promise<{ id: string; created: boolean }> {
   const existing = await db.query<{ id: string }>("SELECT id FROM artworks WHERE title = $1", [seed.title]);
-  if (existing.rows[0]) return { id: existing.rows[0].id, created: false };
+  if (existing.rows[0]) {
+    await db.query(
+      `UPDATE artworks
+       SET artist_id = $2,
+           material = $3,
+           image_url = $4,
+           base_description = $5,
+           appreciation_points = $6
+       WHERE id = $1`,
+      [
+        existing.rows[0].id,
+        artistId,
+        seed.material ?? seed.type ?? null,
+        seed.imageUrl ?? null,
+        buildArtworkBaseDescription(seed),
+        buildArtworkAppreciationPoints(seed),
+      ],
+    );
+    return { id: existing.rows[0].id, created: false };
+  }
 
   const inserted = await db.query<{ id: string }>(
-    `INSERT INTO artworks (title, artist_id, material, base_description, appreciation_points)
-     VALUES ($1, $2, $3, $4, $5)
+    `INSERT INTO artworks (title, artist_id, material, image_url, base_description, appreciation_points)
+     VALUES ($1, $2, $3, $4, $5, $6)
      RETURNING id`,
-    [seed.title, artistId, seed.material ?? null, buildArtworkBaseDescription(seed), buildArtworkAppreciationPoints(seed)],
+    [
+      seed.title,
+      artistId,
+      seed.material ?? seed.type ?? null,
+      seed.imageUrl ?? null,
+      buildArtworkBaseDescription(seed),
+      buildArtworkAppreciationPoints(seed),
+    ],
   );
   return { id: inserted.rows[0].id, created: true };
 }
@@ -132,7 +158,10 @@ async function linkExhibitionArtwork(
   await db.query(
     `INSERT INTO exhibition_artworks (exhibition_id, artwork_id, collect_identifier, exhibition_description, published)
      VALUES ($1, $2, $3, $4, true)
-     ON CONFLICT (exhibition_id, artwork_id) DO NOTHING`,
+     ON CONFLICT (exhibition_id, artwork_id)
+     DO UPDATE SET collect_identifier = EXCLUDED.collect_identifier,
+                   exhibition_description = EXCLUDED.exhibition_description,
+                   published = true`,
     [exhibitionId, artworkId, collectIdentifier, exhibitionDescription],
   );
 }
