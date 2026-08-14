@@ -8,13 +8,17 @@ import { ExhibitionListScreen } from "./screens/ExhibitionListScreen";
 import { PersonalHallScreen } from "./screens/PersonalHallScreen";
 import { ProductCurationScreen } from "./screens/ProductCurationScreen";
 import { MyPageScreen } from "./screens/MyPageScreen";
+import { GalleryScreen } from "./screens/GalleryScreen";
+import { CameraCaptureButton } from "./components/CameraCaptureButton";
 import type { AuthUser } from "./types";
 
-const navItems = ["홈", "전시", "전시회장", "맞춤 추천", "마이"] as const;
+const navItems = ["홈", "전시", "전시회장", "사진첩", "맞춤 추천", "마이"] as const;
 
 function MainShell({ user, onLogout }: { user: AuthUser; onLogout: () => Promise<void> }) {
   const [activeNav, setActiveNav] = useState<(typeof navItems)[number]>("홈");
   const [initialExhibitionId, setInitialExhibitionId] = useState<string | null>(null);
+  const [activeExhibitionId, setActiveExhibitionId] = useState<string | null>(null);
+  const [cameraOpenRequest, setCameraOpenRequest] = useState(0);
   const [notice, setNotice] = useState("");
 
   function announce(message: string) {
@@ -31,9 +35,15 @@ function MainShell({ user, onLogout }: { user: AuthUser; onLogout: () => Promise
       }}
     />
   ) : activeNav === "전시" ? (
-    <ExhibitionListScreen announce={announce} initialExhibitionId={initialExhibitionId} />
+    <ExhibitionListScreen
+      announce={announce}
+      initialExhibitionId={initialExhibitionId}
+      onActiveExhibitionChange={setActiveExhibitionId}
+    />
   ) : activeNav === "전시회장" ? (
     <PersonalHallScreen announce={announce} />
+  ) : activeNav === "사진첩" ? (
+    <GalleryScreen onOpenCamera={() => setCameraOpenRequest((request) => request + 1)} />
   ) : activeNav === "맞춤 추천" ? (
     <ProductCurationScreen announce={announce} />
   ) : (
@@ -56,6 +66,13 @@ function MainShell({ user, onLogout }: { user: AuthUser; onLogout: () => Promise
 
       {screen}
 
+      <CameraCaptureButton
+        key={cameraOpenRequest}
+        activeExhibitionId={activeNav === "전시" ? activeExhibitionId : null}
+        initiallyOpen={cameraOpenRequest > 0}
+        announce={announce}
+      />
+
       <nav className="bottom-nav" aria-label="주 메뉴">
         {navItems.map((key, index) => (
           <button
@@ -64,6 +81,7 @@ function MainShell({ user, onLogout }: { user: AuthUser; onLogout: () => Promise
             key={key}
             onClick={() => {
               if (key === "전시") setInitialExhibitionId(null);
+              if (key !== "전시") setActiveExhibitionId(null);
               setActiveNav(key);
             }}
           >
