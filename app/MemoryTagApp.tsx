@@ -7,17 +7,19 @@ import { HomeScreen } from "./screens/HomeScreen";
 import { ExhibitionListScreen } from "./screens/ExhibitionListScreen";
 import { PersonalHallScreen } from "./screens/PersonalHallScreen";
 import { ProductCurationScreen } from "./screens/ProductCurationScreen";
+import { TimedContentScreen } from "./screens/TimedContentScreen";
 import { MyPageScreen } from "./screens/MyPageScreen";
 import { GalleryScreen } from "./screens/GalleryScreen";
 import { CameraCaptureButton } from "./components/CameraCaptureButton";
 import type { AuthUser } from "./types";
 
-const navItems = ["홈", "전시", "사진첩", "맞춤 추천", "마이"] as const;
+const navItems = ["홈", "전시", "사진첩", "콘텐츠", "맞춤 추천", "마이"] as const;
 type ScreenKey = (typeof navItems)[number] | "전시회장";
 const navIconClasses: Record<(typeof navItems)[number], string> = {
   홈: "nav-1",
   전시: "nav-2",
   사진첩: "nav-4",
+  콘텐츠: "nav-3",
   "맞춤 추천": "nav-5",
   마이: "nav-6",
 };
@@ -62,10 +64,12 @@ function MainShell({ user, onLogout }: { user: AuthUser; onLogout: () => Promise
     />
   ) : activeNav === "사진첩" ? (
     <GalleryScreen onOpenCamera={() => setCameraOpenRequest((request) => request + 1)} />
+  ) : activeNav === "콘텐츠" ? (
+    <TimedContentScreen announce={announce} />
   ) : activeNav === "맞춤 추천" ? (
     <ProductCurationScreen announce={announce} />
   ) : (
-    <MyPageScreen announce={announce} />
+    <MyPageScreen user={user} onLogout={onLogout} />
   );
 
   return (
@@ -76,7 +80,7 @@ function MainShell({ user, onLogout }: { user: AuthUser; onLogout: () => Promise
           <button className="notification-button" type="button" aria-label="알림" onClick={() => announce("새 알림이 3개 있어요.")}>
             <span aria-hidden="true">⌁</span><i>3</i>
           </button>
-          <button className="avatar-button" type="button" aria-label={`${user.username} 로그아웃`} onClick={() => void onLogout()}>
+          <button className="avatar-button" type="button" aria-label={`${user.username} 마이 페이지`} onClick={() => setActiveNav("마이")}>
             {user.username.slice(0, 2).toUpperCase()}
           </button>
         </div>

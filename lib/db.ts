@@ -3,6 +3,7 @@ import { Pool, type PoolConfig } from "pg";
 type DatabaseGlobal = typeof globalThis & {
   mcmPgPool?: Pool;
   mcmAuthSchemaPromise?: Promise<void>;
+  mcmGallerySchemaPromise?: Promise<void>;
 };
 
 const databaseGlobal = globalThis as DatabaseGlobal;
@@ -88,4 +89,18 @@ export async function ensureAuthSchema() {
   }
 
   return databaseGlobal.mcmAuthSchemaPromise;
+}
+
+export async function ensureGallerySchema() {
+  if (!databaseGlobal.mcmGallerySchemaPromise) {
+    databaseGlobal.mcmGallerySchemaPromise = (async () => {
+      const db = getDb();
+      await db.query(`ALTER TABLE gallery_photos ADD COLUMN IF NOT EXISTS image_data BYTEA`);
+      await db.query(`ALTER TABLE gallery_photos ADD COLUMN IF NOT EXISTS mime_type VARCHAR(100)`);
+    })().catch((error) => {
+      databaseGlobal.mcmGallerySchemaPromise = undefined;
+      throw error;
+    });
+  }
+  return databaseGlobal.mcmGallerySchemaPromise;
 }

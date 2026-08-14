@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getUserBySessionToken, SESSION_COOKIE_NAME } from "../../../lib/auth";
 import { resolveExhibitionId, seedExhibitionFor } from "../../../lib/catalog-db";
-import { getDb } from "../../../lib/db";
+import { ensureGallerySchema, getDb } from "../../../lib/db";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -32,6 +32,7 @@ export async function GET(request: NextRequest) {
   if (!user) return NextResponse.json({ error: "로그인이 필요합니다." }, { status: 401 });
 
   try {
+    await ensureGallerySchema();
     const result = await getDb().query<PhotoRow>(
       `SELECT gp.id::text, e.id::text AS exhibition_id, e.title AS exhibition_title, gp.created_at
        FROM gallery_photos gp
@@ -52,6 +53,7 @@ export async function POST(request: NextRequest) {
   if (!user) return NextResponse.json({ error: "로그인이 필요합니다." }, { status: 401 });
 
   try {
+    await ensureGallerySchema();
     const formData = await request.formData();
     const reference = formData.get("exhibitionId");
     const photo = formData.get("photo");
