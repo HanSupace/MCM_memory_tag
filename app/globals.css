@@ -253,15 +253,22 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--gold); outl
 .artwork-detail-header { min-height: 66px; display: grid; grid-template-columns: 48px 1fr 48px; align-items: center; margin-bottom: 24px; border-bottom: 1px solid var(--line); }
 .artwork-detail-header > div { text-align: center; }
 .artwork-detail-header h1 { margin: 5px 0 16px; font-family: Georgia, "Noto Serif KR", serif; font-size: 27px; line-height: 1; font-weight: 400; }
-.artwork-detail-hero { width: 100%; aspect-ratio: 16 / 10; border-radius: 8px; background-color: #dedbd4; background-size: cover; background-position: center; box-shadow: 0 18px 42px rgba(28, 24, 18, .13); }
-.artwork-detail-heading { padding: 30px 4px 24px; border-bottom: 1px solid var(--line); }
-.artwork-detail-heading h2 { margin: 10px 0 7px; font-family: Georgia, "Noto Serif KR", serif; font-size: clamp(32px, 5vw, 54px); line-height: 1.08; font-weight: 400; letter-spacing: -.05em; }
-.artwork-detail-heading p { margin: 0; color: var(--gold); font-size: 14px; font-weight: 700; }
-.artwork-detail-meta-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin: 24px 0; border-top: 1px solid var(--ink); }
-.artwork-detail-meta-grid > div { min-width: 0; padding: 20px 16px; display: grid; gap: 8px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
-.artwork-detail-meta-grid > div:nth-child(even) { border-right: 0; }
-.artwork-detail-meta-grid small { color: var(--muted); font-size: 9px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
-.artwork-detail-meta-grid strong { overflow-wrap: anywhere; font-family: Georgia, "Noto Serif KR", serif; font-size: 16px; font-weight: 400; line-height: 1.45; }
+.artwork-detail-hero { position: relative; width: 100%; height: clamp(400px, 54vh, 460px); display: flex; align-items: flex-end; overflow: hidden; border-radius: 8px; background: linear-gradient(145deg, #6d685f, #24221f); box-shadow: 0 18px 42px rgba(28, 24, 18, .18); isolation: isolate; }
+.artwork-detail-hero-image { z-index: 0; object-fit: cover; object-position: center; filter: blur(9px); transform: scale(1.06); }
+.artwork-detail-hero-shade { position: absolute; z-index: 1; inset: 0; background: linear-gradient(180deg, rgba(12,11,9,.12) 8%, rgba(12,11,9,.42) 46%, rgba(12,11,9,.92) 100%); }
+.artwork-detail-hero-copy { position: relative; z-index: 2; width: 100%; padding: clamp(30px, 5vw, 58px); color: #fff; }
+.artwork-detail-hero-copy .section-kicker { color: #d6b374; }
+.artwork-detail-hero-copy h2 { max-width: 820px; margin: 12px 0 8px; font-family: Georgia, "Noto Serif KR", serif; font-size: clamp(42px, 7vw, 76px); line-height: 1; font-weight: 400; letter-spacing: -.045em; }
+.artwork-detail-hero-copy > p { margin: 0; color: #d6b374; font-size: 17px; font-weight: 700; }
+.artwork-detail-meta-grid { margin: 34px 0 0; display: grid; grid-template-columns: 1fr; border-top: 1px solid rgba(255,255,255,.42); }
+.artwork-detail-meta-grid > div { min-width: 0; padding: 12px 0; display: grid; grid-template-columns: 82px minmax(0, 1fr); align-items: baseline; gap: 12px; border-bottom: 1px solid rgba(255,255,255,.25); }
+.artwork-detail-meta-grid dt { color: rgba(255,255,255,.65); font-size: 9px; font-weight: 700; letter-spacing: .12em; }
+.artwork-detail-meta-grid dd { margin: 0; overflow-wrap: anywhere; font-family: Georgia, "Noto Serif KR", serif; font-size: 16px; line-height: 1.45; }
+.artwork-detail-actions { margin: 20px 0 30px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.artwork-detail-actions button { min-height: 58px; padding: 0 18px; display: inline-flex; align-items: center; justify-content: center; gap: 9px; border: 1px solid var(--ink); border-radius: 6px; background: transparent; color: var(--ink); font-size: 13px; font-weight: 800; cursor: pointer; transition: transform .2s, background-color .2s, color .2s; }
+.artwork-detail-actions button:hover { transform: translateY(-2px); }
+.artwork-detail-actions button.primary { background: var(--ink); color: #fff; }
+.artwork-detail-actions button span { color: var(--gold); font-size: 18px; }
 .artwork-description-card { margin-top: 20px; padding: 30px; border: 1px solid var(--line); border-radius: 8px; background: rgba(255,255,255,.3); }
 .artwork-description-card h3 { margin: 10px 0 18px; font-family: Georgia, "Noto Serif KR", serif; font-size: 25px; font-weight: 400; }
 .artwork-description-card p { margin: 0; color: #625f58; font-size: 14px; line-height: 1.9; white-space: pre-line; }
@@ -327,11 +334,13 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--gold); outl
   .artwork-detail-screen { padding-top: 10px; }
   .artwork-detail-header { margin: 0 -16px 22px; padding: 0 12px; background: rgba(244,241,233,.96); position: sticky; top: 68px; z-index: 15; }
   .artwork-detail-header h1 { font-size: 22px; }
-  .artwork-detail-hero { margin: 0 -8px; width: calc(100% + 16px); aspect-ratio: 4 / 3; }
-  .artwork-detail-heading { padding-top: 25px; }
-  .artwork-detail-heading h2 { font-size: 36px; }
-  .artwork-detail-meta-grid { grid-template-columns: 1fr; }
-  .artwork-detail-meta-grid > div { border-right: 0; }
+  .artwork-detail-hero { height: clamp(350px, 48svh, 390px); margin: 0 -8px; width: calc(100% + 16px); border-radius: 0; }
+  .artwork-detail-hero-copy { padding: 22px 20px; }
+  .artwork-detail-hero-copy h2 { font-size: 39px; }
+  .artwork-detail-meta-grid { margin-top: 22px; }
+  .artwork-detail-meta-grid > div { padding: 8px 0; grid-template-columns: 70px minmax(0, 1fr); gap: 8px; }
+  .artwork-detail-meta-grid dd { font-size: 14px; }
+  .artwork-detail-actions button { min-height: 56px; padding: 0 10px; font-size: 12px; }
   .artwork-description-card { padding: 24px 20px; }
 }
 
