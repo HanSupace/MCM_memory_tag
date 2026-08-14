@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useState } from "react";
 import Image from "next/image";
+import { AiDocentPanel } from "../components/AiDocentPanel";
 
 type ExhibitionStatus = "upcoming" | "ongoing" | "ended";
 
@@ -55,6 +56,7 @@ export function ExhibitionDetailScreen({
   const [exhibition, setExhibition] = useState<ExhibitionDetail | null>(null);
   const [error, setError] = useState("");
   const [selectedArtworkId, setSelectedArtworkId] = useState<string | null>(null);
+  const [showDocentPanel, setShowDocentPanel] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -150,11 +152,20 @@ export function ExhibitionDetailScreen({
               <span aria-hidden="true">＋</span>
               내 컬렉션에 담기
             </button>
-            <button type="button" className="primary" onClick={() => announce("AI 작품 대화 기능은 다음 단계에서 연결됩니다.")}>
+            <button type="button" className="primary" onClick={() => setShowDocentPanel(true)}>
               <span aria-hidden="true">✦</span>
               AI와 대화하기
             </button>
           </div>
+
+          {showDocentPanel && (
+            <AiDocentPanel
+              exhibitionArtworkId={selectedArtwork.exhibitionArtworkId}
+              artworkTitle={selectedArtwork.title}
+              announce={announce}
+              onClose={() => setShowDocentPanel(false)}
+            />
+          )}
 
           <article className="artwork-description-card">
             <span className="section-kicker">ABOUT THE WORK</span>
