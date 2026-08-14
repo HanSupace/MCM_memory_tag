@@ -186,7 +186,9 @@ erDiagram
 | id | bigserial PK | |
 | user_id | bigint FK → app_users | cascade |
 | exhibition_id | bigint FK → exhibitions | cascade |
-| file_ref | text | 사진 파일 참조값 |
+| file_ref | text | 저장 방식 식별값. PostgreSQL 저장 사진은 `postgresql` |
+| image_data | bytea nullable | 촬영/선택한 이미지 바이너리. 기존 행 호환을 위해 nullable |
+| mime_type | varchar(100) nullable | 이미지 Content-Type |
 | analysis_consent | boolean | 사진 분석 활용 동의 여부 (기본 false) |
 | created_at | timestamptz | |
 
@@ -275,10 +277,8 @@ erDiagram
 
 ---
 
-## 이미지 저장소는 아직 미정
+## 이미지 저장 방식
 
-`exhibitions.hero_image_url`, `artworks.image_url`, `gallery_photos.file_ref`는 모두 **사진 파일 자체가 아니라 파일이 있는 위치를 가리키는 문자열(`text`)**만 저장한다. 실제 사진 바이너리는 별도의 오브젝트 스토리지(Cloudflare R2, AWS S3 등)에 저장하고, 그 위치 값만 이 컬럼에 넣는 구조다.
+전시와 작품의 `hero_image_url`, `image_url`은 파일 위치만 저장한다. 사용자가 카메라로 촬영하거나 선택한 사진은 현재 `gallery_photos.image_data`에 `bytea`로 저장하고, `mime_type`으로 응답 형식을 기록한다. 사진 조회 API는 로그인 사용자와 `user_id`가 일치하는 행만 반환한다.
 
-어떤 오브젝트 스토리지를 쓸지는 **배포 플랫폼이 무엇이냐에 따라 달라지고, 아직 결정되지 않았다** (배포 플랫폼 자체도 미정 — Cloudflare Workers / Render 등 검토 중, 관련 논의는 별도 이슈 참고).
-
-이 설계(참조값만 저장)는 어떤 스토리지를 고르든 스키마 변경이 필요 없도록 의도한 것이므로, 배포 플랫폼이 정해지기 전까지 스키마를 먼저 바꿀 필요는 없다. 다만 실제 업로드 기능(사진을 스토리지에 저장하고 참조값을 써넣는 API)은 배포 플랫폼이 정해지기 전까지 구현할 수 없다.
+사진 수와 트래픽이 커지면 바이너리를 오브젝트 스토리지로 옮기고 `file_ref`에 위치를 저장하는 방식으로 확장할 수 있다. 현재 API는 전시별 50장, 파일당 5MB 제한을 적용한다.

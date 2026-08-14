@@ -81,18 +81,12 @@ export function CameraCaptureButton({
     }
 
     try {
-      await saveGalleryPhoto({
-        id: crypto.randomUUID(),
-        exhibitionId: exhibition.id,
-        exhibitionTitle: exhibition.title,
-        blob,
-        createdAt: new Date().toISOString(),
-      });
+      await saveGalleryPhoto(exhibition.id, blob);
       window.dispatchEvent(new Event("mcm-gallery-updated"));
       announce(`${exhibition.title} 사진첩에 저장했습니다.`);
       closeCamera();
-    } catch {
-      setCameraError("사진 저장에 실패했습니다. 잠시 후 다시 시도해 주세요.");
+    } catch (error) {
+      setCameraError(error instanceof Error ? error.message : "사진 저장에 실패했습니다. 잠시 후 다시 시도해 주세요.");
     }
   }
 

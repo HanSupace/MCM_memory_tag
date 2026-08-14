@@ -1,5 +1,11 @@
 import { sql } from "drizzle-orm";
-import { bigserial, bigint, boolean, char, index, jsonb, pgTable, text, timestamp, uniqueIndex, varchar } from "drizzle-orm/pg-core";
+import { bigserial, bigint, boolean, char, customType, index, jsonb, pgTable, text, timestamp, uniqueIndex, varchar } from "drizzle-orm/pg-core";
+
+const bytea = customType<{ data: Buffer }>({
+  dataType() {
+    return "bytea";
+  },
+});
 
 export const users = pgTable(
   "app_users",
@@ -181,6 +187,8 @@ export const galleryPhotos = pgTable(
     userId: bigint("user_id", { mode: "bigint" }).notNull().references(() => users.id, { onDelete: "cascade" }),
     exhibitionId: bigint("exhibition_id", { mode: "bigint" }).notNull().references(() => exhibitions.id, { onDelete: "cascade" }),
     fileRef: text("file_ref").notNull(),
+    imageData: bytea("image_data"),
+    mimeType: varchar("mime_type", { length: 100 }),
     analysisConsent: boolean("analysis_consent").notNull().default(false),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },

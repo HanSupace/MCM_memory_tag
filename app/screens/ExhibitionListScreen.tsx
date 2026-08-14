@@ -38,10 +38,12 @@ export function ExhibitionListScreen({
   announce,
   initialExhibitionId = null,
   onActiveExhibitionChange,
+  onOpenPersonalHall,
 }: {
   announce: (message: string) => void;
   initialExhibitionId?: string | null;
   onActiveExhibitionChange?: (exhibitionId: string | null) => void;
+  onOpenPersonalHall: (exhibitionId: string) => void;
 }) {
   const [exhibitions, setExhibitions] = useState<ExhibitionSummary[] | null>(null);
   const [error, setError] = useState("");
@@ -77,7 +79,12 @@ export function ExhibitionListScreen({
 
   if (selectedId) {
     return (
-      <ExhibitionDetailScreen exhibitionId={selectedId} onBack={() => setSelectedId(null)} announce={announce} />
+      <ExhibitionDetailScreen
+        exhibitionId={selectedId}
+        onBack={() => setSelectedId(null)}
+        onOpenPersonalHall={onOpenPersonalHall}
+        announce={announce}
+      />
     );
   }
 
