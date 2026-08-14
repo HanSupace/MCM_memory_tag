@@ -27,6 +27,7 @@ function MainShell({ user, onLogout }: { user: AuthUser; onLogout: () => Promise
   const [initialExhibitionId, setInitialExhibitionId] = useState<string | null>(null);
   const [activeExhibitionId, setActiveExhibitionId] = useState<string | null>(null);
   const [personalHallExhibitionId, setPersonalHallExhibitionId] = useState<string | null>(null);
+  const [galleryExhibitionId, setGalleryExhibitionId] = useState<string | null>(null);
   const [cameraOpenRequest, setCameraOpenRequest] = useState(0);
   const [notice, setNotice] = useState("");
 
@@ -47,7 +48,10 @@ function MainShell({ user, onLogout }: { user: AuthUser; onLogout: () => Promise
     <ExhibitionListScreen
       announce={announce}
       initialExhibitionId={initialExhibitionId}
-      onActiveExhibitionChange={setActiveExhibitionId}
+      onActiveExhibitionChange={(exhibitionId) => {
+        setActiveExhibitionId(exhibitionId);
+        setCameraOpenRequest(0);
+      }}
       onOpenPersonalHall={(exhibitionId) => {
         setInitialExhibitionId(exhibitionId);
         setPersonalHallExhibitionId(exhibitionId);
@@ -61,7 +65,13 @@ function MainShell({ user, onLogout }: { user: AuthUser; onLogout: () => Promise
       announce={announce}
     />
   ) : activeNav === "사진첩" ? (
-    <GalleryScreen onOpenCamera={() => setCameraOpenRequest((request) => request + 1)} />
+    <GalleryScreen
+      onOpenCamera={() => setCameraOpenRequest((request) => request + 1)}
+      onSelectedExhibitionChange={(exhibitionId) => {
+        setGalleryExhibitionId(exhibitionId);
+        setCameraOpenRequest(0);
+      }}
+    />
   ) : activeNav === "맞춤 추천" ? (
     <ProductCurationScreen announce={announce} />
   ) : (
@@ -84,12 +94,14 @@ function MainShell({ user, onLogout }: { user: AuthUser; onLogout: () => Promise
 
       {screen}
 
-      <CameraCaptureButton
-        key={cameraOpenRequest}
-        activeExhibitionId={activeNav === "전시" ? activeExhibitionId : null}
-        initiallyOpen={cameraOpenRequest > 0}
-        announce={announce}
-      />
+      {(activeNav === "전시" ? activeExhibitionId : activeNav === "사진첩" ? galleryExhibitionId : null) && (
+        <CameraCaptureButton
+          key={cameraOpenRequest}
+          activeExhibitionId={activeNav === "전시" ? activeExhibitionId : galleryExhibitionId}
+          initiallyOpen={cameraOpenRequest > 0}
+          announce={announce}
+        />
+      )}
 
       <nav className="bottom-nav" aria-label="주 메뉴">
         {navItems.map((key) => (
@@ -100,6 +112,7 @@ function MainShell({ user, onLogout }: { user: AuthUser; onLogout: () => Promise
             onClick={() => {
               if (key === "전시") setInitialExhibitionId(null);
               if (key !== "전시") setActiveExhibitionId(null);
+              if (key !== "사진첩") setGalleryExhibitionId(null);
               setActiveNav(key);
             }}
           >
