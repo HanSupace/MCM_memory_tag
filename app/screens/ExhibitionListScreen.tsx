@@ -37,15 +37,22 @@ function formatDateRange(startAt: string, endAt: string) {
 export function ExhibitionListScreen({
   announce,
   initialExhibitionId = null,
+  onActiveExhibitionChange,
 }: {
   announce: (message: string) => void;
   initialExhibitionId?: string | null;
+  onActiveExhibitionChange?: (exhibitionId: string | null) => void;
 }) {
   const [exhibitions, setExhibitions] = useState<ExhibitionSummary[] | null>(null);
   const [error, setError] = useState("");
   const [filter, setFilter] = useState<"all" | ExhibitionStatus>("all");
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(initialExhibitionId);
+
+  useEffect(() => {
+    onActiveExhibitionChange?.(selectedId);
+    return () => onActiveExhibitionChange?.(null);
+  }, [onActiveExhibitionChange, selectedId]);
 
   useEffect(() => {
     let active = true;
