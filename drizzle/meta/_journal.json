@@ -15,6 +15,20 @@
       "when": 1786258215452,
       "tag": "0001_great_arclight",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1786543872749,
+      "tag": "0002_tiny_vargas",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1786546634156,
+      "tag": "0003_known_blockbuster",
+      "breakpoints": true
     }
   ]
 }
