@@ -348,6 +348,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--gold); outl
 .personal-hall-heading { margin-bottom: 34px; display: grid; grid-template-columns: 44px 1fr; align-items: start; gap: 14px; }
 .personal-hall-heading h1 { margin: 8px 0 10px; font-family: Georgia, "Noto Serif KR", serif; font-size: clamp(34px, 5vw, 54px); line-height: 1; font-weight: 400; letter-spacing: -.045em; }
 .personal-hall-heading p { max-width: 460px; margin: 0; color: var(--muted); font-size: 12px; line-height: 1.7; }
+.personal-hall-collect-button { min-height: 42px; margin-top: 18px; padding: 0 18px; border: 1px solid var(--ink); border-radius: 5px; background: var(--ink); color: #fff; font-size: 11px; font-weight: 800; cursor: pointer; }
 .personal-hall-empty { min-height: 360px; padding: 48px 24px; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 1px dashed #b9a27b; border-radius: 10px; background: #ece5d8; text-align: center; }
 .personal-hall-empty .hall-grid-symbol { width: 42px; height: 42px; margin-bottom: 22px; }
 .personal-hall-empty h2 { margin: 0 0 10px; font-family: Georgia, "Noto Serif KR", serif; font-size: 25px; font-weight: 400; }

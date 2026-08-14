@@ -1,20 +1,42 @@
 import { useEffect, useLayoutEffect, useState } from "react";
 import Image from "next/image";
+import { CollectArtworkPanel, type CollectedArtwork } from "../components/CollectArtworkPanel";
 import {
   COLLECTION_UPDATED_EVENT,
   listCollectionItems,
   type CollectionItem,
 } from "../../lib/collection-storage";
 
-export function PersonalHallScreen({ exhibitionId, onBack }: { exhibitionId: string | null; onBack: () => void }) {
+export function PersonalHallScreen({
+  exhibitionId,
+  onBack,
+  announce,
+}: {
+  exhibitionId: string | null;
+  onBack: () => void;
+  announce: (message: string) => void;
+}) {
   const [items, setItems] = useState<CollectionItem[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [showCollectPanel, setShowCollectPanel] = useState(false);
+
+  async function loadItems() {
+    try {
+      const nextItems = await listCollectionItems();
+      setItems(nextItems);
+      setError("");
+    } catch (loadError) {
+      setError(loadError instanceof Error ? loadError.message : "전시회장을 불러오지 못했습니다.");
+    } finally {
+      setLoading(false);
+    }
+  }
 
   useEffect(() => {
     let active = true;
-    const loadItems = async () => {
+    const refreshItems = async () => {
       try {
         const nextItems = await listCollectionItems();
         if (active) {
@@ -27,14 +49,20 @@ export function PersonalHallScreen({ exhibitionId, onBack }: { exhibitionId: str
         if (active) setLoading(false);
       }
     };
-    void loadItems();
-    const handleUpdate = () => void loadItems();
+    void refreshItems();
+    const handleUpdate = () => void refreshItems();
     window.addEventListener(COLLECTION_UPDATED_EVENT, handleUpdate);
     return () => {
       active = false;
       window.removeEventListener(COLLECTION_UPDATED_EVENT, handleUpdate);
     };
   }, []);
+
+  function handleCollected(artwork: CollectedArtwork) {
+    announce(`${artwork.title} 작품을 수집했습니다.`);
+    setShowCollectPanel(false);
+    void loadItems();
+  }
 
   useLayoutEffect(() => {
     if (!selectedId) return;
@@ -130,6 +158,13 @@ export function PersonalHallScreen({ exhibitionId, onBack }: { exhibitionId: str
             <span className="section-kicker">MY EXHIBITION HALL</span>
             <h1>나만의 전시회장</h1>
             <p>{exhibitionTitle}에서 마음에 담은 작품과 기록을 모았습니다.</p>
+            <button
+              type="button"
+              className="personal-hall-collect-button"
+              onClick={() => setShowCollectPanel(true)}
+            >
+              작품 QR·NFC로 수집하기
+            </button>
           </div>
         </header>
 
@@ -179,6 +214,14 @@ export function PersonalHallScreen({ exhibitionId, onBack }: { exhibitionId: str
           </>
         ) : null}
       </section>
+
+      {showCollectPanel && (
+        <CollectArtworkPanel
+          announce={announce}
+          onClose={() => setShowCollectPanel(false)}
+          onCollected={handleCollected}
+        />
+      )}
     </div>
   );
 }

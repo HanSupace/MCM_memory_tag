@@ -58,6 +58,7 @@ function MainShell({ user, onLogout }: { user: AuthUser; onLogout: () => Promise
     <PersonalHallScreen
       exhibitionId={personalHallExhibitionId}
       onBack={() => setActiveNav("전시")}
+      announce={announce}
     />
   ) : activeNav === "사진첩" ? (
     <GalleryScreen onOpenCamera={() => setCameraOpenRequest((request) => request + 1)} />

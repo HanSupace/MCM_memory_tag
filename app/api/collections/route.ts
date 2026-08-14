@@ -54,15 +54,15 @@ const collectionSelect = `
          a.image_url,
          ea.collect_identifier,
          COALESCE(a.base_description, ea.exhibition_description) AS description,
-         n.content AS review,
+         COALESCE(n.content, '') AS review,
          c.collected_at AS created_at,
-         n.updated_at
+         COALESCE(n.updated_at, c.collected_at) AS updated_at
   FROM collections c
   JOIN exhibition_artworks ea ON ea.id = c.exhibition_artwork_id
   JOIN exhibitions e ON e.id = ea.exhibition_id
   JOIN artworks a ON a.id = ea.artwork_id
   LEFT JOIN artists ar ON ar.id = a.artist_id
-  JOIN notes n ON n.user_id = c.user_id AND n.exhibition_artwork_id = c.exhibition_artwork_id`;
+  LEFT JOIN notes n ON n.user_id = c.user_id AND n.exhibition_artwork_id = c.exhibition_artwork_id`;
 
 export async function GET(request: NextRequest) {
   const user = await currentUser(request);
@@ -70,7 +70,7 @@ export async function GET(request: NextRequest) {
 
   try {
     const result = await getDb().query<CollectionRow>(
-      `${collectionSelect} WHERE c.user_id = $1 ORDER BY n.updated_at DESC`,
+      `${collectionSelect} WHERE c.user_id = $1 ORDER BY COALESCE(n.updated_at, c.collected_at) DESC`,
       [user.id],
     );
     return NextResponse.json({ items: result.rows.map(serialize) }, { headers: { "Cache-Control": "no-store" } });
