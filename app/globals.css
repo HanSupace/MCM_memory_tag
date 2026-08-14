@@ -170,12 +170,41 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--gold); outl
 .toast { position: fixed; z-index: 40; left: 50%; bottom: 104px; transform: translate(-50%, 18px); padding: 12px 17px; border-radius: 999px; background: var(--ink); color: #fff; font-size: 11px; opacity: 0; pointer-events: none; transition: opacity .25s, transform .25s; box-shadow: 0 10px 28px rgba(0,0,0,.24); }
 .toast.visible { opacity: 1; transform: translate(-50%, 0); }
 
+.search-input { width: 100%; height: 48px; margin-bottom: 16px; border: 1px solid var(--line); border-radius: 2px; background: transparent; padding: 0 16px; color: var(--ink); }
+.search-input::placeholder { color: #aaa69c; }
+.search-input:focus { border-color: var(--ink); outline: none; }
+.filter-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; }
+.filter-chip { height: 34px; padding: 0 16px; border: 1px solid var(--line); border-radius: 999px; background: transparent; color: var(--muted); font-size: 12px; font-weight: 700; cursor: pointer; transition: background .2s, color .2s, border-color .2s; }
+.filter-chip.active { border-color: var(--ink); background: var(--ink); color: #fff; }
+.exhibition-list-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.exhibition-list-card { display: block; width: 100%; border: 0; background: none; padding: 0; text-align: left; cursor: pointer; }
+.art-placeholder { background: linear-gradient(135deg, #2a2621 0%, #6b5a45 55%, #a98445 100%); }
+.status-chip.static { position: static; display: inline-block; }
+.detail-back-button { border: 0; background: none; padding: 0 0 24px; color: var(--muted); font-size: 12px; font-weight: 700; cursor: pointer; }
+.detail-hero { height: 280px; margin-bottom: 24px; }
+.detail-status-row { margin-bottom: 12px; }
+.detail-title { margin: 0 0 14px; font-family: Georgia, "Noto Serif KR", serif; font-size: 32px; font-weight: 400; letter-spacing: -.03em; }
+.detail-meta-row { display: flex; align-items: center; gap: 14px; margin-bottom: 6px; font-size: 13px; color: var(--muted); }
+.text-link-button { border: 0; border-bottom: 1px solid currentColor; background: none; padding: 0; color: var(--ink); font-size: 12px; font-weight: 700; cursor: pointer; }
+.detail-meta-line { margin: 0 0 4px; font-size: 13px; color: var(--muted); }
+.detail-info-box { margin-top: 28px; padding: 24px; border: 1px solid var(--line); }
+.detail-info-box h2 { margin: 0 0 14px; font-family: Georgia, "Noto Serif KR", serif; font-size: 19px; font-weight: 400; }
+.detail-info-box p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.7; }
+.artist-list { display: grid; gap: 14px; margin: 0; padding: 0; list-style: none; }
+.artist-row { display: flex; align-items: center; gap: 12px; font-size: 13px; }
+.artist-avatar { width: 32px; height: 32px; display: grid; place-items: center; border-radius: 50%; background: var(--ink); color: #fff; font-family: Georgia, serif; font-size: 12px; flex-shrink: 0; }
+.stat-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
+.stat-row:last-of-type { border-bottom: 0; }
+.detail-hint { margin-top: 12px !important; font-size: 11px !important; }
+.detail-cta { width: 100%; margin: 28px 0 8px; }
+
 @media (max-width: 900px) {
   .login-heading { margin: 45px 0 30px; }
   .login-heading h1 { font-size: 38px; }
   .exhibition-grid { grid-template-columns: 1fr 1fr; }
   .exhibition-art { height: 260px; }
   .keyring-card { padding: 40px; }
+  .exhibition-list-grid { grid-template-columns: 1fr 1fr; }
 }
 
 @media (max-width: 640px) {
@@ -215,6 +244,8 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--gold); outl
   .product-card { flex: 0 0 82%; scroll-snap-align: start; }
   .product-art { height: 310px; }
   .bottom-nav { bottom: 10px; height: 64px; border-radius: 18px; }
+  .exhibition-list-grid { grid-template-columns: 1fr; }
+  .detail-title { font-size: 26px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

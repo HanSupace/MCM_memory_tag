@@ -15,6 +15,7 @@ erDiagram
     app_users ||--o{ product_recommendations : "추천받음"
     app_users ||--o{ content_unlocks : "공개받음"
     app_users ||--o{ consents : "동의"
+    app_users ||--o{ social_accounts : "소셜 로그인"
     app_users ||--o{ exhibitions : "등록(운영자)"
 
     exhibitions ||--o{ exhibition_artists : ""
@@ -38,7 +39,7 @@ erDiagram
 |---|---|---|
 | id | bigserial PK | |
 | username | varchar(20) | 대소문자 무시 unique |
-| password_hash | text | bcrypt 해시 |
+| password_hash | text nullable | 로컬 계정의 bcrypt 해시. 소셜 전용 계정은 null |
 | role | varchar(20) | `visitor` \| `exhibition_operator` \| `content_operator`. **이번에 추가됨** — Issue #16/#17(운영자 화면)의 권한 체크 근거 |
 | created_at | timestamptz | |
 
@@ -50,6 +51,20 @@ erDiagram
 | token_hash | char(64) unique | |
 | expires_at | timestamptz | |
 | created_at | timestamptz | |
+
+### `social_accounts`
+| 컬럼 | 타입 | 설명 |
+|---|---|---|
+| id | bigserial PK | |
+| user_id | bigint FK → app_users | cascade delete |
+| provider | varchar(20) | `kakao` |
+| provider_user_id | varchar(255) | 제공자가 발급한 사용자 고유 ID |
+| email | varchar(320) nullable | 제공자가 동의 범위에서 반환한 이메일 |
+| display_name | varchar(120) nullable | 제공자가 반환한 닉네임/이름 |
+| profile_image_url | text nullable | 제공자가 반환한 프로필 이미지 URL |
+| created_at / updated_at | timestamptz | |
+
+`(provider, provider_user_id)` 조합은 unique다. OAuth access/refresh token은 저장하지 않는다.
 
 ---
 

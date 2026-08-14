@@ -6,7 +6,7 @@ export const users = pgTable(
   {
     id: bigserial("id", { mode: "bigint" }).primaryKey(),
     username: varchar("username", { length: 20 }).notNull(),
-    passwordHash: text("password_hash").notNull(),
+    passwordHash: text("password_hash"),
     // visitor | exhibition_operator | content_operator (PRD 역할: 방문 고객 / 전시 운영자 / MCM 콘텐츠 운영자)
     role: varchar("role", { length: 20 }).notNull().default("visitor"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
@@ -26,6 +26,25 @@ export const sessions = pgTable(
   (table) => [
     index("auth_sessions_user_id_idx").on(table.userId),
     index("auth_sessions_expires_at_idx").on(table.expiresAt),
+  ],
+);
+
+export const socialAccounts = pgTable(
+  "social_accounts",
+  {
+    id: bigserial("id", { mode: "bigint" }).primaryKey(),
+    userId: bigint("user_id", { mode: "bigint" }).notNull().references(() => users.id, { onDelete: "cascade" }),
+    provider: varchar("provider", { length: 20 }).notNull(),
+    providerUserId: varchar("provider_user_id", { length: 255 }).notNull(),
+    email: varchar("email", { length: 320 }),
+    displayName: varchar("display_name", { length: 120 }),
+    profileImageUrl: text("profile_image_url"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("social_accounts_user_id_idx").on(table.userId),
+    uniqueIndex("social_accounts_provider_user_unique").on(table.provider, table.providerUserId),
   ],
 );
 
