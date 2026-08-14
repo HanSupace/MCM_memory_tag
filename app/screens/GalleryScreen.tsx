@@ -1,25 +1,19 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { listGalleryPhotos, type LocalGalleryPhoto } from "../../lib/gallery-storage";
-
-type GalleryPhotoView = LocalGalleryPhoto & { objectUrl: string };
+import { listGalleryPhotos, type GalleryPhoto } from "../../lib/gallery-storage";
 
 export function GalleryScreen({ onOpenCamera }: { onOpenCamera: () => void }) {
-  const [photos, setPhotos] = useState<GalleryPhotoView[]>([]);
+  const [photos, setPhotos] = useState<GalleryPhoto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
     let active = true;
-    let objectUrls: string[] = [];
-
     async function loadPhotos() {
       try {
         const storedPhotos = await listGalleryPhotos();
         if (!active) return;
-        objectUrls.forEach((url) => URL.revokeObjectURL(url));
-        objectUrls = storedPhotos.map((photo) => URL.createObjectURL(photo.blob));
-        setPhotos(storedPhotos.map((photo, index) => ({ ...photo, objectUrl: objectUrls[index] })));
+        setPhotos(storedPhotos);
         setError("");
       } catch {
         if (active) setError("사진첩을 불러오지 못했습니다.");
@@ -34,11 +28,10 @@ export function GalleryScreen({ onOpenCamera }: { onOpenCamera: () => void }) {
     return () => {
       active = false;
       window.removeEventListener("mcm-gallery-updated", loadPhotos);
-      objectUrls.forEach((url) => URL.revokeObjectURL(url));
     };
   }, []);
 
-  const groupedPhotos = photos.reduce<Array<{ exhibitionId: string; title: string; photos: GalleryPhotoView[] }>>(
+  const groupedPhotos = photos.reduce<Array<{ exhibitionId: string; title: string; photos: GalleryPhoto[] }>>(
     (groups, photo) => {
       const group = groups.find((item) => item.exhibitionId === photo.exhibitionId);
       if (group) group.photos.push(photo);
@@ -83,7 +76,7 @@ export function GalleryScreen({ onOpenCamera }: { onOpenCamera: () => void }) {
                 <figure key={photo.id}>
                   <span className="gallery-photo-frame">
                     <Image
-                      src={photo.objectUrl}
+                      src={photo.imageUrl}
                       alt={`${photo.exhibitionTitle}에서 촬영한 사진`}
                       fill
                       unoptimized

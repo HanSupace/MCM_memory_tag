@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useState } from "react";
 import Image from "next/image";
 import { AiDocentPanel } from "../components/AiDocentPanel";
+import { getCollectionItem, saveCollectionItem } from "../../lib/collection-storage";
 
 type ExhibitionStatus = "upcoming" | "ongoing" | "ended";
 
@@ -47,16 +48,22 @@ function formatDate(value: string) {
 export function ExhibitionDetailScreen({
   exhibitionId,
   onBack,
+  onOpenPersonalHall,
   announce,
 }: {
   exhibitionId: string;
   onBack: () => void;
+  onOpenPersonalHall: (exhibitionId: string) => void;
   announce: (message: string) => void;
 }) {
   const [exhibition, setExhibition] = useState<ExhibitionDetail | null>(null);
   const [error, setError] = useState("");
   const [selectedArtworkId, setSelectedArtworkId] = useState<string | null>(null);
   const [showDocentPanel, setShowDocentPanel] = useState(false);
+  const [showCollectionForm, setShowCollectionForm] = useState(false);
+  const [collectionReview, setCollectionReview] = useState("");
+  const [isCollected, setIsCollected] = useState(false);
+  const [isSavingCollection, setIsSavingCollection] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -99,7 +106,63 @@ export function ExhibitionDetailScreen({
     };
   }, [selectedArtworkId]);
 
+  useEffect(() => {
+    if (!showCollectionForm) return;
+    const previousOverflow = document.body.style.overflow;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setShowCollectionForm(false);
+    };
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [showCollectionForm]);
+
   const selectedArtwork = exhibition?.artworks.find((artwork) => artwork.id === selectedArtworkId) ?? null;
+
+  async function openArtwork(artwork: ArtworkSummary) {
+    setSelectedArtworkId(artwork.id);
+    setCollectionReview("");
+    setIsCollected(false);
+    setShowCollectionForm(false);
+    try {
+      const storedItem = await getCollectionItem(artwork.exhibitionArtworkId);
+      setCollectionReview(storedItem?.review ?? "");
+      setIsCollected(Boolean(storedItem));
+    } catch {
+      // 작품 상세는 계속 보여주고 저장 시 서버 오류 메시지를 안내한다.
+    }
+  }
+
+  function closeArtwork() {
+    setSelectedArtworkId(null);
+    setCollectionReview("");
+    setIsCollected(false);
+    setShowCollectionForm(false);
+  }
+
+  async function submitCollectionReview(event: React.FormEvent) {
+    event.preventDefault();
+    const review = collectionReview.trim();
+    if (!exhibition || !selectedArtwork || !review) {
+      announce("한 줄 평을 입력해 주세요.");
+      return;
+    }
+
+    setIsSavingCollection(true);
+    try {
+      await saveCollectionItem({ exhibitionArtworkId: selectedArtwork.exhibitionArtworkId, review });
+      setIsCollected(true);
+      setShowCollectionForm(false);
+      announce("작품과 한 줄 평을 나만의 전시회장에 담았습니다.");
+    } catch (error) {
+      announce(error instanceof Error ? error.message : "컬렉션을 저장하지 못했습니다.");
+    } finally {
+      setIsSavingCollection(false);
+    }
+  }
 
   if (exhibition && selectedArtwork) {
     return (
@@ -109,7 +172,7 @@ export function ExhibitionDetailScreen({
             <button
               type="button"
               className="round-back-button"
-              onClick={() => setSelectedArtworkId(null)}
+              onClick={closeArtwork}
               aria-label="작품 목록으로 돌아가기"
             >
               ←
@@ -148,15 +211,64 @@ export function ExhibitionDetailScreen({
           </div>
 
           <div className="artwork-detail-actions" aria-label="작품 기능">
-            <button type="button" onClick={() => announce("내 컬렉션 담기 기능은 다음 단계에서 연결됩니다.")}>
-              <span aria-hidden="true">＋</span>
-              내 컬렉션에 담기
+            <button type="button" className={isCollected ? "collected" : ""} onClick={() => setShowCollectionForm(true)}>
+              <span aria-hidden="true">{isCollected ? "✓" : "＋"}</span>
+              {isCollected ? "한 줄 평 수정하기" : "내 컬렉션에 담기"}
             </button>
             <button type="button" className="primary" onClick={() => setShowDocentPanel(true)}>
               <span aria-hidden="true">✦</span>
               AI와 대화하기
             </button>
           </div>
+
+          {showCollectionForm && (
+            <div
+              className="collection-modal-backdrop"
+              role="presentation"
+              onMouseDown={(event) => {
+                if (event.target === event.currentTarget) setShowCollectionForm(false);
+              }}
+            >
+              <form
+                className="collection-review-form collection-review-modal"
+                onSubmit={submitCollectionReview}
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="collection-modal-title"
+              >
+                <button
+                  type="button"
+                  className="collection-modal-close"
+                  onClick={() => setShowCollectionForm(false)}
+                  aria-label="컬렉션 팝업 닫기"
+                >
+                  ×
+                </button>
+                <div>
+                  <span className="section-kicker">MY COMMENT</span>
+                  <h3 id="collection-modal-title">{isCollected ? "한 줄 평 수정하기" : "컬렉션에 담기"}</h3>
+                  <p>{selectedArtwork.title}을 기억할 나만의 문장을 남겨보세요.</p>
+                </div>
+                <label>
+                  <span className="sr-only">작품 한 줄 평</span>
+                  <input
+                    type="text"
+                    value={collectionReview}
+                    maxLength={80}
+                    placeholder="예: 익숙한 물건이 새로운 공간으로 보였다."
+                    onChange={(event) => setCollectionReview(event.target.value)}
+                  />
+                  <small>{collectionReview.length}/80</small>
+                </label>
+                <div className="collection-review-actions">
+                  <button type="button" onClick={() => setShowCollectionForm(false)}>취소</button>
+                  <button type="submit" className="primary" disabled={!collectionReview.trim() || isSavingCollection}>
+                    {isSavingCollection ? "저장 중…" : "전시회장에 담기"}
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
 
           {showDocentPanel && (
             <AiDocentPanel
@@ -194,8 +306,14 @@ export function ExhibitionDetailScreen({
             <span className="section-kicker">EXHIBITION</span>
             <h1>전시 작품</h1>
           </div>
-          <button type="button" className="qr-header-button" onClick={() => announce("작품 QR 스캔 기능은 다음 단계에서 연결됩니다.")}>
-            <span aria-hidden="true">▦</span> QR
+          <button
+            type="button"
+            className="personal-hall-header-button"
+            onClick={() => onOpenPersonalHall(exhibitionId)}
+            aria-label={`${exhibition?.title ?? "현재 전시"} 나만의 전시회장 열기`}
+          >
+            <span className="hall-grid-symbol" aria-hidden="true" />
+            <span><small>MY HALL</small><strong>전시회장</strong></span>
           </button>
         </div>
 
@@ -230,7 +348,7 @@ export function ExhibitionDetailScreen({
                     type="button"
                     className="artwork-card"
                     key={artwork.exhibitionArtworkId}
-                    onClick={() => setSelectedArtworkId(artwork.id)}
+                    onClick={() => void openArtwork(artwork)}
                   >
                     <span
                       className={`artwork-image${artwork.imageUrl ? " has-image" : ` artwork-image-${(index % 4) + 1}`}`}

@@ -152,7 +152,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--gold); outl
 .product-info small { color: var(--gold); font-size: 9px; letter-spacing: .12em; }
 .product-info h3 { margin: 6px 0; font-family: Georgia, "Noto Serif KR", serif; font-size: 22px; font-weight: 400; }
 .product-info p { min-height: 34px; margin: 0 0 18px; color: var(--muted); font-size: 11px; line-height: 1.55; }
-.bottom-nav { position: fixed; z-index: 30; left: 50%; bottom: 18px; transform: translateX(-50%); width: min(560px, calc(100% - 32px)); height: 68px; padding: 7px 8px; display: grid; grid-template-columns: repeat(6, 1fr); border: 1px solid rgba(255,255,255,.15); border-radius: 20px; background: rgba(21,21,19,.94); box-shadow: 0 16px 40px rgba(0,0,0,.28); backdrop-filter: blur(20px); }
+.bottom-nav { position: fixed; z-index: 30; left: 50%; bottom: 18px; transform: translateX(-50%); width: min(560px, calc(100% - 32px)); height: 68px; padding: 7px 8px; display: grid; grid-template-columns: repeat(5, 1fr); border: 1px solid rgba(255,255,255,.15); border-radius: 20px; background: rgba(21,21,19,.94); box-shadow: 0 16px 40px rgba(0,0,0,.28); backdrop-filter: blur(20px); }
 .bottom-nav button { display: grid; place-items: center; gap: 3px; border: 0; background: none; color: rgba(255,255,255,.48); font-size: 9px; cursor: pointer; }
 .bottom-nav button.active { color: #e6c58c; }
 .nav-icon { position: relative; width: 20px; height: 19px; display: block; }
@@ -256,6 +256,11 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--gold); outl
 .explore-titlebar h1 { margin: 5px 0 0; font-family: Georgia, "Noto Serif KR", serif; font-size: 31px; line-height: 1; font-weight: 400; letter-spacing: -.045em; }
 .qr-header-button { height: 48px; padding: 0 15px; display: inline-flex; align-items: center; gap: 8px; border: 0; border-radius: 5px; background: var(--ink); color: white; font-size: 12px; font-weight: 800; cursor: pointer; }
 .qr-header-button span { font-size: 23px; line-height: 1; }
+.personal-hall-header-button { min-width: 112px; height: 52px; padding: 0 13px; display: inline-flex; align-items: center; justify-content: center; gap: 10px; border: 1px solid rgba(255,255,255,.16); border-radius: 8px; background: var(--ink); color: #fff; cursor: pointer; box-shadow: 0 8px 20px rgba(20,18,14,.14); }
+.personal-hall-header-button > span:last-child { display: grid; gap: 2px; text-align: left; }
+.personal-hall-header-button small { color: #c6a36c; font-size: 7px; letter-spacing: .12em; }
+.personal-hall-header-button strong { font-size: 11px; white-space: nowrap; }
+.hall-grid-symbol { width: 23px; height: 23px; flex: 0 0 auto; border: 2px solid currentColor; background: linear-gradient(90deg, transparent 28%, currentColor 29% 36%, transparent 37% 63%, currentColor 64% 71%, transparent 72%), linear-gradient(0deg, transparent 28%, currentColor 29% 36%, transparent 37% 63%, currentColor 64% 71%, transparent 72%); color: #d6b374; }
 .explore-search { height: 52px; display: flex; align-items: center; gap: 13px; margin-bottom: 14px; padding: 0 18px; border-radius: 7px; background: #e9e4da; }
 .explore-search input { width: 100%; height: 100%; border: 0; outline: 0; background: transparent; color: var(--ink); }
 .explore-search input::placeholder { color: #8c877c; }
@@ -265,8 +270,8 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--gold); outl
 .explore-card-grid .exhibition-art { height: 250px; background-size: cover; background-position: center; }
 .explore-card-grid .exhibition-card-body { background: #ebe5da; }
 .explore-card-action { display: flex; justify-content: space-between; padding-top: 15px; border-top: 1px solid var(--line); font-size: 11px; font-weight: 800; }
-.detail-titlebar { grid-template-columns: 42px 1fr auto; }
-.detail-titlebar > div { text-align: center; }
+.detail-titlebar { width: 100%; grid-template-columns: 42px minmax(0, 1fr) auto; }
+.detail-titlebar > div { min-width: 0; text-align: center; }
 .round-back-button { width: 42px; height: 42px; border: 0; background: transparent; font-size: 25px; cursor: pointer; }
 .selected-exhibition-summary { padding: 20px; display: flex; justify-content: space-between; align-items: center; gap: 18px; border-radius: 7px; background: #e9e4da; }
 .selected-exhibition-summary h2 { margin: 0 0 6px; font-family: Georgia, "Noto Serif KR", serif; font-size: 20px; font-weight: 400; }
@@ -317,11 +322,58 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--gold); outl
 .artwork-detail-actions button { min-height: 58px; padding: 0 18px; display: inline-flex; align-items: center; justify-content: center; gap: 9px; border: 1px solid var(--ink); border-radius: 6px; background: transparent; color: var(--ink); font-size: 13px; font-weight: 800; cursor: pointer; transition: transform .2s, background-color .2s, color .2s; }
 .artwork-detail-actions button:hover { transform: translateY(-2px); }
 .artwork-detail-actions button.primary { background: var(--ink); color: #fff; }
+.artwork-detail-actions button.collected { border-color: var(--gold); background: #e9e1d2; }
 .artwork-detail-actions button span { color: var(--gold); font-size: 18px; }
+.collection-review-form { margin: -10px 0 30px; padding: 24px; display: grid; gap: 18px; border: 1px solid #c7b18b; border-radius: 8px; background: #eee7da; box-shadow: 0 14px 32px rgba(43,36,25,.08); }
+.collection-modal-backdrop { position: fixed; z-index: 80; inset: 0; padding: 24px; display: grid; place-items: center; background: rgba(12,11,9,.7); backdrop-filter: blur(7px); }
+.collection-review-form.collection-review-modal { position: relative; width: min(100%, 480px); max-height: calc(100svh - 48px); margin: 0; padding: 30px; overflow-y: auto; border-radius: 12px; box-shadow: 0 30px 90px rgba(0,0,0,.38); }
+.collection-modal-close { position: absolute; top: 14px; right: 14px; width: 34px; height: 34px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 50%; background: transparent; color: var(--ink); font-size: 23px; line-height: 1; cursor: pointer; }
+.collection-review-form h3 { margin: 7px 0 4px; font-family: Georgia, "Noto Serif KR", serif; font-size: 23px; font-weight: 400; }
+.collection-review-form p { margin: 0; color: var(--muted); font-size: 11px; }
+.collection-review-form label { position: relative; display: block; }
+.collection-review-form input { width: 100%; height: 52px; padding: 0 54px 0 15px; border: 1px solid var(--line); border-radius: 5px; outline: 0; background: #fff; color: var(--ink); font-size: 13px; }
+.collection-review-form input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(174,138,78,.12); }
+.collection-review-form label > small { position: absolute; right: 13px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 9px; }
+.collection-review-actions { display: flex; justify-content: flex-end; gap: 8px; }
+.collection-review-actions button { min-height: 42px; padding: 0 16px; border: 1px solid var(--ink); border-radius: 5px; background: transparent; color: var(--ink); font-size: 11px; font-weight: 800; cursor: pointer; }
+.collection-review-actions button.primary { background: var(--ink); color: #fff; }
+.collection-review-actions button:disabled { opacity: .4; cursor: default; }
 .artwork-description-card { margin-top: 20px; padding: 30px; border: 1px solid var(--line); border-radius: 8px; background: rgba(255,255,255,.3); }
 .artwork-description-card h3 { margin: 10px 0 18px; font-family: Georgia, "Noto Serif KR", serif; font-size: 25px; font-weight: 400; }
 .artwork-description-card p { margin: 0; color: #625f58; font-size: 14px; line-height: 1.9; white-space: pre-line; }
 .appreciation-card { background: #e9e2d5; }
+
+/* Personal exhibition hall */
+.personal-hall-screen { padding: 36px 0 128px; }
+.personal-hall-heading { margin-bottom: 34px; display: grid; grid-template-columns: 44px 1fr; align-items: start; gap: 14px; }
+.personal-hall-heading h1 { margin: 8px 0 10px; font-family: Georgia, "Noto Serif KR", serif; font-size: clamp(34px, 5vw, 54px); line-height: 1; font-weight: 400; letter-spacing: -.045em; }
+.personal-hall-heading p { max-width: 460px; margin: 0; color: var(--muted); font-size: 12px; line-height: 1.7; }
+.personal-hall-empty { min-height: 360px; padding: 48px 24px; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 1px dashed #b9a27b; border-radius: 10px; background: #ece5d8; text-align: center; }
+.personal-hall-empty .hall-grid-symbol { width: 42px; height: 42px; margin-bottom: 22px; }
+.personal-hall-empty h2 { margin: 0 0 10px; font-family: Georgia, "Noto Serif KR", serif; font-size: 25px; font-weight: 400; }
+.personal-hall-empty p { max-width: 360px; margin: 0 0 24px; color: var(--muted); font-size: 12px; line-height: 1.7; }
+.personal-hall-empty button { min-height: 44px; padding: 0 20px; border: 0; border-radius: 5px; background: var(--ink); color: #fff; font-size: 11px; font-weight: 800; cursor: pointer; }
+.personal-hall-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.personal-hall-card { overflow: hidden; border-radius: 9px; background: #e9e1d3; box-shadow: 0 12px 28px rgba(40,34,25,.08); }
+.personal-hall-art { position: relative; width: 100%; aspect-ratio: 4 / 3; overflow: hidden; background: linear-gradient(135deg, #b9aa92, #665f54); }
+.personal-hall-art img { object-fit: contain; background: #d8d1c5; }
+.personal-hall-art > span { position: absolute; z-index: 2; top: 12px; left: 12px; padding: 5px 8px; border-radius: 3px; background: rgba(20,19,16,.56); color: #fff; font-size: 9px; }
+.personal-hall-card-copy { padding: 20px; }
+.personal-hall-card-copy > small { color: var(--gold); font-size: 8px; font-weight: 800; letter-spacing: .08em; }
+.personal-hall-card-copy h2 { margin: 7px 0 4px; font-family: Georgia, "Noto Serif KR", serif; font-size: 22px; line-height: 1.2; font-weight: 400; }
+.personal-hall-artist { margin: 0; color: var(--muted); font-size: 10px; }
+.personal-hall-card-copy blockquote { margin: 18px 0 0; padding: 15px 0 0; border-top: 1px solid var(--line); color: #4d473e; font-family: Georgia, "Noto Serif KR", serif; font-size: 14px; line-height: 1.7; }
+.personal-hall-count { margin-top: 0; }
+.personal-hall-detail-hero { position: relative; width: 100%; aspect-ratio: 4 / 3; display: grid; place-items: center; overflow: hidden; border-radius: 8px; background: #d8d1c5; box-shadow: 0 18px 42px rgba(28,24,18,.12); color: var(--muted); font-size: 12px; }
+.personal-hall-detail-hero img { object-fit: contain; object-position: center; }
+.personal-hall-detail-title { padding: 30px 2px 24px; border-bottom: 1px solid var(--line); }
+.personal-hall-detail-title h2 { margin: 10px 0 5px; font-family: Georgia, "Noto Serif KR", serif; font-size: clamp(38px, 7vw, 64px); line-height: 1; font-weight: 400; letter-spacing: -.045em; }
+.personal-hall-detail-title p { margin: 0 0 14px; color: var(--gold); font-size: 16px; font-weight: 700; }
+.personal-hall-detail-title small { color: var(--muted); font-size: 11px; }
+.personal-review-card { border-color: #c7b18b; background: #eee7da; }
+.personal-review-card blockquote { margin: 0; color: #302b24; font-family: Georgia, "Noto Serif KR", serif; font-size: clamp(20px, 4vw, 28px); line-height: 1.65; }
+.personal-ai-history-card { position: relative; border-style: dashed; background: rgba(255,255,255,.18); }
+.feature-coming-soon { margin-top: 22px; display: inline-flex; padding: 7px 10px; border-radius: 999px; background: var(--ink); color: #d6b374; font-size: 8px; font-weight: 800; letter-spacing: .13em; }
 
 @media (max-width: 900px) {
   .login-heading { margin: 45px 0 30px; }
@@ -370,6 +422,17 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--gold); outl
   .product-art { height: 310px; }
   .bottom-nav { bottom: 10px; height: 64px; border-radius: 18px; }
   .bottom-nav button { font-size: 8px; }
+  .personal-hall-header-button { width: 52px; min-width: 0; height: 46px; padding: 0; gap: 0; }
+  .personal-hall-header-button .hall-grid-symbol { width: 20px; height: 20px; }
+  .personal-hall-header-button > span:last-child { display: none; }
+  .personal-hall-heading { margin-bottom: 26px; }
+  .personal-hall-heading h1 { font-size: 38px; }
+  .personal-hall-grid { grid-template-columns: 1fr; }
+  .personal-hall-detail-hero { margin: 0 -8px; width: calc(100% + 16px); border-radius: 0; }
+  .personal-hall-detail-title { padding-top: 24px; }
+  .collection-review-form { padding: 20px 16px; }
+  .collection-modal-backdrop { padding: 18px; }
+  .collection-review-form.collection-review-modal { width: 100%; max-height: calc(100svh - 36px); padding: 28px 20px 22px; }
   .camera-toggle-button { right: 20px; bottom: 88px; width: 52px; height: 52px; }
   .camera-panel-backdrop { padding: 0; align-items: end; }
   .camera-panel { width: 100%; max-height: 92svh; padding: 22px 18px calc(22px + env(safe-area-inset-bottom)); border-radius: 18px 18px 0 0; }
@@ -387,7 +450,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--gold); outl
   .explore-titlebar h1 { font-size: 25px; }
   .explore-card-grid { display: grid; margin-right: 0; grid-template-columns: 1fr; overflow: visible; }
   .explore-card-grid .exhibition-list-card { width: 100%; }
-  .detail-titlebar { grid-template-columns: 38px 1fr 66px; gap: 7px; }
+  .detail-titlebar { grid-template-columns: 38px minmax(0, 1fr) 52px; gap: 6px; }
   .detail-titlebar .qr-header-button { padding: 0 10px; }
   .selected-exhibition-summary { align-items: flex-start; }
   .artwork-image { height: auto; aspect-ratio: 4 / 3; }
