@@ -13,6 +13,15 @@ type FeaturedExhibition = {
 
 const fallbackExhibitions: FeaturedExhibition[] = [
   {
+    id: "exhibition-berbrick-wonderland-2025",
+    title: "BE@RBRICK in MCM Wonderland",
+    venue: "MCM HAUS 플래그십 스토어",
+    heroImageUrl: "/artworks/berbrick-wonderland/nobuki-hizume-installation.jpg",
+    startAt: "2025-09-03",
+    endAt: "2025-09-30",
+    status: "ended",
+  },
+  {
     id: "exhibition-fam-2022",
     title: "F.A.M: Fashion & Art at MCM HAUS",
     venue: "MCM HAUS 청담",
@@ -31,6 +40,11 @@ const fallbackExhibitions: FeaturedExhibition[] = [
     status: "ended",
   },
 ];
+
+const fallbackHeroImages: Record<string, string> = {
+  "exhibition-berbrick-wonderland-2025": "/artworks/berbrick-wonderland/nobuki-hizume-installation.jpg",
+  "exhibition-wearable-casa-2024": "/artworks/wearable-casa/chatty-sofa.png",
+};
 
 const statusLabel = { upcoming: "예정", ongoing: "진행 중", ended: "종료" } as const;
 
@@ -92,11 +106,10 @@ export function HomeScreen({
       .then(async (response) => {
         if (!response.ok) return null;
         const data = await response.json() as { exhibitions?: FeaturedExhibition[] };
-        return data.exhibitions?.slice(0, 2).map((exhibition) => (
-          exhibition.id === "exhibition-wearable-casa-2024" && !exhibition.heroImageUrl
-            ? { ...exhibition, heroImageUrl: "/artworks/wearable-casa/chatty-sofa.png" }
-            : exhibition
-        )) ?? null;
+        return data.exhibitions?.slice(0, 3).map((exhibition) => ({
+          ...exhibition,
+          heroImageUrl: exhibition.heroImageUrl ?? fallbackHeroImages[exhibition.id] ?? null,
+        })) ?? null;
       })
       .then((exhibitions) => {
         if (active && exhibitions?.length) setFeaturedExhibitions(exhibitions);

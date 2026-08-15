@@ -12,6 +12,12 @@ const wearableCasaSource = {
   accessedAt: "2026-08-14",
 } as const;
 
+const berbrickWonderlandSource = {
+  label: "BE@RBRICK in MCM Wonderland 기획 문서 및 MCM 공식 전시 자료",
+  url: "https://jp.mcmworldwide.com/en_JP/frieze25-edit",
+  accessedAt: "2026-08-15",
+} as const;
+
 export const exhibitions = [
   {
     id: "exhibition-fam-2022",
@@ -134,6 +140,81 @@ export const exhibitions = [
     ],
     source: wearableCasaSource,
   },
+  {
+    id: "exhibition-berbrick-wonderland-2025",
+    slug: "berbrick-in-mcm-wonderland-2025",
+    title: "BE@RBRICK in MCM Wonderland",
+    shortTitle: "BE@RBRICK Wonderland",
+    theme: "예술·패션·팝 컬처와 일본 장인정신이 만나는 MCM의 원더랜드",
+    summary:
+      "동일한 BE@RBRICK 형태가 서로 다른 재료와 기법, 기억을 만나 완전히 다른 정체성을 얻는 과정을 층별 몰입형 공간으로 보여주는 전시입니다.",
+    description:
+      "프리즈 서울 2025 기간에 맞춰 MCM HAUS 전체를 하나의 원더랜드로 바꾼 MCM 최초의 BE@RBRICK 특화 전시입니다. 노부키 히즈메의 오트 쿠튀르 모자, 켄 야시키의 가족 기억이 담긴 직물과 키메코미 기법, 인덴야의 400년 고슈 인덴 공예가 BE@RBRICK이라는 공통 형식 위에서 만납니다. 여기에 MCM, MEDICOM TOY, Karimoku가 참여한 한정 컬렉터 제품을 더해 예술 작품과 패션 상품, 전통 공예와 팝 아이콘 사이의 경계를 확장합니다.",
+    nature:
+      "작가별 설치 작품, 일본 장인 공예, 컬렉터 제품과 캡슐 컬렉션을 층마다 독립적인 세계로 구성한 몰입형 복합 전시입니다. MCM과 MEDICOM TOY가 2021년부터 이어 온 협업의 다섯 번째 프로젝트이자 MCM의 첫 BE@RBRICK 중심 전시입니다.",
+    venue: "MCM HAUS 플래그십 스토어",
+    address: "서울특별시 강남구 압구정로 412",
+    startDate: "2025-09-03",
+    endDate: "2025-09-30",
+    operatingHours: "매일 11:00–20:00",
+    status: "ended",
+    artists: [
+      "노부키 히즈메",
+      "켄 야시키",
+      "INDEN-YA",
+      "Karimoku",
+      "MCM",
+      "MEDICOM TOY",
+    ],
+    audiences: [
+      "BE@RBRICK과 아트 토이를 수집하는 컬렉터",
+      "패션과 현대미술의 교차점에 관심 있는 관람객",
+      "프리즈 서울과 서울 아트 위크를 찾은 방문객",
+      "일본 전통 공예와 현대 디자인에 관심 있는 관람객",
+      "MCM의 문화·예술 프로젝트와 한정 컬렉션을 경험하려는 고객",
+    ],
+    tags: [
+      "BE@RBRICK",
+      "프리즈 서울 2025",
+      "일본 장인정신",
+      "오트 쿠튀르",
+      "키메코미",
+      "고슈 인덴",
+      "팝 컬처",
+      "컬렉터 아트",
+    ],
+    keyMessage:
+      "같은 형태도 어떤 재료와 기술, 기억을 품는지에 따라 전혀 다른 존재가 됩니다. BE@RBRICK은 장인의 기술과 개인의 이야기를 새로운 세대에 전달하는 문화적 플랫폼으로 확장됩니다.",
+    featuredQuote:
+      "하나의 형태에 서로 다른 세계가 담기고, 그 차이가 모여 새로운 풍경을 만듭니다.",
+    floorMap: [
+      {
+        floor: "ROOFTOP",
+        description: "도시 풍경과 대형 BE@RBRICK을 연결한 랜드마크형 포토존",
+      },
+      {
+        floor: "5F",
+        description: "새벽의 신비로운 숲 속 INDEN-YA 400%·1000% 작품과 고슈 인덴 시연",
+      },
+      {
+        floor: "3F",
+        description: "COSMOS IN BLOOM 정원 속 켄 야시키 1000% BE@RBRICK과 〈PAUSE–Usa Usa〉",
+      },
+      {
+        floor: "1F",
+        description: "노부키 히즈메의 오트 쿠튀르 모자 설치, 미러룸과 한정 캡슐 컬렉션",
+      },
+    ],
+    directionPrinciples: [
+      "참여 작가의 개별 세계를 하나의 스타일로 통일하지 않고 층별 독립 공간으로 보존합니다.",
+      "서로 다른 문화와 신념을 존중하면서 동일한 BE@RBRICK 형식 안에서 대화하게 합니다.",
+      "전통 공예의 손기술과 현대 팝 컬처의 대중성을 결합합니다.",
+      "오래된 기술이 새로운 시장과 세대에 도달하는 방식을 보여줍니다.",
+      "예술 작품, 패션 제품과 컬렉터 아이템 사이의 경계를 확장합니다.",
+      "재료와 제작 과정이 만든 차이를 가까이 관찰할 수 있도록 공간을 구성합니다.",
+    ],
+    source: berbrickWonderlandSource,
+  },
 ] satisfies ExhibitionSeed[];
 
-export { notionSource, wearableCasaSource };
+export { berbrickWonderlandSource, notionSource, wearableCasaSource };
