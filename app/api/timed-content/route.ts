@@ -12,6 +12,7 @@ type ContentType = "summary" | "stickers" | "invitation";
 type TimelineExhibitionRow = {
   id: string; title: string; venue: string; reference_at: string; reference_type: "visit" | "collection";
 };
+type StoredContentRow = { exhibition_id: string; content_type: ContentType; generated_content: unknown };
 type VisitRow = {
   exhibition_id: string;
   title: string;
@@ -50,8 +51,9 @@ export async function GET(request: NextRequest) {
   const user = await currentUser(request);
   if (!user) return NextResponse.json({ error: "로그인이 필요합니다." }, { status: 401 });
   try {
-    const result = await getDb().query<TimelineExhibitionRow>(
-      `SELECT e.id::text, e.title, e.venue,
+    const [result, storedResult] = await Promise.all([
+      getDb().query<TimelineExhibitionRow>(
+        `SELECT e.id::text, e.title, e.venue,
               COALESCE(MAX(v.visited_at), MIN(c.collected_at))::text AS reference_at,
               CASE WHEN MAX(v.visited_at) IS NOT NULL THEN 'visit' ELSE 'collection' END AS reference_type
        FROM exhibitions e
@@ -61,13 +63,38 @@ export async function GET(request: NextRequest) {
        WHERE v.id IS NOT NULL OR c.id IS NOT NULL
        GROUP BY e.id, e.title, e.venue
        ORDER BY COALESCE(MAX(v.visited_at), MIN(c.collected_at)) DESC`,
-      [user.id],
-    );
-    return NextResponse.json({ exhibitions: result.rows }, { headers: { "Cache-Control": "no-store" } });
+        [user.id],
+      ),
+      getDb().query<StoredContentRow>(
+        `SELECT exhibition_id::text, content_type, generated_content
+         FROM content_unlocks
+         WHERE user_id = $1 AND generated_content IS NOT NULL`,
+        [user.id],
+      ),
+    ]);
+    const savedContent: Record<string, Record<string, unknown>> = {};
+    for (const row of storedResult.rows) {
+      const key = row.content_type === "stickers" ? "sticker" : row.content_type;
+      savedContent[row.exhibition_id] = { ...savedContent[row.exhibition_id], [key]: row.generated_content };
+    }
+    return NextResponse.json({ exhibitions: result.rows, savedContent }, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
     console.error("시간차 콘텐츠 전시 목록 조회 실패", error);
     return NextResponse.json({ error: "기록이 있는 전시를 불러오지 못했습니다." }, { status: 500 });
   }
+}
+
+async function saveGeneratedContent(userId: string, exhibitionId: string, contentType: ContentType, content: unknown) {
+  await getDb().query(
+    `INSERT INTO content_unlocks
+       (user_id, exhibition_id, content_type, unlock_at, viewed_at, generated_content, generated_at)
+     VALUES ($1, $2, $3, NOW(), NOW(), $4::jsonb, NOW())
+     ON CONFLICT (user_id, exhibition_id, content_type)
+     DO UPDATE SET generated_content = EXCLUDED.generated_content,
+                   generated_at = EXCLUDED.generated_at,
+                   viewed_at = EXCLUDED.viewed_at`,
+    [userId, exhibitionId, contentType, JSON.stringify(content)],
+  );
 }
 
 const commonInstructions = [
@@ -199,12 +226,14 @@ export async function POST(request: NextRequest) {
           },
         } } },
       });
-      return NextResponse.json({ content: {
+      const content = {
         ...JSON.parse(response.output_text),
         exhibition: latestVisit ? { title: latestVisit.title, venue: latestVisit.venue, visitedAt: latestVisit.visited_at } : null,
         counts: { exhibitions: 1, artworks: artworksResult.rows.length, notes: notesResult.rows.length },
         artworkImages: Object.fromEntries(artworksResult.rows.map((artwork) => [artwork.title, artwork.image_url])),
-      } });
+      };
+      await saveGeneratedContent(user.id, exhibitionId, body.type, content);
+      return NextResponse.json({ content });
     }
 
     if (body.type === "stickers") {
@@ -243,11 +272,13 @@ export async function POST(request: NextRequest) {
         : await client.images.generate({ ...imageOptions, n: 1, prompt: stickerPrompt }, { timeout: 120_000 });
       const imageBase64 = imageResponse.data?.[0]?.b64_json;
       if (!imageBase64) throw new Error("IMAGE_DATA_MISSING");
-      return NextResponse.json({ content: {
+      const content = {
         title: "나의 전시 기억 스티커",
         description: "수집 작품과 감상에서 발견한 사물·소재·분위기를 한 장의 다이컷 스티커 시트로 만들었어요.",
         imageDataUrl: `data:image/jpeg;base64,${imageBase64}`,
-      } });
+      };
+      await saveGeneratedContent(user.id, exhibitionId, body.type, content);
+      return NextResponse.json({ content });
     }
 
     const recommendationResult = await db.query<ExhibitionRow>(
@@ -275,10 +306,12 @@ export async function POST(request: NextRequest) {
         },
       } } },
     });
-    return NextResponse.json({ content: {
+    const content = {
       ...JSON.parse(response.output_text),
       recommendedExhibition,
-    } });
+    };
+    await saveGeneratedContent(user.id, exhibitionId, body.type, content);
+    return NextResponse.json({ content });
   } catch (error) {
     console.error("AI 시간차 콘텐츠 생성 실패", error);
     return NextResponse.json({ error: "AI 맞춤 콘텐츠를 만들지 못했습니다. 잠시 후 다시 시도해 주세요." }, { status: 500 });

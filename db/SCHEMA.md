@@ -245,6 +245,8 @@ erDiagram
 | content_type | varchar(40) | 콘텐츠 유형(관람요약/숨은해설/비하인드 등) |
 | unlock_at | timestamptz | 공개 시점 |
 | viewed_at | timestamptz | 열람 시점(nullable) |
+| generated_content | jsonb | 계정에 저장된 AI 생성 결과(nullable) |
+| generated_at | timestamptz | AI 콘텐츠 생성 시점(nullable) |
 | — | unique(user_id, exhibition_id, content_type) | |
 
 ---

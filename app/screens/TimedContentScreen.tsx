@@ -66,12 +66,13 @@ export function TimedContentScreen({
   const [exhibitions, setExhibitions] = useState<TimelineExhibition[]>([]);
   const [selectedExhibitionId, setSelectedExhibitionId] = useState("");
   const [listLoading, setListLoading] = useState(true);
+  const [savedByExhibition, setSavedByExhibition] = useState<Record<string, Generated>>({});
 
   useEffect(() => {
     let active = true;
     fetch("/api/timed-content", { cache: "no-store" })
       .then(async (response) => {
-        const payload = await response.json() as { exhibitions?: TimelineExhibition[]; error?: string };
+        const payload = await response.json() as { exhibitions?: TimelineExhibition[]; savedContent?: Record<string, Generated>; error?: string };
         if (!response.ok) throw new Error(payload.error || "전시 기록을 불러오지 못했습니다.");
         if (!active) return;
         const next = payload.exhibitions || [];
@@ -79,6 +80,9 @@ export function TimedContentScreen({
         const preferredId = initialExhibitionId && next.some((item) => item.id === initialExhibitionId)
           ? initialExhibitionId
           : next[0]?.id || "";
+        const savedContent = payload.savedContent || {};
+        setSavedByExhibition(savedContent);
+        setGenerated(savedContent[preferredId] || {});
         setSelectedExhibitionId(preferredId);
       })
       .catch((caught) => active && setError(caught instanceof Error ? caught.message : "전시 기록을 불러오지 못했습니다."))
@@ -91,7 +95,7 @@ export function TimedContentScreen({
   function selectExhibition(id: string) {
     setSelectedExhibitionId(id);
     onSelectedExhibitionChange?.(id);
-    setGenerated({});
+    setGenerated(savedByExhibition[id] || {});
     setOpenContent(null);
     setError(null);
   }
@@ -120,7 +124,9 @@ export function TimedContentScreen({
       });
       const payload = await response.json() as { content?: Summary | Stickers | Letter; error?: string };
       if (!response.ok || !payload.content) throw new Error(payload.error || "맞춤 콘텐츠를 만들지 못했습니다.");
-      setGenerated((current) => ({ ...current, [key]: payload.content }));
+      const nextGenerated = { ...generated, [key]: payload.content };
+      setGenerated(nextGenerated);
+      setSavedByExhibition((current) => ({ ...current, [selectedExhibitionId]: nextGenerated }));
       setOpenContent(key);
       announce("현재 계정의 관람 기록으로 AI 맞춤 콘텐츠를 만들었습니다.");
     } catch (caught) {

@@ -43,6 +43,13 @@
       "when": 1786705813194,
       "tag": "0005_wakeful_strong_guy",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1786799169194,
+      "tag": "0006_harsh_lady_deathstrike",
+      "breakpoints": true
     }
   ]
 }

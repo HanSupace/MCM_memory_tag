@@ -271,6 +271,8 @@ export const contentUnlocks = pgTable(
     contentType: varchar("content_type", { length: 40 }).notNull(),
     unlockAt: timestamp("unlock_at", { withTimezone: true }).notNull(),
     viewedAt: timestamp("viewed_at", { withTimezone: true }),
+    generatedContent: jsonb("generated_content"),
+    generatedAt: timestamp("generated_at", { withTimezone: true }),
   },
   (table) => [uniqueIndex("content_unlocks_user_exhibition_type_unique").on(table.userId, table.exhibitionId, table.contentType)],
 );
