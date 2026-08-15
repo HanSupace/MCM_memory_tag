@@ -50,7 +50,15 @@ function releaseDate(referenceAt: string, offset: number) {
   return new Intl.DateTimeFormat("ko-KR", { year: "numeric", month: "long", day: "numeric" }).format(date);
 }
 
-export function TimedContentScreen({ announce }: { announce: (message: string) => void }) {
+export function TimedContentScreen({
+  announce,
+  initialExhibitionId = null,
+  onSelectedExhibitionChange,
+}: {
+  announce: (message: string) => void;
+  initialExhibitionId?: string | null;
+  onSelectedExhibitionChange?: (exhibitionId: string) => void;
+}) {
   const [openContent, setOpenContent] = useState<ContentKey | null>(null);
   const [generated, setGenerated] = useState<Generated>({});
   const [loadingKey, setLoadingKey] = useState<ContentKey | null>(null);
@@ -68,17 +76,21 @@ export function TimedContentScreen({ announce }: { announce: (message: string) =
         if (!active) return;
         const next = payload.exhibitions || [];
         setExhibitions(next);
-        setSelectedExhibitionId(next[0]?.id || "");
+        const preferredId = initialExhibitionId && next.some((item) => item.id === initialExhibitionId)
+          ? initialExhibitionId
+          : next[0]?.id || "";
+        setSelectedExhibitionId(preferredId);
       })
       .catch((caught) => active && setError(caught instanceof Error ? caught.message : "전시 기록을 불러오지 못했습니다."))
       .finally(() => active && setListLoading(false));
     return () => { active = false; };
-  }, []);
+  }, [initialExhibitionId]);
 
   const selectedExhibition = exhibitions.find((item) => item.id === selectedExhibitionId) || null;
 
   function selectExhibition(id: string) {
     setSelectedExhibitionId(id);
+    onSelectedExhibitionChange?.(id);
     setGenerated({});
     setOpenContent(null);
     setError(null);

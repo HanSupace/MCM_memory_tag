@@ -48,18 +48,22 @@ function formatDate(value: string) {
 
 export function ExhibitionDetailScreen({
   exhibitionId,
+  initialArtworkId = null,
   onBack,
+  onArtworkChange,
   onOpenPersonalHall,
   announce,
 }: {
   exhibitionId: string;
+  initialArtworkId?: string | null;
   onBack: () => void;
+  onArtworkChange?: (artworkId: string | null) => void;
   onOpenPersonalHall: (exhibitionId: string) => void;
   announce: (message: string) => void;
 }) {
   const [exhibition, setExhibition] = useState<ExhibitionDetail | null>(null);
   const [error, setError] = useState("");
-  const [selectedArtworkId, setSelectedArtworkId] = useState<string | null>(null);
+  const [selectedArtworkId, setSelectedArtworkId] = useState<string | null>(initialArtworkId);
   const [showVisitPanel, setShowVisitPanel] = useState(false);
   const [showDocentPanel, setShowDocentPanel] = useState(false);
   const [showCollectionForm, setShowCollectionForm] = useState(false);
@@ -129,22 +133,36 @@ export function ExhibitionDetailScreen({
 
   const selectedArtwork = exhibition?.artworks.find((artwork) => artwork.id === selectedArtworkId) ?? null;
 
-  async function openArtwork(artwork: ArtworkSummary) {
+  useEffect(() => {
+    if (!selectedArtwork) return;
+    let active = true;
+
+    getCollectionItem(selectedArtwork.exhibitionArtworkId)
+      .then((storedItem) => {
+        if (!active) return;
+        setCollectionReview(storedItem?.review ?? "");
+        setIsCollected(Boolean(storedItem));
+      })
+      .catch(() => {
+        // 작품 상세는 계속 보여주고 저장 시 서버 오류 메시지를 안내한다.
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [selectedArtwork]);
+
+  function openArtwork(artwork: ArtworkSummary) {
     setSelectedArtworkId(artwork.id);
+    onArtworkChange?.(artwork.id);
     setCollectionReview("");
     setIsCollected(false);
     setShowCollectionForm(false);
-    try {
-      const storedItem = await getCollectionItem(artwork.exhibitionArtworkId);
-      setCollectionReview(storedItem?.review ?? "");
-      setIsCollected(Boolean(storedItem));
-    } catch {
-      // 작품 상세는 계속 보여주고 저장 시 서버 오류 메시지를 안내한다.
-    }
   }
 
   function closeArtwork() {
     setSelectedArtworkId(null);
+    onArtworkChange?.(null);
     setCollectionReview("");
     setIsCollected(false);
     setShowCollectionForm(false);
