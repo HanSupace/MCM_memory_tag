@@ -205,11 +205,11 @@ export async function POST(request: NextRequest) {
         )).rows.reverse()
       : [];
 
-    if (!process.env.OPENAI_API_KEY) {
+    if (!process.env.OPEN_API) {
       return NextResponse.json({ error: "AI 도슨트 설정이 완료되지 않았습니다." }, { status: 500 });
     }
 
-    const openai = new OpenAI();
+    const openai = new OpenAI({ apiKey: process.env.OPEN_API });
     const completion = await openai.responses.create({
       model: process.env.OPENAI_MODEL || "gpt-5-mini",
       instructions: buildSystemPrompt(context.artwork, context.sources),
