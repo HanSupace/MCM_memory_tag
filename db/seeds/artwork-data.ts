@@ -1,5 +1,5 @@
 import type { ArtworkSeed } from "../types/exhibition";
-import { notionSource, wearableCasaSource } from "./exhibition-data";
+import { berbrickWonderlandSource, notionSource, wearableCasaSource } from "./exhibition-data";
 
 export const artworks = [
   {
@@ -495,5 +495,271 @@ export const artworks = [
     ],
     displayOrder: 9,
     source: wearableCasaSource,
+  },
+  {
+    id: "artwork-berbrick-nobuki-hizume-installation",
+    exhibitionId: "exhibition-berbrick-wonderland-2025",
+    slug: "nobuki-hizume-berbrick-installation",
+    title: "NOBUKI HIZUME BE@RBRICK Installation",
+    artistName: "노부키 히즈메",
+    imageUrl: "/artworks/berbrick-wonderland/nobuki-hizume-installation.jpg",
+    collaborator: "MCM · MEDICOM TOY",
+    type: "오트 쿠튀르 모자·BE@RBRICK 설치",
+    form: "서로 다른 쿠튀르 모자를 쓴 BE@RBRICK 군집 설치",
+    material: "BE@RBRICK 플라스틱, 직물, 수공예 헤드피스",
+    location: "MCM HAUS 입구·1F 쇼윈도와 미러룸",
+    summary:
+      "동일한 BE@RBRICK들이 각기 다른 오트 쿠튀르 모자를 쓰며 런웨이 모델처럼 독립적인 정체성을 얻는 설치 작품입니다.",
+    description:
+      "노부키 히즈메는 자신의 대표 헤드피스 〈Olympia Red〉를 BE@RBRICK의 머리 비율, 둥근 귀와 얼굴 곡선에 맞게 다시 설계했습니다. 중앙의 붉은 BE@RBRICK을 중심으로 흰색, 검정, 투명과 야광 등 서로 다른 색과 형태의 모자를 쓴 인물들이 배열됩니다. 대량생산된 동일 형식과 한 점씩 제작되는 쿠튀르의 차이를 한 장면에서 드러냅니다.",
+    interpretation:
+      "모자는 착용되는 패션이면서 동시에 독립된 예술 오브제가 될 수 있습니다. 표준화된 캐릭터 위에 액세서리 하나가 더해지는 순간 개별 인물처럼 읽힌다는 점에서 정체성이 무엇으로 만들어지는지 질문합니다.",
+    viewingTips: [
+      "모자를 쓰지 않은 동일한 형식과 모자를 쓴 형식의 인상이 어떻게 달라지는지 비교해 보세요.",
+      "모자의 선이 BE@RBRICK의 귀와 얼굴 곡선을 피하거나 강조하는 방식을 살펴보세요.",
+      "중앙의 붉은 작품과 주변 작품들의 색·재료가 만드는 런웨이 같은 리듬을 관찰해 보세요.",
+    ],
+    keywords: ["오트 쿠튀르", "밀리너리", "정체성", "대량생산", "수공예", "패션 조각"],
+    tmi: [
+      "노부키 히즈메는 2019년 프랑스 최고 장인 MOF의 모자 부문을 수상한 최초의 일본인입니다.",
+      "히즈메는 모자를 실제로 착용하는 패션이자 착용하지 않을 때도 아름다운 독립 오브제로 바라봅니다.",
+      "이번 설치는 히즈메의 〈Olympia Red〉를 BE@RBRICK 비례에 맞춰 재해석한 작업에서 시작했습니다.",
+    ],
+    facts: [
+      "MCM HAUS 입구와 1층에서 관람객을 맞이한 설치입니다.",
+      "중앙의 붉은 BE@RBRICK과 색·재료가 다른 헤드피스 작품군으로 구성됩니다.",
+      "대량생산 캐릭터와 일점 제작 오트 쿠튀르의 대비가 핵심입니다.",
+    ],
+    displayOrder: 1,
+    source: berbrickWonderlandSource,
+  },
+  {
+    id: "artwork-berbrick-ken-yashiki-1000",
+    exhibitionId: "exhibition-berbrick-wonderland-2025",
+    slug: "ken-yashiki-1000-berbrick",
+    title: "Ken Yashiki 1000% BE@RBRICK",
+    artistName: "켄 야시키",
+    imageUrl: "/artworks/berbrick-wonderland/ken-yashiki-1000.jpg",
+    collaborator: "MCM · MEDICOM TOY",
+    series: "COSMOS IN BLOOM",
+    type: "직물 기반 대형 BE@RBRICK",
+    form: "키메코미 기법으로 기억의 직물을 입힌 1000% 피규어",
+    material: "아이의 옷, 직물, BE@RBRICK 바디, 키메코미",
+    location: "MCM HAUS 3F COSMOS IN BLOOM",
+    summary:
+      "작가의 아이가 성장하며 입었던 옷을 BE@RBRICK 표면에 키메코미 기법으로 새겨 가족의 시간을 대형 팝 아이콘으로 확장한 작품입니다.",
+    description:
+      "켄 야시키는 입체 표면에 홈을 내고 천을 밀어 넣는 일본의 키메코미 기법을 사용합니다. 2016년 작품 〈PAUSE–Usa Usa〉가 아이의 0세부터 2세까지의 옷에서 출발했다면, 이번 1000% 신작은 이후 약 10년 동안 함께한 옷과 기억을 담았습니다. 작품은 분홍빛 조명과 코스모스 꽃, Usa Usa 패턴이 어우러진 정원 속에 떠 있는 듯 전시됐습니다.",
+    interpretation:
+      "아주 사적인 가족의 기억이 MCM과 BE@RBRICK이라는 보편적인 언어를 만나 더 많은 사람의 성장과 관계에 대한 이야기로 확장됩니다. 손으로 끼워 넣은 직물 조각은 지나간 시간을 멈추면서도 다음 세대로 이어지는 희망의 표면을 만듭니다.",
+    viewingTips: [
+      "얼굴과 몸의 곡면에서 서로 다른 옷감 조각이 이어지는 경계를 가까이 살펴보세요.",
+      "작품의 Usa Usa 인물 패턴과 실제 코스모스 정원이 만드는 반복을 비교해 보세요.",
+      "대형 조각이 공중에 떠 있는 연출이 개인의 기억을 우주적 풍경으로 바꾸는 방식을 느껴보세요.",
+    ],
+    keywords: ["키메코미", "가족 기억", "아이의 옷", "성장", "COSMOS IN BLOOM", "1000%"],
+    tmi: [
+      "키메코미는 입체 표면의 홈에 직물을 밀어 넣어 형태를 완성하는 전통 기법입니다.",
+      "작가는 이 제작 방식을 희망과 소망이 실현되는 과정을 보여주는 방법으로 설명합니다.",
+      "2016년 원작과 이번 신작 사이에는 아이가 성장한 약 10년의 시간이 놓여 있습니다.",
+    ],
+    facts: [
+      "〈PAUSE–Usa Usa〉의 패턴과 제작 철학을 1000% BE@RBRICK으로 확장한 작품입니다.",
+      "아이의 실제 옷과 키메코미 기법이 사용됐습니다.",
+      "MCM HAUS 3층의 COSMOS IN BLOOM 공간에 전시됐습니다.",
+    ],
+    displayOrder: 2,
+    source: berbrickWonderlandSource,
+  },
+  {
+    id: "artwork-berbrick-pause-usa-usa",
+    exhibitionId: "exhibition-berbrick-wonderland-2025",
+    slug: "pause-usa-usa",
+    title: "〈PAUSE–Usa Usa〉",
+    artistName: "켄 야시키",
+    imageUrl: "/artworks/berbrick-wonderland/pause-usa-usa.jpg",
+    series: "PAUSE",
+    type: "직물 회화·부조",
+    form: "토끼와 사람의 얼굴이 반복되는 정사각형 직물 부조",
+    material: "톱밥, 아이들이 입던 옷, 발포 스티로폼, 인조 속눈썹",
+    location: "MCM HAUS 3F COSMOS IN BLOOM",
+    summary:
+      "아이들이 0세부터 2세까지 입었던 옷으로 반복되는 Usa Usa 얼굴을 만든 2016년 작품으로, 전시의 1000%와 100%·400% BE@RBRICK의 출발점입니다.",
+    description:
+      "162×162cm 크기의 화면을 토끼 귀와 사람 얼굴이 결합된 Usa Usa 인물들이 가득 채웁니다. 각 인물의 옷과 표정은 실제 아이들의 옷감으로 구성되어 같은 패턴 안에서도 서로 다른 기억을 품습니다. 원작의 손으로 만든 표면은 1000% 작품에서는 키메코미로, 100%·400% 제품에서는 수전사 프린트로 번역됐습니다.",
+    titleMeaning:
+      "PAUSE는 흘러가는 시간을 잠시 멈추고 기억을 붙잡는 행위를, Usa Usa는 토끼와 사람의 얼굴이 반복되는 작가 고유의 형상을 가리킵니다.",
+    interpretation:
+      "더 이상 입지 못하는 작은 옷은 폐기되는 물건이 아니라 성장의 시간을 보존하는 기록이 됩니다. 하나의 원작이 손공예 대형 조각과 복제 가능한 컬렉터 제품으로 달라지는 과정도 전시의 전통과 대중문화라는 주제를 압축합니다.",
+    viewingTips: [
+      "반복되는 인물 가운데 서로 다른 옷감 무늬와 표정을 찾아보세요.",
+      "실제 원작의 촉감과 1000% BE@RBRICK 표면이 어떻게 번역됐는지 비교해 보세요.",
+      "아래의 코스모스 정원과 화면 속 인물 군집이 만드는 생명감을 함께 보세요.",
+    ],
+    keywords: ["PAUSE", "Usa Usa", "기억", "아이의 옷", "직물 부조", "2016"],
+    tmi: [
+      "작품의 재료는 작가의 아이들이 0세부터 2세까지 실제로 입었던 옷입니다.",
+      "원작의 소재와 패턴은 이번 협업에서 크기와 제작 방식이 다른 세 종류의 BE@RBRICK으로 번역됐습니다.",
+    ],
+    facts: [
+      "2016년에 제작된 162×162cm 작품입니다.",
+      "톱밥, 아이들이 입던 옷, 발포 스티로폼과 인조 속눈썹으로 구성됩니다.",
+      "이번 전시의 Ken Yashiki BE@RBRICK 작품과 제품의 원작입니다.",
+    ],
+    displayOrder: 3,
+    source: berbrickWonderlandSource,
+  },
+  {
+    id: "artwork-berbrick-inden-ya-1000",
+    exhibitionId: "exhibition-berbrick-wonderland-2025",
+    slug: "inden-ya-1000-berbrick",
+    title: "INDEN-YA 1000% BE@RBRICK",
+    artistName: "INDEN-YA",
+    imageUrl: "/artworks/berbrick-wonderland/inden-ya-1000.jpg",
+    collaborator: "MCM · MEDICOM TOY · IVXJAPAN",
+    type: "전통 가죽공예 대형 BE@RBRICK",
+    form: "고슈 인덴 기법으로 마감한 1000% 피규어",
+    material: "사슴가죽, 옻칠, MCM 비세토스·월계수 모티프",
+    location: "MCM HAUS 5F 새벽의 신비로운 숲",
+    summary:
+      "400년 이상 이어진 고슈 인덴의 사슴가죽과 옻칠 기술을 1000% BE@RBRICK에 적용해 전통과 팝 아이콘을 결합한 작품입니다.",
+    description:
+      "INDEN-YA 장인들은 부드러운 사슴가죽 위에 옻으로 MCM 비세토스와 월계수 문양을 올리고, 이를 거대한 BE@RBRICK 곡면에 맞춰 완성했습니다. 나무와 사슴, 안개로 구성된 5층의 숲은 고요한 새벽처럼 연출됐으며 현장에서는 고슈 인덴 제작 시연도 진행됐습니다.",
+    interpretation:
+      "오래된 공예가 박물관 안의 과거에 머무르지 않고 세계적인 팝 캐릭터를 통해 새로운 세대와 만납니다. 자연 재료와 옻칠의 미세한 차이는 복제 가능한 동일 형식 안에서도 손으로 만든 유일성을 남깁니다.",
+    viewingTips: [
+      "사슴가죽의 부드러운 결 위에 옻으로 표현된 비세토스와 월계수 문양을 살펴보세요.",
+      "평면 가죽이 BE@RBRICK의 귀, 얼굴과 관절 곡면을 감싸는 제작 난도를 상상해 보세요.",
+      "새벽 숲의 자연 연출과 현대 캐릭터가 만드는 긴장과 조화를 느껴보세요.",
+    ],
+    keywords: ["INDEN-YA", "고슈 인덴", "사슴가죽", "옻칠", "전통 공예", "1000%"],
+    tmi: [
+      "고슈 인덴은 사슴가죽과 옻칠을 결합해 400년 이상 이어 온 일본 전통 공예입니다.",
+      "대형 곡면에 가죽을 구현하는 과정에는 IVXJAPAN이 협력했습니다.",
+      "전시장에서는 완성 작품뿐 아니라 장인의 고슈 인덴 제작 시연도 볼 수 있었습니다.",
+    ],
+    facts: [
+      "사슴가죽과 옻칠로 제작된 1000% BE@RBRICK입니다.",
+      "MCM 비세토스와 월계수 문양이 고슈 인덴 기법으로 표현됐습니다.",
+      "MCM HAUS 5층의 새벽 숲 콘셉트 공간에 전시됐습니다.",
+    ],
+    displayOrder: 4,
+    source: berbrickWonderlandSource,
+  },
+  {
+    id: "artwork-berbrick-ken-yashiki-set",
+    exhibitionId: "exhibition-berbrick-wonderland-2025",
+    slug: "mcm-berbrick-ken-yashiki-100-400-set",
+    title: "MCM × BE@RBRICK Ken Yashiki 100% & 400% Set",
+    artistName: "켄 야시키",
+    imageUrl: "/artworks/berbrick-wonderland/ken-yashiki-set.jpg",
+    collaborator: "MCM · MEDICOM TOY",
+    series: "PAUSE–Usa Usa",
+    type: "한정판 컬렉터 BE@RBRICK 세트",
+    form: "100%와 400% 크기의 두 피규어 세트",
+    material: "ABS, 수전사 프린트",
+    location: "MCM HAUS 1F 한정 캡슐 컬렉션",
+    summary:
+      "〈PAUSE–Usa Usa〉의 기억 패턴을 수전사 프린트로 옮긴 100%·400% BE@RBRICK 한정 세트입니다.",
+    description:
+      "켄 야시키 원작의 반복되는 인물과 토끼 패턴을 두 크기의 ABS 피규어 전체에 인쇄하고, 몸통에는 MCM 월계수 로고를 더했습니다. 손으로 직물을 끼워 넣은 원작과 1000% 작품의 표면을 재현 가능한 컬렉터 제품으로 번역합니다.",
+    interpretation:
+      "개인의 기억에서 출발한 이미지가 복제 가능한 제품으로 넓어지며 더 많은 사람의 일상으로 이동합니다. 같은 패턴도 100%와 400%의 크기 차이에 따라 밀도와 인상이 달라지는 점이 작품과 상품의 경계를 다시 생각하게 합니다.",
+    viewingTips: [
+      "100%와 400%에서 같은 Usa Usa 패턴이 얼마나 다르게 보이는지 비교해 보세요.",
+      "곡면과 관절을 지나며 수전사 패턴이 연결되거나 끊기는 지점을 살펴보세요.",
+      "원작 직물 부조와 인쇄 표면의 촉각적 차이를 상상해 보세요.",
+    ],
+    keywords: ["100%", "400%", "수전사", "PAUSE–Usa Usa", "컬렉터 세트", "MCM"],
+    tmi: [
+      "제품 스타일 코드는 MEZFAMM11MT001입니다.",
+      "일본 출시 가격은 세금 포함 33,000엔으로 안내됐습니다.",
+      "수전사 기법은 복잡한 곡면 전체에 연속 패턴을 입히는 데 사용됩니다.",
+    ],
+    facts: [
+      "100%와 400% 두 크기의 BE@RBRICK으로 구성됩니다.",
+      "ABS 바디에 〈PAUSE–Usa Usa〉 패턴과 MCM 월계수 로고가 적용됐습니다.",
+      "MCM, MEDICOM TOY와 켄 야시키의 협업 제품입니다.",
+    ],
+    contents: [
+      "BE@RBRICK 100% — 휴대 가능한 소형 컬렉터 피규어",
+      "BE@RBRICK 400% — 원작 패턴을 더 크게 감상하는 메인 피규어",
+    ],
+    displayOrder: 5,
+    source: berbrickWonderlandSource,
+  },
+  {
+    id: "artwork-berbrick-inden-ya-400",
+    exhibitionId: "exhibition-berbrick-wonderland-2025",
+    slug: "mcm-berbrick-inden-ya-400",
+    title: "MCM × BE@RBRICK INDEN-YA 400%",
+    artistName: "INDEN-YA",
+    imageUrl: "/artworks/berbrick-wonderland/inden-ya-400.jpg",
+    collaborator: "MCM · MEDICOM TOY · IVXJAPAN",
+    type: "수공예 한정판 컬렉터 BE@RBRICK",
+    form: "고슈 인덴 사슴가죽으로 완성한 400% 피규어",
+    material: "사슴가죽, 옻칠, MCM 비세토스 모티프",
+    location: "MCM HAUS 5F·1F 한정 컬렉션",
+    summary:
+      "INDEN-YA의 사슴가죽과 옻칠 기술을 400% 크기에 집약한 수공예 컬렉터 작품입니다.",
+    description:
+      "부드러운 사슴가죽을 400% BE@RBRICK 형태에 맞추고 검은 옻으로 MCM 비세토스와 월계수 문양을 표현했습니다. 천연 가죽의 결, 옻칠의 번짐과 장인의 손작업 때문에 같은 제품이라도 미세한 표정이 달라집니다.",
+    interpretation:
+      "수집 가능한 캐릭터 제품이 장인의 시간과 자연 재료를 품으며 하나의 공예품으로 바뀝니다. 1000% 설치가 공간 전체에서 전통의 규모를 보여준다면 400%는 그 기술을 개인 컬렉션으로 옮기는 매개체입니다.",
+    viewingTips: [
+      "검은 옻 문양이 빛의 각도에 따라 사슴가죽 위에서 드러나는 방식을 관찰해 보세요.",
+      "귀와 손, 관절처럼 작은 곡면에 가죽을 맞춘 이음새를 살펴보세요.",
+      "1000% 작품과 400% 제품에서 문양의 밀도와 장인 작업이 어떻게 달라지는지 비교해 보세요.",
+    ],
+    keywords: ["400%", "INDEN-YA", "고슈 인덴", "사슴가죽", "옻칠", "한정판"],
+    tmi: [
+      "제품 스타일 코드는 MEZFAMM10CO001입니다.",
+      "한국 출시 가격은 3,950,000원, 일본 출시 가격은 세금 포함 462,000엔으로 안내됐습니다.",
+      "천연 사슴가죽과 수작업 옻칠 때문에 각 작품의 표면은 완전히 동일하지 않습니다.",
+    ],
+    facts: [
+      "400% 크기의 수공예 BE@RBRICK입니다.",
+      "사슴가죽 위에 고슈 인덴 옻칠로 MCM 문양을 표현했습니다.",
+      "INDEN-YA, MCM, MEDICOM TOY와 IVXJAPAN이 협력했습니다.",
+    ],
+    displayOrder: 6,
+    source: berbrickWonderlandSource,
+  },
+  {
+    id: "artwork-berbrick-karimoku-400",
+    exhibitionId: "exhibition-berbrick-wonderland-2025",
+    slug: "mcm-berbrick-karimoku-400",
+    title: "MCM × BE@RBRICK Karimoku 400%",
+    artistName: "Karimoku",
+    imageUrl: "/artworks/berbrick-wonderland/karimoku-400.jpg",
+    collaborator: "MCM · MEDICOM TOY",
+    type: "수공예 목재 컬렉터 BE@RBRICK",
+    form: "원목을 조각·조립해 완성한 400% 피규어",
+    material: "월넛·오크 원목, 우레탄 마감",
+    location: "MCM HAUS 1F 한정 캡슐 컬렉션",
+    summary:
+      "Karimoku의 목공 기술로 월넛과 오크 원목을 조합하고 MCM 바바리안 다이아몬드와 월계수 문양을 새긴 400% 작품입니다.",
+    description:
+      "짙은 월넛과 밝은 오크의 결을 교차해 MCM의 바바리안 다이아몬드 패턴을 만들고, 몸통에는 월계수 로고를 넣었습니다. 여러 목재 조각을 BE@RBRICK의 곡선과 관절에 맞춰 손으로 깎고 조립한 뒤 우레탄으로 마감했습니다.",
+    interpretation:
+      "독일에서 출발한 MCM의 시각적 유산과 일본 Karimoku의 목공 기술이 하나의 몸에서 만납니다. 자연스러운 나뭇결은 좌우가 완벽히 같은 캐릭터에 비대칭적인 표정을 주며 장난감의 이미지를 가구와 조각으로 이동시킵니다.",
+    viewingTips: [
+      "월넛과 오크 조각의 접합선과 조립 방향을 따라가 보세요.",
+      "평면의 다이아몬드 패턴이 얼굴과 몸의 곡면에서 어떻게 변형되는지 살펴보세요.",
+      "대칭적인 형상 안에서 좌우가 다른 자연 나뭇결을 비교해 보세요.",
+    ],
+    keywords: ["Karimoku", "400%", "월넛", "오크", "목공", "바바리안 다이아몬드"],
+    tmi: [
+      "제품 스타일 코드는 MEZFAMM09IR001입니다.",
+      "한국 출시 가격은 1,890,000원, 일본 출시 가격은 세금 포함 220,000엔으로 안내됐습니다.",
+      "천연 원목의 결 때문에 각각의 작품은 같은 패턴을 가져도 서로 다른 표정을 보입니다.",
+    ],
+    facts: [
+      "월넛과 오크 원목을 사용한 400% BE@RBRICK입니다.",
+      "MCM 바바리안 다이아몬드 패턴과 월계수 로고가 목재로 표현됐습니다.",
+      "일본에서 수작업으로 제작되고 우레탄 마감이 적용됐습니다.",
+    ],
+    displayOrder: 7,
+    source: berbrickWonderlandSource,
   },
 ] satisfies ArtworkSeed[];

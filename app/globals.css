@@ -84,7 +84,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--gold); outl
 .section-heading > button { border: 0; border-bottom: 1px solid currentColor; background: none; padding: 0 0 4px; font-size: 11px; font-weight: 700; cursor: pointer; }
 .section-kicker { color: var(--gold); }
 .section-kicker.light { color: #d0aa70; }
-.exhibition-grid { display: grid; grid-template-columns: 1.45fr 1fr; gap: 20px; }
+.exhibition-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
 .exhibition-card { min-width: 0; background: #ede8dd; }
 .exhibition-art { position: relative; height: 330px; overflow: hidden; isolation: isolate; }
 .art-one { background: radial-gradient(circle at 66% 45%, #cba36d 0 5%, transparent 5.5%), linear-gradient(115deg, #19222c 0 28%, #695a52 28% 46%, #221e1f 46% 72%, #9c7957 72%); }
