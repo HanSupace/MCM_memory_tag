@@ -14,14 +14,16 @@ type GalleryAlbum = ExhibitionOption & {
 
 export function GalleryScreen({
   onOpenCamera,
+  initialExhibitionId = null,
   onSelectedExhibitionChange,
 }: {
   onOpenCamera: () => void;
+  initialExhibitionId?: string | null;
   onSelectedExhibitionChange: (exhibitionId: string | null) => void;
 }) {
   const [photos, setPhotos] = useState<GalleryPhoto[]>([]);
   const [exhibitions, setExhibitions] = useState<ExhibitionOption[]>([]);
-  const [selectedExhibitionId, setSelectedExhibitionId] = useState<string | null>(null);
+  const [selectedExhibitionId, setSelectedExhibitionId] = useState<string | null>(initialExhibitionId);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 

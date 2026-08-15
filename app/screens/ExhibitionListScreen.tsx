@@ -37,12 +37,16 @@ function formatDateRange(startAt: string, endAt: string) {
 export function ExhibitionListScreen({
   announce,
   initialExhibitionId = null,
+  initialArtworkId = null,
   onActiveExhibitionChange,
+  onArtworkChange,
   onOpenPersonalHall,
 }: {
   announce: (message: string) => void;
   initialExhibitionId?: string | null;
+  initialArtworkId?: string | null;
   onActiveExhibitionChange?: (exhibitionId: string | null) => void;
+  onArtworkChange?: (artworkId: string | null) => void;
   onOpenPersonalHall: (exhibitionId: string) => void;
 }) {
   const [exhibitions, setExhibitions] = useState<ExhibitionSummary[] | null>(null);
@@ -53,7 +57,6 @@ export function ExhibitionListScreen({
 
   useEffect(() => {
     onActiveExhibitionChange?.(selectedId);
-    return () => onActiveExhibitionChange?.(null);
   }, [onActiveExhibitionChange, selectedId]);
 
   useEffect(() => {
@@ -81,7 +84,12 @@ export function ExhibitionListScreen({
     return (
       <ExhibitionDetailScreen
         exhibitionId={selectedId}
-        onBack={() => setSelectedId(null)}
+        initialArtworkId={initialArtworkId}
+        onBack={() => {
+          setSelectedId(null);
+          onActiveExhibitionChange?.(null);
+        }}
+        onArtworkChange={onArtworkChange}
         onOpenPersonalHall={onOpenPersonalHall}
         announce={announce}
       />
@@ -144,7 +152,10 @@ export function ExhibitionListScreen({
               type="button"
               className="exhibition-card exhibition-list-card"
               key={exhibition.id}
-              onClick={() => setSelectedId(exhibition.id)}
+              onClick={() => {
+                setSelectedId(exhibition.id);
+                onActiveExhibitionChange?.(exhibition.id);
+              }}
             >
               <div
                 className={`exhibition-art${exhibition.heroImageUrl ? "" : " art-placeholder"}`}
