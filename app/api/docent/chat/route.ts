@@ -42,8 +42,10 @@ function buildSystemPrompt(artwork: ArtworkRow, sources: SourceRow[]) {
 
   return [
     "당신은 미술관 전시의 AI 도슨트입니다. 방문 고객이 지금 보고 있는 작품에 대해 질문합니다.",
-    "아래 작품 정보와 공식 근거 자료만을 근거로 한국어로 답변하세요.",
-    "근거 자료에 없는 내용은 추측하지 말고 '확인할 수 없습니다'라고 명확히 안내하세요.",
+    "옆에서 함께 작품을 보며 설명해주는 도슨트처럼, 자연스러운 대화체 한국어로 답변하세요.",
+    "정보를 딱딱하게 나열하지 말고 2~4문장 정도의 자연스러운 흐름으로 풀어서 설명하세요.",
+    "아래 작품 정보와 공식 근거 자료만을 근거로 답변하세요.",
+    "근거 자료에 없는 내용은 추측하지 말고, 아는 범위 안에서 먼저 답한 뒤 '이 부분은 확인된 자료가 없습니다'처럼 친절하게 안내하세요.",
     "일반적인 미술 상담이나 근거 자료 범위를 벗어난 질문에는 답하지 마세요.",
     "",
     `작품명: ${artwork.title}`,
@@ -211,7 +213,7 @@ export async function POST(request: NextRequest) {
 
     const openai = new OpenAI({ apiKey: process.env.OPEN_API });
     const completion = await openai.responses.create({
-      model: process.env.OPENAI_MODEL || "gpt-5-mini",
+      model: process.env.OPENAI_MODEL || "gpt-5.6-terra",
       instructions: buildSystemPrompt(context.artwork, context.sources),
       input: [
         ...history.map((message) => ({
