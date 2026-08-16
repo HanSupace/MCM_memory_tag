@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { NativeQrScanner } from "./NativeQrScanner";
+import { QrScanner } from "./QrScanner";
 
 export type ConnectedKeyring = { keyringCode: string; connectedAt: string; exhibitionId?: string };
 
@@ -143,10 +143,10 @@ export function KeyringConnectPanel({
   );
 
   const handleQrDetected = useCallback(
-    (value: string) => {
+    (value: string): string | null => {
       setShowQrScanner(false);
       const scannedValue = value.trim();
-      if (!scannedValue) return;
+      if (!scannedValue) return "QR 내용을 읽지 못했습니다. 다시 스캔해 주세요.";
 
       let entryToken: string | null = null;
       try {
@@ -160,10 +160,11 @@ export function KeyringConnectPanel({
 
       if (entryToken) {
         void verifyVenueQr(entryToken);
-        return;
+        return null;
       }
 
       void connect(scannedValue);
+      return null;
     },
     [connect, verifyVenueQr],
   );
@@ -268,9 +269,14 @@ export function KeyringConnectPanel({
         <button type="button" style={secondaryButtonStyle} onClick={onClose}>취소</button>
       </div>
       {showQrScanner && (
-        <NativeQrScanner
+        <QrScanner
           onDetected={handleQrDetected}
           onClose={() => setShowQrScanner(false)}
+          kicker="EXHIBITION ACCESS"
+          title="전시장 입장 QR 스캔"
+          cameraMessage="전시장 입장 QR을 사각형 안에 들어오도록 비춰 주세요."
+          manualLabel="카메라가 안 되면 키링 코드 입력"
+          manualPlaceholder="예: MCM-XXXX-XXXX"
         />
       )}
     </div>
