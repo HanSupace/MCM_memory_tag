@@ -42,3 +42,10 @@ export async function saveCollectionItem(input: { exhibitionArtworkId: string; r
   window.dispatchEvent(new Event(COLLECTION_UPDATED_EVENT));
   return body.item;
 }
+
+export async function deleteCollectionItem(exhibitionArtworkId: string) {
+  const query = new URLSearchParams({ exhibitionArtworkId });
+  const response = await fetch(`/api/collections?${query.toString()}`, { method: "DELETE" });
+  await readJson<{ deleted: true }>(response);
+  window.dispatchEvent(new Event(COLLECTION_UPDATED_EVENT));
+}
