@@ -512,6 +512,29 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--gold); outl
 .artwork-qr-callout strong { font-family: Georgia, "Noto Serif KR", serif; font-size: 16px; font-weight: 400; }
 .artwork-qr-callout small { color: var(--muted); font-size: 11px; }
 .artwork-qr-callout > b { color: var(--gold); }
+.qr-scanner-backdrop { position: fixed; z-index: 90; inset: 0; padding: 20px; display: grid; place-items: center; background: rgba(12,11,9,.72); backdrop-filter: blur(7px); }
+.qr-scanner-modal { width: min(100%, 460px); max-height: calc(100svh - 40px); padding: 26px; overflow-y: auto; border-radius: 12px; background: var(--paper); box-shadow: 0 30px 90px rgba(0,0,0,.4); }
+.qr-scanner-modal > header { margin-bottom: 18px; display: flex; align-items: start; justify-content: space-between; gap: 20px; }
+.qr-scanner-modal h2 { margin: 7px 0 0; font-family: Georgia, "Noto Serif KR", serif; font-size: 27px; font-weight: 400; }
+.qr-scanner-close { width: 36px; height: 36px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 50%; background: transparent; color: var(--ink); font-size: 24px; line-height: 1; cursor: pointer; }
+.qr-camera-frame { position: relative; width: 100%; aspect-ratio: 1; display: grid; place-items: center; overflow: hidden; border-radius: 8px; background: #171612; }
+.qr-camera-frame video { width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .2s; }
+.qr-camera-frame.ready video { opacity: 1; }
+.qr-camera-guide { position: absolute; inset: 16%; border: 2px solid rgba(255,255,255,.9); border-radius: 12px; box-shadow: 0 0 0 999px rgba(0,0,0,.32); }
+.qr-camera-guide::before, .qr-camera-guide::after { content: ""; position: absolute; left: 10%; right: 10%; height: 1px; background: rgba(205,167,99,.9); }
+.qr-camera-guide::before { top: 33%; }
+.qr-camera-guide::after { bottom: 33%; }
+.qr-camera-placeholder { position: absolute; color: #b99557; font-size: 58px; }
+.qr-camera-select { margin-top: 12px; display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 12px; }
+.qr-camera-select label { color: var(--muted); font-size: 10px; font-weight: 700; }
+.qr-camera-select select { width: 100%; min-width: 0; height: 40px; padding: 0 34px 0 11px; border: 1px solid var(--line); border-radius: 5px; background: #fff; color: var(--ink); font-size: 11px; }
+.qr-scanner-message { min-height: 38px; margin: 14px 0; color: var(--muted); font-size: 12px; line-height: 1.55; }
+.qr-manual-form { padding-top: 16px; border-top: 1px solid var(--line); }
+.qr-manual-form label { display: block; margin-bottom: 9px; font-size: 11px; font-weight: 700; }
+.qr-manual-form > div { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; }
+.qr-manual-form input { min-width: 0; height: 46px; padding: 0 12px; border: 1px solid var(--line); border-radius: 5px; background: #fff; color: var(--ink); font-size: 12px; }
+.qr-manual-form button { min-width: 70px; border: 1px solid var(--ink); border-radius: 5px; background: var(--ink); color: #fff; font-size: 11px; font-weight: 800; cursor: pointer; }
+.qr-manual-form button:disabled { opacity: .42; cursor: default; }
 .artwork-section-heading { margin: 28px 0 14px; display: flex; align-items: flex-end; justify-content: space-between; }
 .artwork-section-heading h2 { margin: 0; font-family: Georgia, "Noto Serif KR", serif; font-size: 18px; font-weight: 400; }
 .artwork-section-heading span { color: var(--muted); font-size: 10px; }

@@ -32,6 +32,7 @@ type ArtistRow = {
 type ArtworkRow = {
   id: string;
   exhibition_artwork_id: string;
+  collect_identifier: string | null;
   title: string;
   artist_name: string | null;
   production_year: string | null;
@@ -51,6 +52,7 @@ function getTypeScriptExhibition(id: string) {
     .map((artwork) => ({
       id: artwork.id,
       exhibitionArtworkId: artwork.id,
+      collectIdentifier: artwork.slug,
       title: artwork.title,
       artistName: artwork.artistName,
       productionYear: null,
@@ -118,6 +120,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     const artworksResult = await db.query<ArtworkRow>(
       `SELECT artworks.id::text,
               exhibition_artworks.id::text AS exhibition_artwork_id,
+              exhibition_artworks.collect_identifier,
               artworks.title,
               artists.name AS artist_name,
               artworks.production_year,
@@ -140,6 +143,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     const databaseArtworks = artworksResult.rows.map((row) => ({
       id: row.id,
       exhibitionArtworkId: row.exhibition_artwork_id,
+      collectIdentifier: row.collect_identifier,
       title: row.title,
       artistName: row.artist_name,
       productionYear: row.production_year,
@@ -156,6 +160,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
           .map((artwork) => ({
             id: artwork.id,
             exhibitionArtworkId: artwork.id,
+            collectIdentifier: artwork.slug,
             title: artwork.title,
             artistName: artwork.artistName,
             productionYear: null,
