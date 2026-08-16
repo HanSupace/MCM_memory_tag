@@ -6,6 +6,12 @@ import { artworks as seedArtworks, exhibitions as seedExhibitions } from "../../
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+const productOnlyCollectIdentifiers = [
+  "mcm-berbrick-ken-yashiki-100-400-set",
+  "mcm-berbrick-inden-ya-400",
+  "mcm-berbrick-karimoku-400",
+];
+
 type ExhibitionRow = {
   id: string;
   title: string;
@@ -122,9 +128,14 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
        FROM exhibition_artworks
        JOIN artworks ON artworks.id = exhibition_artworks.artwork_id
        LEFT JOIN artists ON artists.id = artworks.artist_id
-       WHERE exhibition_artworks.exhibition_id = $1 AND exhibition_artworks.published = true
+       WHERE exhibition_artworks.exhibition_id = $1
+         AND exhibition_artworks.published = true
+         AND (
+           exhibition_artworks.collect_identifier IS NULL
+           OR exhibition_artworks.collect_identifier <> ALL($2::text[])
+         )
        ORDER BY exhibition_artworks.id`,
-      [id],
+      [id, productOnlyCollectIdentifiers],
     );
     const databaseArtworks = artworksResult.rows.map((row) => ({
       id: row.id,
@@ -174,8 +185,10 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
           `SELECT count(*)::text AS count
            FROM collections c
            JOIN exhibition_artworks ea ON ea.id = c.exhibition_artwork_id
-           WHERE c.user_id = $1 AND ea.exhibition_id = $2`,
-          [user.id, id],
+           WHERE c.user_id = $1
+             AND ea.exhibition_id = $2
+             AND (ea.collect_identifier IS NULL OR ea.collect_identifier <> ALL($3::text[]))`,
+          [user.id, id, productOnlyCollectIdentifiers],
         );
         collectedCount = Number(collectedResult.rows[0]?.count ?? "0");
       }

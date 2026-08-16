@@ -135,3 +135,51 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "컬렉션을 저장하지 못했습니다." }, { status: 500 });
   }
 }
+
+export async function DELETE(request: NextRequest) {
+  const user = await currentUser(request);
+  if (!user) return NextResponse.json({ error: "로그인이 필요합니다." }, { status: 401 });
+
+  const reference = request.nextUrl.searchParams.get("exhibitionArtworkId")?.trim() ?? "";
+  if (!reference) {
+    return NextResponse.json({ error: "삭제할 소장 작품을 지정해 주세요." }, { status: 400 });
+  }
+
+  try {
+    const db = getDb();
+    const exhibitionArtworkId = await resolveExhibitionArtworkId(db, reference);
+    if (!exhibitionArtworkId) {
+      return NextResponse.json({ error: "DB에서 작품을 찾을 수 없습니다." }, { status: 404 });
+    }
+
+    const client = await db.connect();
+    try {
+      await client.query("BEGIN");
+      const result = await client.query(
+        `DELETE FROM collections
+         WHERE user_id = $1 AND exhibition_artwork_id = $2
+         RETURNING id`,
+        [user.id, exhibitionArtworkId],
+      );
+      if ((result.rowCount ?? 0) === 0) {
+        await client.query("ROLLBACK");
+        return NextResponse.json({ error: "소장 목록에서 작품을 찾을 수 없습니다." }, { status: 404 });
+      }
+      await client.query(
+        "DELETE FROM notes WHERE user_id = $1 AND exhibition_artwork_id = $2",
+        [user.id, exhibitionArtworkId],
+      );
+      await client.query("COMMIT");
+    } catch (error) {
+      await client.query("ROLLBACK");
+      throw error;
+    } finally {
+      client.release();
+    }
+
+    return NextResponse.json({ deleted: true });
+  } catch (error) {
+    console.error("컬렉션 삭제 실패", error);
+    return NextResponse.json({ error: "소장 작품을 삭제하지 못했습니다." }, { status: 500 });
+  }
+}
