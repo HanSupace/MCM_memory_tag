@@ -192,7 +192,7 @@ export async function POST(request: NextRequest) {
       sharedDocentQuestions: questionsResult.rows,
     };
     const client = new OpenAI({ apiKey: process.env.OPEN_API, timeout: 60_000, maxRetries: 1 });
-    const model = process.env.OPENAI_CONTENT_MODEL || process.env.OPENAI_MODEL || "gpt-5-mini";
+    const model = process.env.OPENAI_CONTENT_MODEL || process.env.OPENAI_MODEL || "gpt-5.6-terra";
 
     if (body.type === "summary") {
       const response = await client.responses.create({

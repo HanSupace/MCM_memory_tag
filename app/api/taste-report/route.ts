@@ -157,7 +157,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    const model = process.env.OPENAI_TASTE_MODEL || process.env.OPENAI_MODEL || "gpt-5.6-luna";
+    const model = process.env.OPENAI_TASTE_MODEL || process.env.OPENAI_MODEL || "gpt-5.6-terra";
     const response = await new OpenAI({ apiKey: process.env.OPEN_API }).responses.create({
       model,
       store: false,
