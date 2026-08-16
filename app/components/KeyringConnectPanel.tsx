@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
+import { NativeQrScanner } from "./NativeQrScanner";
 
-export type ConnectedKeyring = { keyringCode: string; connectedAt: string };
+export type ConnectedKeyring = { keyringCode: string; connectedAt: string; exhibitionId?: string };
 
 type Step = "nfc" | "code";
 type Status = "idle" | "scanning" | "connecting" | "error";
@@ -73,16 +74,19 @@ const secondaryButtonStyle: React.CSSProperties = {
 export function KeyringConnectPanel({
   onClose,
   onConnected,
+  onVisitVerified,
   announce,
 }: {
   onClose: () => void;
   onConnected: (keyring: ConnectedKeyring) => void;
+  onVisitVerified?: (exhibitionId: string) => void;
   announce: (message: string) => void;
 }) {
   const [step, setStep] = useState<Step>("nfc");
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string | null>(null);
   const [code, setCode] = useState("");
+  const [showQrScanner, setShowQrScanner] = useState(false);
   // 이 패널은 클릭 시에만 클라이언트에서 렌더되어(SSR 대상 아님) 초기 렌더에서 바로 판정해도 하이드레이션 불일치가 없다.
   const [nfcSupported] = useState(() => typeof window !== "undefined" && "NDEFReader" in window);
 
@@ -96,20 +100,72 @@ export function KeyringConnectPanel({
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ keyringCode }),
         });
-        const data = (await response.json()) as { keyring?: ConnectedKeyring; error?: string };
+        const data = (await response.json()) as { keyring?: ConnectedKeyring; exhibitionId?: string; accessGranted?: boolean; error?: string };
         if (!response.ok || !data.keyring) {
           setStatus("error");
           setError(data.error ?? "키링 연결에 실패했습니다.");
           return;
         }
-        announce("키링이 연결되었습니다.");
-        onConnected(data.keyring);
+        announce(data.accessGranted ? "키링 코드가 확인되어 전시 접근 권한이 생겼습니다." : "키링이 연결되었습니다.");
+        onConnected({ ...data.keyring, exhibitionId: data.exhibitionId });
       } catch {
         setStatus("error");
         setError("네트워크 오류로 키링 연결에 실패했습니다.");
       }
     },
     [announce, onConnected],
+  );
+
+  const verifyVenueQr = useCallback(
+    async (entryToken: string) => {
+      setStatus("connecting");
+      setError(null);
+      try {
+        const response = await fetch("/api/visits", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ entryToken }),
+        });
+        const data = (await response.json()) as { exhibitionId?: string; visitedAt?: string; alreadyVisited?: boolean; error?: string };
+        if (!response.ok || !data.visitedAt || !data.exhibitionId) {
+          setStatus("error");
+          setError(data.error ?? "전시장 QR 인증에 실패했습니다.");
+          return;
+        }
+        announce(data.alreadyVisited ? "이미 방문 인증된 전시입니다." : "전시장 QR 인증이 완료되었습니다.");
+        onVisitVerified?.(data.exhibitionId);
+      } catch {
+        setStatus("error");
+        setError("네트워크 오류로 전시장 QR 인증에 실패했습니다.");
+      }
+    },
+    [announce, onVisitVerified],
+  );
+
+  const handleQrDetected = useCallback(
+    (value: string) => {
+      setShowQrScanner(false);
+      const scannedValue = value.trim();
+      if (!scannedValue) return;
+
+      let entryToken: string | null = null;
+      try {
+        const url = new URL(scannedValue, window.location.origin);
+        const visitIndex = url.pathname.split("/").filter(Boolean).indexOf("visit");
+        const visitToken = visitIndex >= 0 ? url.pathname.split("/").filter(Boolean)[visitIndex + 1] : url.searchParams.get("visit");
+        if (visitToken) entryToken = decodeURIComponent(visitToken);
+      } catch {
+        // URL이 아닌 값은 키링 코드로 처리한다.
+      }
+
+      if (entryToken) {
+        void verifyVenueQr(entryToken);
+        return;
+      }
+
+      void connect(scannedValue);
+    },
+    [connect, verifyVenueQr],
   );
 
   useEffect(() => {
@@ -180,9 +236,12 @@ export function KeyringConnectPanel({
             <div>
               <h2 style={{ margin: "0 0 8px", fontSize: 20 }}>QR·코드로 키링 연결</h2>
               <p style={{ margin: 0, color: "var(--muted)", fontSize: 13 }}>
-                키링 뒷면의 코드를 입력하거나 QR 코드를 확인해 아래에 입력하세요.
+                QR을 스캔하거나 키링 뒷면의 코드를 직접 입력하세요.
               </p>
             </div>
+            <button type="button" style={secondaryButtonStyle} onClick={() => { setError(null); setShowQrScanner(true); }}>
+              카메라로 QR 스캔
+            </button>
             <label style={{ display: "grid", gap: 8 }}>
               <span style={{ fontSize: 12 }}>키링 코드</span>
               <input
@@ -208,6 +267,12 @@ export function KeyringConnectPanel({
         )}
         <button type="button" style={secondaryButtonStyle} onClick={onClose}>취소</button>
       </div>
+      {showQrScanner && (
+        <NativeQrScanner
+          onDetected={handleQrDetected}
+          onClose={() => setShowQrScanner(false)}
+        />
+      )}
     </div>
   );
 }

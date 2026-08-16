@@ -58,6 +58,8 @@ export async function ensureAuthSchema() {
         )
       `);
 
+      await db.query(`ALTER TABLE app_users ADD COLUMN IF NOT EXISTS role VARCHAR(20) NOT NULL DEFAULT 'visitor'`);
+
       await db.query(`
         CREATE UNIQUE INDEX IF NOT EXISTS app_users_username_lower_unique
         ON app_users (LOWER(username))

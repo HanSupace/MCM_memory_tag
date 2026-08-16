@@ -3,6 +3,7 @@ import Image from "next/image";
 import { AiDocentPanel } from "../components/AiDocentPanel";
 import { getCollectionItem, saveCollectionItem } from "../../lib/collection-storage";
 import { VisitVerificationPanel } from "../components/VisitVerificationPanel";
+import { AccessLockedPanel } from "../components/AccessLockedPanel";
 
 type ExhibitionStatus = "upcoming" | "ongoing" | "ended";
 
@@ -63,6 +64,7 @@ export function ExhibitionDetailScreen({
 }) {
   const [exhibition, setExhibition] = useState<ExhibitionDetail | null>(null);
   const [error, setError] = useState("");
+  const [accessDenied, setAccessDenied] = useState(false);
   const [selectedArtworkId, setSelectedArtworkId] = useState<string | null>(initialArtworkId);
   const [showVisitPanel, setShowVisitPanel] = useState(false);
   const [showDocentPanel, setShowDocentPanel] = useState(false);
@@ -81,15 +83,24 @@ export function ExhibitionDetailScreen({
 
     fetch(`/api/exhibitions/${exhibitionId}`, { cache: "no-store" })
       .then(async (response) => {
+        if (response.status === 403) {
+          if (active) setAccessDenied(true);
+          throw new Error("access-denied");
+        }
         if (!response.ok) throw new Error("failed");
         const data = (await response.json()) as { exhibition: ExhibitionDetail };
         return data.exhibition;
       })
       .then((detail) => {
-        if (active) setExhibition(detail);
+        if (active) {
+          setAccessDenied(false);
+          setExhibition(detail);
+        }
       })
-      .catch(() => {
-        if (active) setError("전시 정보를 불러오지 못했습니다.");
+      .catch((loadError) => {
+        if (active && loadError instanceof Error && loadError.message !== "access-denied") {
+          setError("전시 정보를 불러오지 못했습니다.");
+        }
       });
 
     return () => {
@@ -151,6 +162,10 @@ export function ExhibitionDetailScreen({
       active = false;
     };
   }, [selectedArtwork]);
+
+  if (accessDenied) {
+    return <AccessLockedPanel onBack={onBack} />;
+  }
 
   function openArtwork(artwork: ArtworkSummary) {
     setSelectedArtworkId(artwork.id);

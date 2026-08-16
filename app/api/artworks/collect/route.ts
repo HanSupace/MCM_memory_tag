@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getUserBySessionToken, SESSION_COOKIE_NAME } from "../../../../lib/auth";
+import { ensureExhibitionVisit, hasExhibitionAccess } from "../../../../lib/exhibition-access";
+import { resolveExhibitionId } from "../../../../lib/catalog-db";
 import { getDb } from "../../../../lib/db";
 
 export const runtime = "nodejs";
@@ -32,7 +34,13 @@ function normalizeIdentifier(value: unknown): string | null {
   const withoutQuery = trimmed.split(/[?#]/)[0];
   const segments = withoutQuery.split("/").filter(Boolean);
   const identifier = segments[segments.length - 1] ?? trimmed;
-  return identifier.length > 0 && identifier.length <= 120 ? identifier : null;
+  let decodedIdentifier = identifier;
+  try {
+    decodedIdentifier = decodeURIComponent(identifier);
+  } catch {
+    return null;
+  }
+  return decodedIdentifier.length > 0 && decodedIdentifier.length <= 120 ? decodedIdentifier : null;
 }
 
 function toArtworkPayload(row: CollectRow) {
@@ -58,13 +66,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "로그인이 필요합니다." }, { status: 401 });
     }
 
-    const body = (await request.json()) as { identifier?: unknown };
+    const body = (await request.json()) as { identifier?: unknown; exhibitionId?: unknown; artworkQr?: unknown };
     const identifier = normalizeIdentifier(body.identifier);
     if (!identifier) {
       return NextResponse.json({ error: "작품 코드 형식이 올바르지 않습니다." }, { status: 400 });
     }
 
     const db = getDb();
+    const requestedExhibition = typeof body.exhibitionId === "string" ? body.exhibitionId.trim() : "";
+    const exhibitionId = requestedExhibition ? await resolveExhibitionId(db, requestedExhibition) : null;
+    if (requestedExhibition && !exhibitionId) {
+      return NextResponse.json({ error: "전시를 찾을 수 없습니다." }, { status: 404 });
+    }
 
     const lookup = await db.query<CollectRow>(
       `SELECT ea.id::text AS exhibition_artwork_id,
@@ -82,13 +95,36 @@ export async function POST(request: NextRequest) {
        JOIN artworks a ON a.id = ea.artwork_id
        JOIN exhibitions e ON e.id = ea.exhibition_id
        LEFT JOIN artists ar ON ar.id = a.artist_id
-       WHERE ea.collect_identifier = $1 AND ea.published = true AND e.published = true
-       LIMIT 1`,
-      [identifier],
+       WHERE ea.collect_identifier = $1
+         AND ea.published = true
+         AND e.published = true
+         AND ($2::bigint IS NULL OR e.id = $2::bigint)
+       ORDER BY e.id
+       LIMIT 2`,
+      [identifier, exhibitionId],
     );
+    if (!exhibitionId && lookup.rows.length > 1) {
+      return NextResponse.json(
+        { error: "같은 작품 코드가 여러 전시에 있습니다. 해당 전시의 QR 링크로 다시 시도해 주세요." },
+        { status: 409 },
+      );
+    }
     const artworkRow = lookup.rows[0];
     if (!artworkRow) {
       return NextResponse.json({ error: "작품을 찾을 수 없습니다. 코드를 다시 확인해 주세요." }, { status: 404 });
+    }
+
+    const access = await hasExhibitionAccess(db, user.id, artworkRow.exhibition_id);
+    let visitedAt: string | undefined;
+    if (!access) {
+      if (!exhibitionId && body.artworkQr !== true) {
+        return NextResponse.json(
+          { error: "이 전시에 접근할 권한이 없습니다. 전시장 QR 또는 키링으로 먼저 인증해 주세요." },
+          { status: 403 },
+        );
+      }
+      const visit = await ensureExhibitionVisit(db, user.id, artworkRow.exhibition_id, "artwork_qr");
+      visitedAt = visit.visitedAt;
     }
 
     const existing = await db.query(
@@ -96,7 +132,7 @@ export async function POST(request: NextRequest) {
       [user.id, artworkRow.exhibition_artwork_id],
     );
     if ((existing.rowCount ?? 0) > 0) {
-      return NextResponse.json({ collected: true, duplicate: true, artwork: toArtworkPayload(artworkRow) });
+      return NextResponse.json({ collected: true, duplicate: true, visitedAt, artwork: toArtworkPayload(artworkRow) });
     }
 
     try {
@@ -104,10 +140,10 @@ export async function POST(request: NextRequest) {
         user.id,
         artworkRow.exhibition_artwork_id,
       ]);
-      return NextResponse.json({ collected: true, duplicate: false, artwork: toArtworkPayload(artworkRow) });
+      return NextResponse.json({ collected: true, duplicate: false, visitedAt, artwork: toArtworkPayload(artworkRow) });
     } catch (error) {
       if ((error as { code?: string }).code === "23505") {
-        return NextResponse.json({ collected: true, duplicate: true, artwork: toArtworkPayload(artworkRow) });
+        return NextResponse.json({ collected: true, duplicate: true, visitedAt, artwork: toArtworkPayload(artworkRow) });
       }
       throw error;
     }

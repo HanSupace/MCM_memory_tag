@@ -54,7 +54,7 @@ export async function GET(
 
   try {
     const identity = await exchangeOAuthCode(provider, code, savedState.codeVerifier);
-    const user = await findOrCreateSocialUser(identity, savedState.mode, savedState.consents);
+    const user = await findOrCreateSocialUser(identity, savedState.mode, savedState.consents, savedState.role ?? "visitor");
     const sessionToken = await createSession(user.id);
     const response = NextResponse.redirect(new URL("/", process.env.APP_BASE_URL ?? "http://localhost:3000"));
     response.cookies.set(SESSION_COOKIE_NAME, sessionToken, sessionCookieOptions());

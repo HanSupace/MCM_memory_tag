@@ -8,6 +8,7 @@
 erDiagram
     app_users ||--o| keyrings : "1개 소유"
     app_users ||--o{ visits : "방문"
+    exhibitions ||--o{ exhibition_entry_tokens : "입장 토큰"
     app_users ||--o{ collections : "수집"
     app_users ||--o{ notes : "작성"
     app_users ||--o{ gallery_photos : "저장"
@@ -147,12 +148,29 @@ erDiagram
 | keyring_code | varchar(64) unique | 실물 키링 식별값 |
 | connected_at | timestamptz | |
 
+기존 계정 연결용 테이블이다. 전시별 키링 코드는 `exhibition_entry_tokens`에 저장하며, 코드 입력 시 `/api/keyrings`가 전시 입장 토큰으로 먼저 확인해 해당 전시의 방문 권한을 생성한다. 따라서 한 사용자가 여러 전시의 키링 코드를 입력할 수 있다.
+
+### `exhibition_entry_tokens` (전시 입장 토큰)
+| 컬럼 | 타입 | 설명 |
+|---|---|---|
+| id | bigserial PK | |
+| exhibition_id | bigint FK → exhibitions | 토큰이 입장 권한을 부여하는 전시 |
+| token_hash | char(64) unique | 키링 NFC 또는 전시장 QR의 해시값 |
+| token_type | varchar(20) | `keyring` \| `venue_qr` |
+| active | boolean | 운영자가 토큰을 비활성화할 수 있음 |
+| created_at | timestamptz | |
+
+한 토큰은 하나의 전시에만 연결된다. 사용자가 유효한 토큰을 인증하면 해당 전시의 방문 기록이 생성되고, 이후 전시 종료 후에도 접근 권한이 유지된다.
+
+전시 운영자는 `POST /api/exhibitions/{id}/entry-tokens`에 `{"type":"keyring"}` 또는 `{"type":"venue_qr"}`를 보내 토큰을 발급할 수 있다. 원시 토큰과 `/visit/{token}` URL은 발급 응답에서 한 번만 반환되며, DB에는 해시만 저장된다. 분실·교체 시 같은 경로의 `DELETE`로 해당 토큰을 비활성화한다.
+
 ### `visits` (방문 인증)
 | 컬럼 | 타입 | 설명 |
 |---|---|---|
 | id | bigserial PK | |
 | user_id | bigint FK → app_users | cascade |
 | exhibition_id | bigint FK → exhibitions | cascade |
+| access_source | varchar(20) | `keyring` \| `venue_qr` \| `artwork_qr` \| `legacy` |
 | visited_at | timestamptz | |
 | — | unique(user_id, exhibition_id) | 전시당 방문 인증 1회 |
 

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getUserBySessionToken, SESSION_COOKIE_NAME } from "../../../lib/auth";
+import { ensureExhibitionVisit, resolveEntryToken } from "../../../lib/exhibition-access";
 import { getDb } from "../../../lib/db";
 
 export const runtime = "nodejs";
@@ -62,6 +63,17 @@ export async function POST(request: NextRequest) {
     }
 
     const db = getDb();
+    const entryToken = await resolveEntryToken(db, keyringCode);
+    if (entryToken?.source === "keyring") {
+      const visit = await ensureExhibitionVisit(db, user.id, entryToken.exhibitionId, "keyring");
+      return NextResponse.json({
+        keyring: { keyringCode, connectedAt: visit.visitedAt },
+        exhibitionId: entryToken.exhibitionId,
+        accessGranted: true,
+        alreadyVisited: visit.alreadyVisited,
+      });
+    }
+
     const existing = await db.query<KeyringRow>(
       `SELECT user_id::text, keyring_code, connected_at FROM keyrings WHERE keyring_code = $1`,
       [keyringCode],

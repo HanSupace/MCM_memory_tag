@@ -137,12 +137,28 @@ export const keyrings = pgTable("keyrings", {
   connectedAt: timestamp("connected_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
+export const exhibitionEntryTokens = pgTable(
+  "exhibition_entry_tokens",
+  {
+    id: bigserial("id", { mode: "bigint" }).primaryKey(),
+    exhibitionId: bigint("exhibition_id", { mode: "bigint" }).notNull().references(() => exhibitions.id, { onDelete: "cascade" }),
+    tokenHash: char("token_hash", { length: 64 }).notNull().unique(),
+    // keyring | venue_qr
+    tokenType: varchar("token_type", { length: 20 }).notNull(),
+    active: boolean("active").notNull().default(true),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [index("exhibition_entry_tokens_exhibition_id_idx").on(table.exhibitionId)],
+);
+
 export const visits = pgTable(
   "visits",
   {
     id: bigserial("id", { mode: "bigint" }).primaryKey(),
     userId: bigint("user_id", { mode: "bigint" }).notNull().references(() => users.id, { onDelete: "cascade" }),
     exhibitionId: bigint("exhibition_id", { mode: "bigint" }).notNull().references(() => exhibitions.id, { onDelete: "cascade" }),
+    // keyring | venue_qr | artwork_qr | legacy
+    accessSource: varchar("access_source", { length: 20 }).notNull().default("legacy"),
     visitedAt: timestamp("visited_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [

@@ -8,6 +8,7 @@ import {
   saveCollectionItem,
   type CollectionItem,
 } from "../../lib/collection-storage";
+import { AccessLockedPanel } from "../components/AccessLockedPanel";
 
 export function PersonalHallScreen({
   exhibitionId,
@@ -22,6 +23,7 @@ export function PersonalHallScreen({
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [accessDenied, setAccessDenied] = useState(false);
   const [showCollectPanel, setShowCollectPanel] = useState(false);
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [reviewDraft, setReviewDraft] = useState("");
@@ -41,6 +43,10 @@ export function PersonalHallScreen({
   }
 
   useEffect(() => {
+    if (!exhibitionId) {
+      return;
+    }
+
     let active = true;
     const refreshItems = async () => {
       try {
@@ -62,7 +68,20 @@ export function PersonalHallScreen({
       active = false;
       window.removeEventListener(COLLECTION_UPDATED_EVENT, handleUpdate);
     };
-  }, []);
+  }, [exhibitionId]);
+
+  useEffect(() => {
+    if (!exhibitionId) return;
+    let active = true;
+    fetch(`/api/exhibitions/${exhibitionId}`, { cache: "no-store" })
+      .then((response) => {
+        if (active && response.status === 403) setAccessDenied(true);
+      })
+      .catch(() => undefined);
+    return () => {
+      active = false;
+    };
+  }, [exhibitionId]);
 
   function handleCollected(artwork: CollectedArtwork) {
     announce(`${artwork.title} 작품을 수집했습니다.`);
@@ -146,6 +165,10 @@ export function PersonalHallScreen({
   const exhibitionItems = exhibitionId ? items.filter((item) => item.exhibitionId === exhibitionId) : [];
   const selectedItem = exhibitionItems.find((item) => item.id === selectedId) ?? null;
   const exhibitionTitle = exhibitionItems[0]?.exhibitionTitle ?? "현재 전시";
+
+  if (accessDenied || !exhibitionId) {
+    return <AccessLockedPanel onBack={onBack} title="나만의 전시회장이 잠겨 있습니다" />;
+  }
 
   if (selectedItem) {
     return (

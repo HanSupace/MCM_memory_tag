@@ -210,6 +210,10 @@ export function HomeScreen({
             setKeyring(connected);
             setShowKeyringPanel(false);
           }}
+          onVisitVerified={(exhibitionId) => {
+            setShowKeyringPanel(false);
+            onExploreExhibitions(exhibitionId);
+          }}
         />
       )}
 
