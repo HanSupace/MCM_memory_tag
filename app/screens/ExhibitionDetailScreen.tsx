@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useState } from "react";
 import Image from "next/image";
 import { AiDocentPanel } from "../components/AiDocentPanel";
+import { ArtworkQrScanner } from "../components/ArtworkQrScanner";
 import { getCollectionItem, saveCollectionItem } from "../../lib/collection-storage";
 import { VisitVerificationPanel } from "../components/VisitVerificationPanel";
 
@@ -26,6 +27,7 @@ type ExhibitionDetail = {
 type ArtworkSummary = {
   id: string;
   exhibitionArtworkId: string;
+  collectIdentifier: string | null;
   title: string;
   artistName: string | null;
   productionYear: string | null;
@@ -70,6 +72,7 @@ export function ExhibitionDetailScreen({
   const [collectionReview, setCollectionReview] = useState("");
   const [isCollected, setIsCollected] = useState(false);
   const [isSavingCollection, setIsSavingCollection] = useState(false);
+  const [showQrScanner, setShowQrScanner] = useState(false);
 
   function handleVisitVerified() {
     setExhibition((current) => (current ? { ...current, visited: true } : current));
@@ -166,6 +169,36 @@ export function ExhibitionDetailScreen({
     setCollectionReview("");
     setIsCollected(false);
     setShowCollectionForm(false);
+  }
+
+  function handleQrDetected(value: string) {
+    if (!exhibition) return "전시 정보를 불러온 뒤 다시 시도해 주세요.";
+
+    const trimmed = value.trim();
+    let pathSegments: string[] = [];
+    try {
+      pathSegments = new URL(trimmed, window.location.origin).pathname.split("/").filter(Boolean);
+    } catch {
+      pathSegments = trimmed.split(/[/?#]/).filter(Boolean);
+    }
+    const artworkPathIndex = pathSegments.lastIndexOf("artworks");
+    const pathArtworkId = artworkPathIndex >= 0 ? pathSegments[artworkPathIndex + 1] : null;
+    const collectPathIndex = pathSegments.lastIndexOf("collect");
+    const collectIdentifier = collectPathIndex >= 0 ? pathSegments[collectPathIndex + 1] : null;
+    const lastSegment = pathSegments[pathSegments.length - 1] ?? trimmed;
+    const candidates = new Set([trimmed, pathArtworkId, collectIdentifier, lastSegment].filter(Boolean));
+
+    const artwork = exhibition.artworks.find((item) => (
+      candidates.has(item.id)
+      || candidates.has(item.exhibitionArtworkId)
+      || (item.collectIdentifier ? candidates.has(item.collectIdentifier) : false)
+    ));
+    if (!artwork) return "현재 전시에 등록된 작품 QR이 아닙니다. 작품 옆 QR을 다시 확인해 주세요.";
+
+    setShowQrScanner(false);
+    openArtwork(artwork);
+    announce(`${artwork.title} 작품을 찾았습니다.`);
+    return null;
   }
 
   async function submitCollectionReview(event: React.FormEvent) {
@@ -363,7 +396,7 @@ export function ExhibitionDetailScreen({
               </button>
             )}
 
-            <button type="button" className="artwork-qr-callout" onClick={() => announce("전시장 작품 QR을 스캔해 주세요.")}>
+            <button type="button" className="artwork-qr-callout" onClick={() => setShowQrScanner(true)}>
               <span className="qr-outline" aria-hidden="true">▦</span>
               <span><strong>작품 QR로 바로 찾기</strong><small>전시장에서 작품 옆 QR을 스캔하세요</small></span>
               <b aria-hidden="true">↗</b>
@@ -417,6 +450,13 @@ export function ExhibitionDetailScreen({
           announce={announce}
           onClose={() => setShowVisitPanel(false)}
           onVerified={handleVisitVerified}
+        />
+      )}
+
+      {showQrScanner && exhibition && (
+        <ArtworkQrScanner
+          onClose={() => setShowQrScanner(false)}
+          onDetected={handleQrDetected}
         />
       )}
     </div>
