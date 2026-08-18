@@ -1,12 +1,9 @@
 import { useEffect, useState } from "react";
+import { getDocentQuestionPresets } from "../../db/seeds/docent-question-data";
 
 type ChatMessage = { role: "user" | "assistant"; content: string; createdAt?: string };
 
-const SUGGESTED_QUESTIONS = [
-  "이 작품의 제작 배경이 궁금해요",
-  "작가는 어떤 의도로 이 작품을 만들었나요?",
-  "이 작품을 감상할 때 무엇을 주목해야 하나요?",
-];
+const SUGGESTION_COUNT = 3;
 
 const overlayStyle: React.CSSProperties = {
   position: "fixed",
@@ -99,6 +96,7 @@ export function AiDocentPanel({
   const [sharePersonalization, setSharePersonalization] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loadingHistory, setLoadingHistory] = useState(true);
+  const suggestedQuestions = getDocentQuestionPresets(exhibitionArtworkId, artworkTitle).slice(0, SUGGESTION_COUNT);
 
   useEffect(() => {
     let active = true;
@@ -172,17 +170,24 @@ export function AiDocentPanel({
         </div>
 
         {messages.length === 0 && !loadingHistory && (
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-            {SUGGESTED_QUESTIONS.map((suggested) => (
-              <button
-                key={suggested}
-                type="button"
-                style={secondaryButtonStyle}
-                onClick={() => void sendQuestion(suggested)}
-              >
-                {suggested}
-              </button>
-            ))}
+          <div style={{ display: "grid", gap: 9 }}>
+            <strong style={{ fontSize: 11 }}>이런 질문은 어떠세요?</strong>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
+              {suggestedQuestions.map((suggested) => (
+                <button
+                  key={`${suggested.category}-${suggested.question}`}
+                  type="button"
+                  title={suggested.category}
+                  style={{ ...secondaryButtonStyle, height: "auto", minHeight: 36, padding: "7px 10px", textAlign: "left" }}
+                  onClick={() => void sendQuestion(suggested.question)}
+                >
+                  <span style={{ display: "block", marginBottom: 2, color: "var(--gold)", fontSize: 8, fontWeight: 800 }}>
+                    {suggested.category}
+                  </span>
+                  {suggested.question}
+                </button>
+              ))}
+            </div>
           </div>
         )}
 

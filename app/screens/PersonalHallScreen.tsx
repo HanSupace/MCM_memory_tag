@@ -1,6 +1,7 @@
 import { type FormEvent, useEffect, useLayoutEffect, useState } from "react";
 import Image from "next/image";
 import { CollectArtworkPanel, type CollectedArtwork } from "../components/CollectArtworkPanel";
+import { DocentConversationSummary } from "../components/DocentConversationSummary";
 import {
   COLLECTION_UPDATED_EVENT,
   deleteCollectionItem,
@@ -230,12 +231,10 @@ export function PersonalHallScreen({
             {actionError && <p className="form-error" role="alert">{actionError}</p>}
           </article>
 
-          <article className="artwork-description-card personal-ai-history-card">
-            <span className="section-kicker">AI CONVERSATION</span>
-            <h3>AI와 나눈 대화</h3>
-            <p>작품별 AI 대화 기록은 다음 개발 단계에서 이곳에 연결됩니다.</p>
-            <span className="feature-coming-soon">COMING SOON</span>
-          </article>
+          <DocentConversationSummary
+            key={selectedItem.exhibitionArtworkId}
+            exhibitionArtworkId={selectedItem.exhibitionArtworkId}
+          />
 
           <article className="artwork-description-card">
             <span className="section-kicker">ABOUT THE WORK</span>

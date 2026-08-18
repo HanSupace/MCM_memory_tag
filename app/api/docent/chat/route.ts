@@ -2,7 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 import { getUserBySessionToken, SESSION_COOKIE_NAME } from "../../../../lib/auth";
 import { getDb } from "../../../../lib/db";
-import { artworks as seedArtworks } from "../../../../db/seeds";
+import {
+  artworks as seedArtworks,
+  exhibitions as seedExhibitions,
+  getDocentQuestionPresets,
+} from "../../../../db/seeds";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -45,7 +49,9 @@ function buildSystemPrompt(artwork: ArtworkRow, sources: SourceRow[]) {
     "옆에서 함께 작품을 보며 설명해주는 도슨트처럼, 자연스러운 대화체 한국어로 답변하세요.",
     "정보를 딱딱하게 나열하지 말고 2~4문장 정도의 자연스러운 흐름으로 풀어서 설명하세요.",
     "아래 작품 정보와 공식 근거 자료만을 근거로 답변하세요.",
-    "근거 자료에 없는 내용은 추측하지 말고, 아는 범위 안에서 먼저 답한 뒤 '이 부분은 확인된 자료가 없습니다'처럼 친절하게 안내하세요.",
+    "질문과 정확히 일치하는 세부 정보가 없더라도 '확인된 자료가 없습니다' 같은 상투적인 문장으로 끝내지 마세요.",
+    "대신 아래 근거에서 질문과 가장 가까운 작품의 의미, 재료, 감상 포인트나 전시 맥락을 골라 도움이 되도록 설명하세요.",
+    "근거에 없는 인물, 수치, 연도, 제작 기법이나 사건은 지어내지 마세요.",
     "일반적인 미술 상담이나 근거 자료 범위를 벗어난 질문에는 답하지 마세요.",
     "",
     `작품명: ${artwork.title}`,
@@ -65,15 +71,44 @@ function buildSystemPrompt(artwork: ArtworkRow, sources: SourceRow[]) {
 function loadSeedArtworkContext(exhibitionArtworkId: string) {
   const seedArtwork = seedArtworks.find((artwork) => artwork.id === exhibitionArtworkId);
   if (!seedArtwork) return null;
+  const seedExhibition = seedExhibitions.find((exhibition) => exhibition.id === seedArtwork.exhibitionId);
+  const recommendedQuestions = getDocentQuestionPresets(seedArtwork.id, seedArtwork.title).slice(0, 3);
 
   const sourceBody = [
+    "[작품 기본 정보]",
+    `작품명: ${seedArtwork.title}`,
+    `작가·디자이너: ${seedArtwork.artistName}`,
+    seedArtwork.collaborator ? `협업: ${seedArtwork.collaborator}` : null,
+    seedArtwork.series ? `시리즈: ${seedArtwork.series}` : null,
+    `작품 유형: ${seedArtwork.type}`,
+    seedArtwork.form ? `형태: ${seedArtwork.form}` : null,
+    seedArtwork.material ? `재료: ${seedArtwork.material}` : null,
+    `전시 위치: ${seedArtwork.location}`,
+    `핵심 요약: ${seedArtwork.summary}`,
+    "[작품 해설]",
     seedArtwork.summary,
     seedArtwork.description,
     seedArtwork.titleMeaning,
     seedArtwork.interpretation,
+    "[감상 포인트]",
     ...seedArtwork.viewingTips,
+    "[확인된 사실과 비하인드]",
     ...seedArtwork.facts,
     ...seedArtwork.tmi,
+    seedArtwork.contents?.length ? `[구성 요소]\n${seedArtwork.contents.join("\n")}` : null,
+    `[핵심 키워드]\n${seedArtwork.keywords.join(", ")}`,
+    seedExhibition ? "[전시 전체 맥락]" : null,
+    seedExhibition ? `전시명: ${seedExhibition.title}` : null,
+    seedExhibition ? `전시 주제: ${seedExhibition.theme}` : null,
+    seedExhibition ? `전시 요약: ${seedExhibition.summary}` : null,
+    seedExhibition ? `전시 설명: ${seedExhibition.description}` : null,
+    seedExhibition ? `전시 성격: ${seedExhibition.nature}` : null,
+    seedExhibition ? `전시 핵심 메시지: ${seedExhibition.keyMessage}` : null,
+    seedExhibition?.featuredQuote ? `대표 문장: ${seedExhibition.featuredQuote}` : null,
+    seedExhibition ? `전시 방향:\n${seedExhibition.directionPrinciples.join("\n")}` : null,
+    seedExhibition ? `공간 구성:\n${seedExhibition.floorMap.map((item) => `${item.floor}: ${item.description}`).join("\n")}` : null,
+    "[화면에 제시되는 추천 질문]",
+    ...recommendedQuestions.map((item) => `${item.category}: ${item.question}`),
   ]
     .filter((value): value is string => Boolean(value))
     .join("\n");
