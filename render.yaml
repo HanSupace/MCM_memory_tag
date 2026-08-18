@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: mcm-memory-tag
+    name: momente
     runtime: node
     plan: free
     region: singapore
