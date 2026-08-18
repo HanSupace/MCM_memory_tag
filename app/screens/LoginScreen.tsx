@@ -3,9 +3,11 @@ import { BrandMark } from "../components/BrandMark";
 import type { AuthUser } from "../types";
 
 type AuthMode = "login" | "signup";
+type SignupRole = "visitor" | "exhibition_operator";
 
 export function LoginScreen({ onAuthenticated }: { onAuthenticated: (user: AuthUser) => void }) {
   const [mode, setMode] = useState<AuthMode>("login");
+  const [signupRole, setSignupRole] = useState<SignupRole>("visitor");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -46,6 +48,7 @@ export function LoginScreen({ onAuthenticated }: { onAuthenticated: (user: AuthU
           username: username.trim(),
           password,
           ...(mode === "signup" ? {
+            role: signupRole,
             consents: {
               required: requiredConsent,
               personalization: personalizationConsent,
@@ -72,6 +75,7 @@ export function LoginScreen({ onAuthenticated }: { onAuthenticated: (user: AuthU
 
   function changeMode(nextMode: AuthMode) {
     setMode(nextMode);
+    setSignupRole("visitor");
     setError("");
     setPassword("");
     setRequiredConsent(false);
@@ -96,6 +100,7 @@ export function LoginScreen({ onAuthenticated }: { onAuthenticated: (user: AuthU
           provider: "kakao",
           mode,
           ...(mode === "signup" ? {
+            role: signupRole,
             consents: {
               required: requiredConsent,
               personalization: personalizationConsent,
@@ -170,6 +175,42 @@ export function LoginScreen({ onAuthenticated }: { onAuthenticated: (user: AuthU
                 </button>
               </div>
             </label>
+            {mode === "signup" ? (
+              <fieldset style={{ border: 0, margin: 0, padding: 0 }}>
+                <legend style={{ marginBottom: 10, fontSize: 12, fontWeight: 700 }}>가입 유형</legend>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                  {[
+                    { value: "visitor" as const, label: "일반 사용자", description: "전시를 관람하고 작품을 수집합니다." },
+                    { value: "exhibition_operator" as const, label: "전시 운영자", description: "전시 입장용 키링·QR·NFC URL을 관리합니다." },
+                  ].map((option) => (
+                    <label
+                      key={option.value}
+                      style={{
+                        display: "grid",
+                        gap: 5,
+                        padding: 12,
+                        border: signupRole === option.value ? "2px solid #ad813b" : "1px solid #d8d3c8",
+                        background: signupRole === option.value ? "#fbf5e8" : "transparent",
+                        cursor: "pointer",
+                      }}
+                    >
+                      <span style={{ display: "flex", alignItems: "center", gap: 8, margin: 0, fontWeight: 700 }}>
+                        <input
+                          type="radio"
+                          name="signup-role"
+                          value={option.value}
+                          checked={signupRole === option.value}
+                          onChange={() => setSignupRole(option.value)}
+                          style={{ width: 16, height: 16, padding: 0 }}
+                        />
+                        {option.label}
+                      </span>
+                      <small style={{ marginLeft: 24, color: "#77736b", lineHeight: 1.4 }}>{option.description}</small>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+            ) : null}
             {mode === "signup" ? (
               <fieldset style={{ border: 0, margin: 0, padding: 0 }}>
                 <legend style={{ marginBottom: 10, fontSize: 12, fontWeight: 700 }}>서비스 동의</legend>

@@ -15,8 +15,8 @@ export async function POST(request: NextRequest) {
     }
 
     await ensureAuthSchema();
-    const result = await getDb().query<{ id: string; username: string; password_hash: string | null }>(
-      `SELECT id::text, username, password_hash
+    const result = await getDb().query<{ id: string; username: string; role: "visitor" | "exhibition_operator" | "content_operator"; password_hash: string | null }>(
+      `SELECT id::text, username, role, password_hash
        FROM app_users
        WHERE LOWER(username) = LOWER($1)
        LIMIT 1`,
@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "아이디 또는 비밀번호가 올바르지 않습니다." }, { status: 401 });
     }
 
-    const user = { id: account.id, username: account.username };
+    const user = { id: account.id, username: account.username, role: account.role };
     const sessionToken = await createSession(user.id);
     const response = NextResponse.json({ user });
     response.cookies.set(SESSION_COOKIE_NAME, sessionToken, sessionCookieOptions());

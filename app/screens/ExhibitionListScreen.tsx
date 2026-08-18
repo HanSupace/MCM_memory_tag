@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { ExhibitionDetailScreen } from "./ExhibitionDetailScreen";
+import { NativeQrScanner } from "../components/NativeQrScanner";
 
 type ExhibitionStatus = "upcoming" | "ongoing" | "ended";
 
@@ -54,6 +55,22 @@ export function ExhibitionListScreen({
   const [filter, setFilter] = useState<"all" | ExhibitionStatus>("all");
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(initialExhibitionId);
+  const [qrScannerOpen, setQrScannerOpen] = useState(false);
+
+  function handleQrDetected(value: string) {
+    try {
+      const parsed = new URL(value, window.location.origin);
+      const segments = parsed.pathname.split("/").filter(Boolean);
+      if (segments[0] !== "visit" && segments[0] !== "collect") {
+        announce("전시 입장 또는 작품 QR을 인식해 주세요.");
+        return;
+      }
+      setQrScannerOpen(false);
+      window.location.assign(`${parsed.pathname}${parsed.search}`);
+    } catch {
+      announce("QR 주소를 읽지 못했습니다.");
+    }
+  }
 
   useEffect(() => {
     onActiveExhibitionChange?.(selectedId);
@@ -113,7 +130,7 @@ export function ExhibitionListScreen({
             <span className="section-kicker">EXHIBITION</span>
             <h1>전시 탐색</h1>
           </div>
-          <button type="button" className="qr-header-button" onClick={() => announce("QR 스캔 기능은 다음 단계에서 연결됩니다.")}>
+          <button type="button" className="qr-header-button" onClick={() => setQrScannerOpen(true)}>
             <span aria-hidden="true">▦</span> QR
           </button>
         </div>
@@ -176,6 +193,7 @@ export function ExhibitionListScreen({
           ))}
         </div>
       </section>
+      {qrScannerOpen && <NativeQrScanner onDetected={handleQrDetected} onClose={() => setQrScannerOpen(false)} />}
     </div>
   );
 }

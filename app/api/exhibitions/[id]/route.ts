@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getUserBySessionToken, SESSION_COOKIE_NAME } from "../../../../lib/auth";
+import { hasExhibitionAccess } from "../../../../lib/exhibition-access";
 import { getDb } from "../../../../lib/db";
+import { resolveExhibitionId } from "../../../../lib/catalog-db";
 import { artworks as seedArtworks, exhibitions as seedExhibitions } from "../../../../db/seeds";
 
 export const runtime = "nodejs";
@@ -80,21 +82,52 @@ function getTypeScriptExhibition(id: string) {
   };
 }
 
+type AccessCheck = {
+  user: Awaited<ReturnType<typeof getUserBySessionToken>>;
+  exhibitionId: string | null;
+  response?: NextResponse;
+};
+
+async function requireExhibitionAccess(request: NextRequest, reference: string): Promise<AccessCheck> {
+  const token = request.cookies.get(SESSION_COOKIE_NAME)?.value;
+  const user = token ? await getUserBySessionToken(token) : null;
+  if (!user) {
+    return { user: null, exhibitionId: null, response: NextResponse.json({ error: "로그인이 필요합니다." }, { status: 401 }) };
+  }
+
+  const exhibitionId = await resolveExhibitionId(getDb(), reference);
+  if (!exhibitionId || !(await hasExhibitionAccess(getDb(), user.id, exhibitionId))) {
+    return {
+      user,
+      exhibitionId,
+      response: NextResponse.json(
+        { error: "이 전시에 접근할 권한이 없습니다. 전시장 QR 또는 키링으로 먼저 인증해 주세요." },
+        { status: 403 },
+      ),
+    };
+  }
+
+  return { user, exhibitionId };
+}
+
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const typeScriptExhibition = getTypeScriptExhibition(id);
-  if (typeScriptExhibition) {
-    return NextResponse.json(
-      { exhibition: typeScriptExhibition },
-      { headers: { "Cache-Control": "no-store" } },
-    );
-  }
-
-  if (!/^\d+$/.test(id)) {
+  if (!typeScriptExhibition && !/^\d+$/.test(id)) {
     return NextResponse.json({ error: "잘못된 전시 ID입니다." }, { status: 400 });
   }
 
   try {
+    const access = await requireExhibitionAccess(request, id);
+    if (access.response) return access.response;
+
+    if (typeScriptExhibition) {
+      return NextResponse.json(
+        { exhibition: { ...typeScriptExhibition, visited: true } },
+        { headers: { "Cache-Control": "no-store" } },
+      );
+    }
+
     const db = getDb();
 
     const exhibitionResult = await db.query<ExhibitionRow>(
@@ -176,28 +209,22 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     let visited = false;
     let collectedCount = 0;
 
-    const sessionToken = request.cookies.get(SESSION_COOKIE_NAME)?.value;
-    if (sessionToken) {
-      const user = await getUserBySessionToken(sessionToken);
-      if (user) {
-        const visitResult = await db.query(
-          "SELECT 1 FROM visits WHERE user_id = $1 AND exhibition_id = $2 LIMIT 1",
-          [user.id, id],
-        );
-        visited = (visitResult.rowCount ?? 0) > 0;
+    const visitResult = await db.query(
+      "SELECT 1 FROM visits WHERE user_id = $1 AND exhibition_id = $2 LIMIT 1",
+      [access.user.id, id],
+    );
+    visited = (visitResult.rowCount ?? 0) > 0;
 
-        const collectedResult = await db.query<{ count: string }>(
-          `SELECT count(*)::text AS count
-           FROM collections c
-           JOIN exhibition_artworks ea ON ea.id = c.exhibition_artwork_id
-           WHERE c.user_id = $1
-             AND ea.exhibition_id = $2
-             AND (ea.collect_identifier IS NULL OR ea.collect_identifier <> ALL($3::text[]))`,
-          [user.id, id, productOnlyCollectIdentifiers],
-        );
-        collectedCount = Number(collectedResult.rows[0]?.count ?? "0");
-      }
-    }
+    const collectedResult = await db.query<{ count: string }>(
+      `SELECT count(*)::text AS count
+       FROM collections c
+       JOIN exhibition_artworks ea ON ea.id = c.exhibition_artwork_id
+       WHERE c.user_id = $1
+         AND ea.exhibition_id = $2
+         AND (ea.collect_identifier IS NULL OR ea.collect_identifier <> ALL($3::text[]))`,
+      [access.user.id, id, productOnlyCollectIdentifiers],
+    );
+    collectedCount = Number(collectedResult.rows[0]?.count ?? "0");
 
     return NextResponse.json(
       {

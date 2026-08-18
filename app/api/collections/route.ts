@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getUserBySessionToken, SESSION_COOKIE_NAME } from "../../../lib/auth";
+import { hasExhibitionAccess } from "../../../lib/exhibition-access";
 import { resolveExhibitionArtworkId, seedArtworkFor } from "../../../lib/catalog-db";
 import { getDb } from "../../../lib/db";
 
@@ -62,6 +63,7 @@ const collectionSelect = `
   JOIN exhibitions e ON e.id = ea.exhibition_id
   JOIN artworks a ON a.id = ea.artwork_id
   LEFT JOIN artists ar ON ar.id = a.artist_id
+  JOIN visits v ON v.user_id = c.user_id AND v.exhibition_id = e.id
   LEFT JOIN notes n ON n.user_id = c.user_id AND n.exhibition_artwork_id = c.exhibition_artwork_id`;
 
 export async function GET(request: NextRequest) {
@@ -98,6 +100,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: "DB에서 작품을 찾을 수 없습니다. 먼저 전시·작품 시드 데이터를 반영해 주세요." },
         { status: 409 },
+      );
+    }
+
+    const accessResult = await db.query<{ exhibition_id: string }>(
+      "SELECT exhibition_id::text FROM exhibition_artworks WHERE id = $1",
+      [exhibitionArtworkId],
+    );
+    const exhibitionId = accessResult.rows[0]?.exhibition_id;
+    if (!exhibitionId || !(await hasExhibitionAccess(db, user.id, exhibitionId))) {
+      return NextResponse.json(
+        { error: "이 전시에 접근할 권한이 없습니다. 전시장 QR 또는 키링으로 먼저 인증해 주세요." },
+        { status: 403 },
       );
     }
 

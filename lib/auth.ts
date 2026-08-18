@@ -5,9 +5,12 @@ export const SESSION_MAX_AGE_SECONDS = 60 * 60 * 24 * 30;
 export const OAUTH_STATE_COOKIE_NAME = "mcm_oauth_state";
 export const OAUTH_STATE_MAX_AGE_SECONDS = 10 * 60;
 
+export type UserRole = "visitor" | "exhibition_operator" | "content_operator";
+
 export type PublicUser = {
   id: string;
   username: string;
+  role: UserRole;
   displayName?: string | null;
   profileImageUrl?: string | null;
 };
@@ -24,6 +27,7 @@ export type OAuthMode = "login" | "signup";
 type OAuthState = {
   provider: OAuthProvider;
   mode: OAuthMode;
+  role?: UserRole;
   state: string;
   codeVerifier: string;
   consents?: ConsentPreferences;
@@ -194,6 +198,7 @@ export async function createOAuthAuthorization(
   provider: OAuthProvider,
   mode: OAuthMode,
   consents?: ConsentPreferences,
+  role: UserRole = "visitor",
 ) {
   const config = getOAuthConfig(provider);
   const state = randomToken();
@@ -215,6 +220,7 @@ export async function createOAuthAuthorization(
     stateCookie: encodeOAuthState({
       provider,
       mode,
+      role,
       state,
       codeVerifier,
       consents,
@@ -302,10 +308,12 @@ export async function findOrCreateSocialUser(
   identity: OAuthIdentity,
   mode: OAuthMode,
   consents?: ConsentPreferences,
+  role: UserRole = "visitor",
 ): Promise<PublicUser> {
   await ensureAuthSchema();
   const existing = await getDb().query<PublicUser>(
     `SELECT users.id::text, users.username,
+            users.role,
             accounts.display_name AS "displayName",
             accounts.profile_image_url AS "profileImageUrl"
      FROM social_accounts accounts
@@ -347,10 +355,10 @@ export async function findOrCreateSocialUser(
     await client.query("BEGIN");
     const username = await createSocialUsername(identity.provider, identity.providerUserId);
     const userResult = await client.query<PublicUser>(
-      `INSERT INTO app_users (username, password_hash)
-       VALUES ($1, NULL)
-       RETURNING id::text, username`,
-      [username],
+      `INSERT INTO app_users (username, password_hash, role)
+       VALUES ($1, NULL, $2)
+       RETURNING id::text, username, role`,
+      [username, role],
     );
     const user = userResult.rows[0];
 
@@ -417,6 +425,7 @@ export async function getUserBySessionToken(token: string): Promise<PublicUser |
   const tokenHash = await hashToken(token);
   const result = await getDb().query<PublicUser>(
     `SELECT users.id::text, users.username,
+            users.role,
             accounts.display_name AS "displayName",
             accounts.profile_image_url AS "profileImageUrl"
      FROM auth_sessions sessions

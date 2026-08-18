@@ -13,7 +13,7 @@ export const runtime = "nodejs";
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json() as { username?: unknown; password?: unknown; consents?: unknown };
+    const body = await request.json() as { username?: unknown; password?: unknown; consents?: unknown; role?: unknown };
     const validationError = validateCredentials(body.username, body.password);
 
     if (validationError) {
@@ -26,18 +26,19 @@ export async function POST(request: NextRequest) {
     }
 
     const username = (body.username as string).trim();
+    const role = body.role === "exhibition_operator" ? "exhibition_operator" : "visitor";
     const passwordHash = await hash(body.password as string, 12);
     await ensureAuthSchema();
     const client = await getDb().connect();
-    let user: { id: string; username: string };
+    let user: { id: string; username: string; role: "visitor" | "exhibition_operator" };
 
     try {
       await client.query("BEGIN");
-      const result = await client.query<{ id: string; username: string }>(
-        `INSERT INTO app_users (username, password_hash)
-         VALUES ($1, $2)
-         RETURNING id::text, username`,
-        [username, passwordHash],
+      const result = await client.query<{ id: string; username: string; role: "visitor" | "exhibition_operator" }>(
+        `INSERT INTO app_users (username, password_hash, role)
+         VALUES ($1, $2, $3)
+         RETURNING id::text, username, role`,
+        [username, passwordHash, role],
       );
       user = result.rows[0];
 

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { NativeQrScanner } from "./NativeQrScanner";
 
 export type CollectedArtwork = {
   artworkId: string;
@@ -48,6 +49,22 @@ function decodeNdefRecord(record: NdefRecord): string | null {
     return null;
   }
   return null;
+}
+
+function getArtworkLinkPayload(value: string) {
+  try {
+    const parsed = new URL(value, window.location.origin);
+    const segments = parsed.pathname.split("/").filter(Boolean);
+    if (segments[0] !== "collect" || !segments[1]) return { identifier: value, artworkQr: false };
+    const hasExhibitionPrefix = Boolean(segments[2]);
+    return {
+      identifier: hasExhibitionPrefix ? segments[2] : segments[1],
+      ...(hasExhibitionPrefix && /^\d+$/.test(segments[1]) ? { exhibitionId: segments[1] } : {}),
+      artworkQr: true,
+    };
+  } catch {
+    return { identifier: value, artworkQr: false };
+  }
 }
 
 const overlayStyle: React.CSSProperties = {
@@ -134,6 +151,7 @@ export function CollectArtworkPanel({
   const [code, setCode] = useState("");
   const [status, setStatus] = useState<Status>("idle");
   const [result, setResult] = useState<ResultState | null>(null);
+  const [qrScannerOpen, setQrScannerOpen] = useState(false);
   const codeInputRef = useRef<HTMLInputElement | null>(null);
   // 이 패널은 버튼 클릭 시에만 클라이언트에서 렌더되어(SSR 대상 아님) 초기 렌더에서 바로 판정해도 하이드레이션 불일치가 없다.
   const [nfcSupported] = useState(() => typeof window !== "undefined" && "NDEFReader" in window);
@@ -143,10 +161,11 @@ export function CollectArtworkPanel({
       if (!identifier.trim()) return;
       setStatus("collecting");
       try {
+        const artworkLinkPayload = getArtworkLinkPayload(identifier);
         const response = await fetch("/api/artworks/collect", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ identifier }),
+          body: JSON.stringify(artworkLinkPayload),
         });
         const data = (await response.json()) as {
           collected?: boolean;
@@ -272,7 +291,7 @@ export function CollectArtworkPanel({
             </div>
 
             <div style={{ display: "flex", gap: 8, justifyContent: "center" }}>
-              <span style={chipStyle}>QR 스캔</span>
+              <button type="button" style={chipStyle} onClick={() => setQrScannerOpen(true)}>QR 스캔</button>
               <span style={chipStyle}>NFC 태그</span>
               <button type="button" style={chipStyle} onClick={() => codeInputRef.current?.focus()}>코드 입력</button>
             </div>
@@ -303,6 +322,15 @@ export function CollectArtworkPanel({
           </>
         )}
       </div>
+      {qrScannerOpen && (
+        <NativeQrScanner
+          onDetected={(value) => {
+            setQrScannerOpen(false);
+            void collect(value);
+          }}
+          onClose={() => setQrScannerOpen(false)}
+        />
+      )}
     </div>
   );
 }
