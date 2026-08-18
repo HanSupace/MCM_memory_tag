@@ -1,5 +1,5 @@
 import type { ArtworkSeed } from "../types/exhibition";
-import { notionSource } from "./exhibition-data";
+import { berbrickWonderlandSource, notionSource, wearableCasaSource } from "./exhibition-data";
 
 export const artworks = [
   {
@@ -8,9 +8,11 @@ export const artworks = [
     slug: "infinity",
     title: "INFINITY",
     artistName: "최정화",
+    imageUrl: "/artworks/fam/infinity.png",
     series: "Journey to Infinity",
     type: "오브제 설치",
     form: "뫼비우스의 띠를 연상시키는 순환 구조",
+    material: "금속·도자기 등 다양한 밥그릇, 결합 구조",
     location: "MCM HAUS B1·1F 전시 동선의 시작",
     summary:
       "여러 개의 밥그릇을 이어 시작과 끝을 구분할 수 없는 고리 형태로 만든 설치 작품입니다.",
@@ -24,7 +26,7 @@ export const artworks = [
       "멀리서 전체 형태를 먼저 본 다음 가까이에서 그릇 하나하나를 살펴보세요.",
       "각 그릇이 독립된 사물이면서 전체 구조의 일부가 되는 방식을 관찰해 보세요.",
     ],
-    keywords: ["무한", "순환", "가족", "관계", "공존", "공동체", "밥그릇"],
+    keywords: ["무한", "순환", "가족", "관계", "공존", "공동체", "밥그릇", "설치미술"],
     tmi: [
       "이 작품은 MCM HAUS에서 처음 만들어진 완전히 새로운 형식이라기보다 최정화가 여러 공간에서 지속적으로 변주해 온 작품 계열입니다.",
       "2022년 운경고택 전시에서는 밥그릇으로 구성된 《Infinity》가 가족이라는 관계를 상징했습니다.",
@@ -37,6 +39,10 @@ export const artworks = [
       "설치 장소와 그릇의 배열에 따라 작품의 크기와 인상이 달라질 수 있습니다.",
       "작품의 의미는 값비싼 재료보다 일상적인 밥그릇이 관계의 상징으로 변하는 데 있습니다.",
     ],
+    contents: [
+      "서로 다른 크기와 재질의 밥그릇",
+      "시작과 끝이 구분되지 않는 고리형 결합 구조",
+    ],
     displayOrder: 1,
     source: notionSource,
   },
@@ -46,8 +52,11 @@ export const artworks = [
     slug: "muimui",
     title: "무이무이",
     artistName: "최정화",
+    imageUrl: "/artworks/fam/muimui.png",
     series: "무이무이 시리즈",
     type: "고가구·수집품·생활 오브제 설치",
+    form: "고가구 안팎에 수집 오브제를 쌓고 진열한 혼합 설치",
+    material: "목재 고가구, 플라스틱 생활용품, 금속·장식 오브제",
     location: "MCM HAUS 1F 입구",
     summary:
       "오래된 한국 가구 위나 안에 현대적인 생활용품과 장식물을 배치한 설치 작품입니다.",
@@ -61,7 +70,7 @@ export const artworks = [
       "가장 오래되어 보이는 물건과 가장 현대적으로 보이는 물건을 찾아보세요.",
       "서로 다른 두 물건이 함께 놓였을 때 각각의 인상이 어떻게 달라지는지 비교해 보세요.",
     ],
-    keywords: ["공존", "수집", "기억", "전통과 현대", "고가구", "생활용품"],
+    keywords: ["공존", "수집", "기억", "전통과 현대", "고가구", "생활용품", "오브제 설치", "사물의 위계"],
     tmi: [
       "《무이무이》에 사용되는 가구 상당수는 작가가 오랫동안 수집하거나 버려진 장소에서 발견한 물건들입니다.",
       "최정화의 작업실은 플라스틱 병뚜껑, 오래된 가구, 생활용품과 건축 폐기물까지 모여 있는 만물상처럼 알려져 있습니다.",
@@ -76,6 +85,11 @@ export const artworks = [
       "작품의 중요한 행위에는 제작뿐 아니라 수집, 선택, 쌓기와 진열이 포함됩니다.",
       "무이무이는 하나의 조각뿐 아니라 다양한 고가구와 오브제를 결합하는 작품군 또는 공간 개념으로도 사용됩니다.",
     ],
+    contents: [
+      "사용 흔적을 보존한 목재 고가구",
+      "플라스틱 생활용품과 장식물",
+      "작가가 수집한 동물상과 혼합 오브제",
+    ],
     displayOrder: 2,
     source: notionSource,
   },
@@ -85,8 +99,11 @@ export const artworks = [
     slug: "the-moment-of-giyeok",
     title: "ㄱ의 순간",
     artistName: "최정화",
+    imageUrl: "/artworks/fam/giyeok-moment.png",
+    series: "ㄱ의 순간",
     type: "농기구·네온 문자 설치",
     form: "오래된 나무 쟁기와 한글 네온사인의 결합",
+    material: "목재 쟁기, 네온 튜브, 전기 장치",
     location: "MCM HAUS 2층으로 올라가는 계단 부근",
     summary:
       "오래된 나무 쟁기 위에 빛나는 한글 네온 문자를 결합해 과거와 현재가 동시에 존재하는 장면을 만든 작품입니다.",
@@ -100,7 +117,7 @@ export const artworks = [
       "네온 문자를 읽기 전에 그 아래 오래된 나무의 형태를 먼저 살펴보세요.",
       "네온이 켜졌을 때와 꺼졌을 때 시선이 문자와 쟁기 사이에서 어떻게 달라지는지 비교해 보세요.",
     ],
-    keywords: ["기억", "노동", "언어", "원시와 현대", "쟁기", "네온", "한글"],
+    keywords: ["기억", "노동", "언어", "원시와 현대", "쟁기", "네온", "한글", "시간성"],
     tmi: [
       "작품에 사용된 쟁기는 작가가 약 15년 전 영국의 아프리카 골동품점에서 발견해 여러 개를 수집한 것으로 알려졌습니다.",
       "쟁기의 정확한 문화적 출처를 단순히 한국 전통 농기구라고 설명하면 부정확할 수 있습니다.",
@@ -114,6 +131,11 @@ export const artworks = [
       "작품에 사용된 쟁기는 작가가 영국의 아프리카 골동품점에서 발견해 수집한 것으로 알려져 있어 정확한 문화적 출처를 한국 전통 농기구로 단정하면 부정확할 수 있습니다.",
       "MCM HAUS에서는 층과 층 사이를 이동하는 계단 부근에 설치됐습니다.",
     ],
+    contents: [
+      "시간의 흔적이 남은 목재 쟁기",
+      "한글 자음 ㄱ을 중심으로 한 네온 문자",
+      "네온을 점등하는 전기 장치",
+    ],
     displayOrder: 3,
     source: notionSource,
   },
@@ -123,21 +145,26 @@ export const artworks = [
     slug: "mcm-johannes-wohnseifer-dj-trunk",
     title: "MCM × 요하네스 본자이퍼 DJ 트렁크",
     artistName: "요하네스 본자이퍼",
+    imageUrl: "/artworks/fam/dj-trunk.png",
     collaborator: "MCM",
+    series: "MCM × Johannes Wohnseifer",
     type: "혼합매체·기능성 오브제",
+    form: "DJ 장비와 수집 오브제를 수납한 개폐형 이동식 트렁크",
     material: "코냑 비세토스 모노그램",
     location: "MCM HAUS 1F",
     summary:
       "MCM 여행용 트렁크를 DJ 장비와 작가의 수집품을 담는 이동식 예술 공간으로 변환한 작품입니다.",
     description:
       "트렁크를 열면 작가와 MCM의 역사 및 취향을 상징하는 이미지, 음악과 오브제가 등장합니다. 가방은 물건을 운반하는 도구를 넘어 기억과 문화를 이동시키는 아카이브가 됩니다.",
+    titleMeaning:
+      "DJ 트렁크는 여행용 가방, 음악 장비 케이스와 이동식 전시 공간이라는 세 역할을 함께 드러내는 이름입니다.",
     interpretation:
       "유럽 르네상스와 바로크 시대의 분더캄머처럼 서로 다른 예술품과 기념품을 한 공간에 모읍니다. 공적인 브랜드 역사와 작가의 사적인 기억을 함께 담아 여행, 수집과 문화적 이동이라는 MCM의 정체성을 확장합니다.",
     viewingTips: [
       "트렁크 안에서 MCM의 역사에 속하는 물건과 작가 개인의 취향에 속하는 물건을 구분해 보세요.",
       "두 영역을 명확하게 나눌 수 없는 이유를 생각해 보세요.",
     ],
-    keywords: ["여행", "기억", "음악", "아카이브", "분더캄머", "트렁크", "MCM"],
+    keywords: ["여행", "기억", "음악", "아카이브", "분더캄머", "트렁크", "MCM", "혼합매체"],
     tmi: [
       "작품은 2022년 서울에서 처음 공개된 것이 아니라 베를린 갤러리 위크엔드에서 먼저 선보인 뒤 서울로 이동했습니다.",
       "트렁크가 실제로 도시를 이동했다는 사실 자체가 여행과 이동을 강조해 온 MCM의 브랜드 정체성과 연결됩니다.",
@@ -162,5 +189,567 @@ export const artworks = [
     ],
     displayOrder: 4,
     source: notionSource,
+  },
+  {
+    id: "artwork-wearable-casa-chatty-sofa",
+    exhibitionId: "exhibition-wearable-casa-2024",
+    slug: "chatty-sofa",
+    title: "Chatty Sofa",
+    artistName: "Atelier Biagetti",
+    imageUrl: "/artworks/wearable-casa/chatty-sofa.png",
+    collaborator: "MCM",
+    series: "Wearable Casa Collection",
+    type: "3인용 문자형 소파",
+    form: "CASA 네 글자를 시각화한 조형",
+    material: "고무 폼, 테디 원단",
+    location: "MCM HAUS 3F 메인 리빙 공간",
+    summary:
+      "CASA라는 단어를 세 사람이 앉을 수 있는 소파로 바꾸어 집을 대화와 연결이 일어나는 공간으로 표현한 작품입니다.",
+    description:
+      "가로 200cm, 세로 115cm, 높이 93cm의 소파로, 부드러운 고무 폼을 테디 원단으로 마감했습니다. 스트리트 그래피티와 도시 예술을 떠올리게 하는 문자형 조형 안에 좌석, 대화 공간, 기기 연결과 충전 기능을 함께 담았습니다.",
+    titleMeaning:
+      "Chatty는 수다스러운이라는 뜻입니다. 소파를 단순히 앉는 가구가 아니라 사람과 디지털 기기가 만나 대화하는 집의 중심으로 바라봅니다.",
+    interpretation:
+      "집을 뜻하는 CASA가 실제 가구가 되면서 단어, 공간과 신체가 하나로 연결됩니다. 아날로그 대화와 디지털 기기 충전을 동시에 지원하는 기능은 오늘날의 거실이 사람과 기술이 함께 머무는 커뮤니케이션 공간이라는 점을 보여줍니다.",
+    viewingTips: [
+      "소파의 전체 윤곽에서 CASA의 각 글자가 어떻게 연결되는지 찾아보세요.",
+      "조형적인 외관과 실제 좌석·충전 기능이 한 오브제 안에서 어떻게 공존하는지 살펴보세요.",
+    ],
+    keywords: ["CASA", "대화", "연결", "소파", "그래피티", "디지털 기기", "문자형 가구", "커뮤니케이션"],
+    tmi: [
+      "Studio 65가 1970년대에 선보인 입술 모양 Bocca Sofa를 디자인 참조로 삼았습니다.",
+      "작품은 사람의 대화뿐 아니라 기기 연결과 충전까지 포함해 디지털 시대의 커뮤니케이션 공간을 제안합니다.",
+    ],
+    facts: [
+      "3인용 소파이며 크기는 가로 200cm, 세로 115cm, 높이 93cm입니다.",
+      "고무 폼 소재를 테디 원단으로 마감했습니다.",
+      "좌석, 대화 공간, 기기 연결과 충전 기능을 갖습니다.",
+    ],
+    contents: [
+      "CASA 네 글자를 연결한 3인용 좌석",
+      "기기 연결·충전 기능",
+      "고무 폼과 테디 원단으로 만든 문자형 외피",
+    ],
+    displayOrder: 1,
+    source: wearableCasaSource,
+  },
+  {
+    id: "artwork-wearable-casa-tatamu",
+    exhibitionId: "exhibition-wearable-casa-2024",
+    slug: "tatamu",
+    title: "Tatamu",
+    artistName: "Atelier Biagetti",
+    imageUrl: "/artworks/wearable-casa/tatamu.png",
+    collaborator: "MCM",
+    series: "Wearable Casa Collection",
+    type: "변형형 모듈 좌석·데이베드·매트",
+    form: "롤 형태의 매트를 접고 펼쳐 변형하는 구조",
+    material: "쿠션 폼, 컬러 직물, MCM 비세토스 소재·라탄(버전별)",
+    location: "MCM HAUS 3F 메인 리빙 공간",
+    summary:
+      "부드러운 롤형 매트를 접고 펼치는 방법에 따라 좌석, 데이베드와 다다미형 공간으로 바뀌는 모듈 가구입니다.",
+    description:
+      "싱글 모듈은 180×90×10cm이며, 270×270×10cm의 타타미형 매트, 180×90×40cm의 데이베드와 90×90×40cm의 푸프 형태로 변형할 수 있습니다. 노랑, 빨강, 파랑과 흰색을 사용하며 코냑 컬러와 라탄을 결합한 버전도 있습니다.",
+    titleMeaning:
+      "Tatamu는 접는다는 뜻의 일본어 畳む에서 가져온 이름입니다. 하나의 물건을 접고 펼치는 단순한 행위가 공간의 기능을 바꿉니다.",
+    interpretation:
+      "고정된 가구 대신 사용자의 상황과 공간에 맞춰 형태를 바꾸는 구조는 디지털 노마드의 유동적인 생활방식을 반영합니다. 바우하우스 색채와 기능주의를 현대적인 휴식 방식과 연결합니다.",
+    viewingTips: [
+      "같은 모듈이 평평한 매트와 높이가 있는 좌석으로 바뀌는 접힘 구조를 따라가 보세요.",
+      "노랑, 빨강, 파랑과 흰색의 조합에서 바우하우스의 색채 언어를 찾아보세요.",
+    ],
+    keywords: ["접기", "변형", "모듈", "데이베드", "바우하우스", "이동형 가구", "다다미", "푸프"],
+    tmi: [
+      "Eileen Gray의 데이베드와 바우하우스의 원색 사용을 디자인 참조로 삼았습니다.",
+      "코냑 컬러와 라탄을 결합한 별도 버전은 MCM의 소재 언어를 리빙 오브제로 확장합니다.",
+    ],
+    facts: [
+      "싱글 모듈 크기는 180×90×10cm입니다.",
+      "타타미형, 데이베드형과 푸프형으로 구성할 수 있습니다.",
+      "명칭은 접는다는 의미의 일본어 畳む에서 유래했습니다.",
+    ],
+    contents: [
+      "싱글 모듈 — 180×90×10cm",
+      "타타미형 — 270×270×10cm",
+      "데이베드형 — 180×90×40cm",
+      "푸프형 — 90×90×40cm",
+    ],
+    displayOrder: 2,
+    source: wearableCasaSource,
+  },
+  {
+    id: "artwork-wearable-casa-clepsydra",
+    exhibitionId: "exhibition-wearable-casa-2024",
+    slug: "clepsydra-lantern",
+    title: "Clepsydra Lantern",
+    artistName: "Atelier Biagetti",
+    imageUrl: "/artworks/wearable-casa/clepsydra.png",
+    collaborator: "MCM",
+    series: "Wearable Casa Collection",
+    type: "휴대용 충전식 테이블 조명·착용형 오브제",
+    form: "모래시계를 닮은 형태와 분리 가능한 램프 갓",
+    material: "가죽, 아연 도금 알루미늄, 라탄",
+    location: "MCM HAUS 3F 메인 리빙 공간",
+    summary:
+      "충전식 LED 테이블 조명의 갓을 분리해 모자로 착용할 수 있도록 만든 이동형 조명입니다.",
+    description:
+      "가로 17cm, 세로 15cm, 높이 38cm의 모래시계형 조명으로 가죽, 아연 도금 알루미늄과 라탄을 결합했습니다. 전선에 고정되지 않는 충전식 LED를 사용하며 램프 갓은 머리에 쓰는 모자로 변형됩니다.",
+    titleMeaning:
+      "Clepsydra는 물시계를 뜻합니다. 모래시계를 닮은 외형과 이동하며 시간을 보내는 생활방식을 함께 떠올리게 합니다.",
+    interpretation:
+      "집 안에 고정되던 조명을 몸에 착용하고 이동할 수 있게 바꾸어 집의 기능이 사람을 따라다니게 합니다. 빛을 제공하는 가구와 패션 액세서리가 하나의 오브제 안에서 교차합니다.",
+    viewingTips: [
+      "조명 전체를 본 뒤 분리되는 램프 갓이 모자로 바뀌는 경계를 찾아보세요.",
+      "가죽, 금속과 라탄처럼 성격이 다른 재료가 휴대성과 집의 안락함을 어떻게 함께 표현하는지 살펴보세요.",
+    ],
+    keywords: ["조명", "모자", "휴대성", "이중 용도", "LED", "착용", "라탄", "충전식"],
+    tmi: [
+      "전원은 충전식이어서 콘센트가 없는 장소에서도 사용할 수 있습니다.",
+      "램프 갓을 모자로 착용하는 순간 집의 조명이 패션 아이템으로 바뀝니다.",
+    ],
+    facts: [
+      "크기는 가로 17cm, 세로 15cm, 높이 38cm입니다.",
+      "가죽, 아연 도금 알루미늄과 라탄으로 제작됐습니다.",
+      "충전식 LED 조명이며 램프 갓을 모자로 착용할 수 있습니다.",
+    ],
+    contents: [
+      "충전식 LED 조명 본체",
+      "모자로 착용할 수 있는 분리형 램프 갓",
+      "휴대를 위한 상단 손잡이 구조",
+    ],
+    displayOrder: 3,
+    source: wearableCasaSource,
+  },
+  {
+    id: "artwork-wearable-casa-planet-small",
+    exhibitionId: "exhibition-wearable-casa-2024",
+    slug: "planet-small",
+    title: "Planet Small",
+    artistName: "Atelier Biagetti",
+    imageUrl: "/artworks/wearable-casa/planet-small.png",
+    collaborator: "MCM",
+    series: "Space Cabinet·Planet Series",
+    type: "거울이 포함된 구형 주얼리 미니백",
+    form: "행성과 지구 밖 탐사를 연상시키는 소형 구체",
+    material: "MCM 비세토스 패턴 소재, 금속 체인, 거울",
+    location: "MCM HAUS 1F 우주·웨어러블 오브제 공간",
+    summary:
+      "행성과 외계 탐험에서 영감을 받은 구형 오브제를 거울이 포함된 주얼리 미니백으로 만든 작품입니다.",
+    description:
+      "Planet 시리즈에서 가장 작은 형태로, 몸에 지니는 가방과 개인 물건을 비추는 거울의 기능을 결합했습니다. 작은 행성을 연상시키는 구체와 체인 스트랩을 통해 이동하는 사람이 자신만의 작은 세계를 휴대한다는 개념을 보여줍니다.",
+    titleMeaning:
+      "Planet Small은 Planet 시리즈의 가장 작은 행성으로, 몸에 지닐 수 있는 개인 공간과 액세서리를 뜻합니다.",
+    interpretation:
+      "행성처럼 완결된 구형 미니백은 새로운 장소를 탐험하는 이동자의 작은 세계를 상징합니다. 패션 액세서리와 개인 공간의 기능이 하나의 휴대 가능한 오브제로 결합됩니다.",
+    viewingTips: [
+      "가방의 구형 구조와 체인 스트랩이 행성의 형태와 궤도를 어떻게 떠올리게 하는지 살펴보세요.",
+      "Planet Medium과 Big으로 크기가 커질 때 기능이 어떻게 달라지는지 비교해 보세요.",
+    ],
+    keywords: ["행성", "우주", "미니백", "거울", "주얼리", "휴대성", "체인 스트랩", "개인 공간"],
+    tmi: [
+      "세 오브제는 크기와 기능은 다르지만 행성 및 지구 밖 탐사라는 공통 레퍼런스를 공유합니다.",
+      "Small은 패션 액세서리, Medium은 수납 가구, Big은 웰니스 좌석으로 확장됩니다.",
+    ],
+    facts: [
+      "Planet Small은 거울이 있는 주얼리 미니백입니다.",
+      "Space Cabinet·Planet Series에서 가장 작은 개별 항목입니다.",
+    ],
+    contents: [
+      "거울이 포함된 구형 미니백 본체",
+      "어깨에 걸 수 있는 체인 스트랩",
+      "작은 소지품을 위한 주얼리 수납공간",
+    ],
+    displayOrder: 4,
+    source: wearableCasaSource,
+  },
+  {
+    id: "artwork-wearable-casa-planet-medium",
+    exhibitionId: "exhibition-wearable-casa-2024",
+    slug: "planet-medium",
+    title: "Planet Medium",
+    artistName: "Atelier Biagetti",
+    imageUrl: "/artworks/wearable-casa/planet-medium.png",
+    collaborator: "MCM",
+    series: "Space Cabinet·Planet Series",
+    type: "후광이 있는 구형 미니 캐비닛",
+    form: "빛나는 원형 후광을 갖춘 중형 구체",
+    material: "MCM 비세토스 패턴 외장, 미러·조명 요소, 구조 프레임",
+    location: "MCM HAUS 1F 우주·웨어러블 오브제 공간",
+    summary:
+      "행성을 닮은 구형 수납공간과 빛나는 후광을 결합해 작은 캐비닛을 우주적 오브제로 바꾼 작품입니다.",
+    description:
+      "Planet 시리즈의 중간 크기 항목으로, 패션 액세서리보다 큰 수납 기능을 갖추면서도 공간 안에서 독립된 조형물처럼 보입니다. 중앙의 빛과 원형 테두리가 행성의 후광을 표현합니다.",
+    titleMeaning:
+      "Planet Medium은 액세서리 크기의 Small과 좌석 크기의 Big 사이에서 수납 가구로 확장된 중간 행성을 뜻합니다.",
+    interpretation:
+      "수납장은 보통 벽이나 방에 고정되지만 Planet Medium은 하나의 작은 행성처럼 독립적으로 존재합니다. 집의 수납 기능을 새로운 장소로 옮길 수 있는 개인화된 공간으로 해석합니다.",
+    viewingTips: [
+      "중앙의 빛과 원형 테두리가 만드는 후광을 관찰해 보세요.",
+      "작은 캐비닛이라는 실용적 기능과 우주적 조형이 어떻게 공존하는지 살펴보세요.",
+    ],
+    keywords: ["행성", "우주", "캐비닛", "후광", "수납", "조명", "미니 캐비닛", "개인 공간"],
+    tmi: [
+      "세 Planet 오브제 가운데 패션 액세서리와 대형 가구 사이를 연결하는 중간 크기입니다.",
+      "원형 후광은 캐비닛을 일상 가구가 아닌 하나의 천체처럼 보이게 합니다.",
+    ],
+    facts: [
+      "Planet Medium은 후광이 있는 구형 미니 캐비닛입니다.",
+      "Space Cabinet·Planet Series의 중간 크기 개별 항목입니다.",
+    ],
+    contents: [
+      "구형 미니 캐비닛 본체",
+      "행성의 후광을 표현하는 원형 조명",
+      "개인 물건을 보관하는 내부 수납공간",
+    ],
+    displayOrder: 5,
+    source: wearableCasaSource,
+  },
+  {
+    id: "artwork-wearable-casa-planet-big",
+    exhibitionId: "exhibition-wearable-casa-2024",
+    slug: "planet-big",
+    title: "Planet Big",
+    artistName: "Atelier Biagetti",
+    imageUrl: "/artworks/wearable-casa/planet-big.png",
+    collaborator: "MCM",
+    series: "Space Cabinet·Planet Series",
+    type: "공기 주입식 대형 웰니스 시팅볼",
+    form: "몸을 지지하는 대형 구체",
+    material: "공기 주입식 내부 구조, MCM 비세토스 패턴 외피, 밴드 구조",
+    location: "MCM HAUS 1F 우주·웨어러블 오브제 공간",
+    summary:
+      "공기를 주입해 사용하는 대형 구체를 몸을 기대고 앉을 수 있는 웰니스 시팅볼로 만든 작품입니다.",
+    description:
+      "Planet 시리즈에서 가장 큰 항목으로, MCM 비세토스 패턴을 입힌 구형 표면과 가로 방향의 밴드 구조가 특징입니다. 공기를 넣고 뺄 수 있어 큰 가구도 이동 가능한 형태로 바뀝니다.",
+    titleMeaning:
+      "Planet Big은 Planet 시리즈의 가장 큰 행성으로, 휴대 오브제가 몸 전체를 지지하는 생활공간으로 확장된 형태를 뜻합니다.",
+    interpretation:
+      "단단하고 무거운 좌석 대신 공기로 형태를 만드는 구조는 이동하는 집에 필요한 유연성과 휴대성을 보여줍니다. 작은 액세서리에서 시작한 Planet 시리즈가 몸 전체를 지지하는 생활공간으로 확장됩니다.",
+    viewingTips: [
+      "구체의 표면을 나누는 밴드와 비세토스 패턴이 형태를 어떻게 강조하는지 살펴보세요.",
+      "공기를 빼면 이동할 수 있다는 점을 떠올리며 일반적인 가구와 비교해 보세요.",
+    ],
+    keywords: ["행성", "우주", "시팅볼", "웰니스", "공기 주입", "이동형 가구", "비세토스", "휴대성"],
+    tmi: [
+      "Planet Big은 단단한 가구가 아니라 공기를 주입해 사용하는 대형 웰니스 시팅볼입니다.",
+      "공기를 빼면 부피를 줄일 수 있어 웨어러블 카사의 이동성 개념과 연결됩니다.",
+    ],
+    facts: [
+      "Planet Big은 공기를 주입하는 대형 웰니스 시팅볼입니다.",
+      "Space Cabinet·Planet Series에서 가장 큰 개별 항목입니다.",
+    ],
+    contents: [
+      "공기를 넣고 뺄 수 있는 대형 구형 본체",
+      "MCM 비세토스 패턴 외피",
+      "형태를 지지하고 분할하는 가로 밴드 구조",
+    ],
+    displayOrder: 6,
+    source: wearableCasaSource,
+  },
+  {
+    id: "artwork-wearable-casa-magic-gilet",
+    exhibitionId: "exhibition-wearable-casa-2024",
+    slug: "magic-gilet",
+    title: "Magic Gilet",
+    artistName: "Atelier Biagetti",
+    imageUrl: "/artworks/wearable-casa/magic-gilet.png",
+    collaborator: "MCM",
+    series: "Wearable Casa Collection",
+    type: "착용형 수납 오브제·자립형 홈 오브제",
+    form: "조끼, 휴대용 수납장과 자립형 오브제로 변형",
+    material: "MCM 비세토스 패턴 가죽",
+    location: "MCM HAUS 1F 우주·웨어러블 오브제 공간",
+    summary:
+      "집의 수납공간을 몸으로 옮겨 조끼로 착용하거나 독립된 수납 오브제로 세울 수 있게 만든 작품입니다.",
+    description:
+      "접었을 때 40×5×56cm, 조끼로 착용했을 때 40×27×57cm, 단독으로 세웠을 때 40×21×56cm입니다. MCM 비세토스 패턴 가죽으로 제작되며 열쇠와 펜처럼 좋아하는 물건을 몸 가까이에 보관할 수 있습니다.",
+    titleMeaning:
+      "Magic Gilet은 조끼를 뜻하는 Gilet에 하나의 물건이 의복과 수납 가구로 변하는 마법 같은 기능을 결합한 이름입니다.",
+    interpretation:
+      "벽이나 가구에 고정되던 수납 기능을 사람의 몸으로 옮기면서 집을 휴대 가능한 개인 영역으로 바꿉니다. 착용하지 않을 때도 독립적인 오브제로 존재해 패션과 리빙 제품의 구분을 흐립니다.",
+    viewingTips: [
+      "접힌 상태, 착용 상태와 자립 상태에서 수납공간의 위치가 어떻게 달라지는지 살펴보세요.",
+      "MCM의 가방 패턴이 조끼와 가구 사이를 연결하는 방식을 관찰해 보세요.",
+    ],
+    keywords: ["조끼", "수납", "비세토스", "웨어러블", "휴대용 집", "변형", "Uten.Silo", "가죽"],
+    tmi: [
+      "Dorothee Becker가 1969년 Vitra를 위해 디자인한 벽걸이 수납 시스템 Uten.Silo를 참조했습니다.",
+      "착용하지 않을 때도 스스로 서는 독립적인 홈 오브제로 사용할 수 있습니다.",
+    ],
+    facts: [
+      "접었을 때 크기는 40×5×56cm입니다.",
+      "조끼 착용 상태는 40×27×57cm, 자립 상태는 40×21×56cm입니다.",
+      "MCM 비세토스 패턴 가죽으로 제작됐습니다.",
+    ],
+    contents: [
+      "조끼로 착용하는 가죽 본체",
+      "열쇠·펜과 작은 물건을 위한 다중 포켓",
+      "착용하지 않을 때 자립하는 수납 구조",
+    ],
+    displayOrder: 7,
+    source: wearableCasaSource,
+  },
+  {
+    id: "artwork-wearable-casa-pet-backpack",
+    exhibitionId: "exhibition-wearable-casa-2024",
+    slug: "pet-backpack",
+    title: "Pet Backpack",
+    artistName: "Atelier Biagetti",
+    imageUrl: "/artworks/wearable-casa/pet-backpack.png",
+    collaborator: "MCM",
+    series: "Wearable Casa Collection",
+    type: "반려동물 이동용 백팩",
+    form: "소형 반려동물을 위한 조절 가능한 이동형 컴파트먼트",
+    material: "MCM 시그니처 비세토스 소재, 조절식 패딩",
+    location: "MCM HAUS 1F 우주·웨어러블 오브제 공간",
+    summary:
+      "소형 반려동물과 함께 이동하는 도시 생활자를 위해 보호 기능과 조절 가능한 내부 공간을 갖춘 백팩입니다.",
+    description:
+      "MCM 시그니처 비세토스 패턴을 사용하며 내부 컴파트먼트의 크기를 조절할 수 있습니다. 조절 가능한 패딩 구조가 이동 중인 소형 반려동물을 편안하게 보호합니다.",
+    titleMeaning:
+      "Pet Backpack은 반려동물을 단순히 운반하는 가방이 아니라 함께 이동하는 작은 집으로 품는 기능을 직접적으로 나타냅니다.",
+    interpretation:
+      "웨어러블 카사가 제안하는 이동형 생활공간의 범위를 사람과 물건에서 반려동물까지 확장합니다. 이동 중에도 함께 머물 수 있는 안전한 공간을 제공해 집을 관계를 품고 이동하는 구조로 해석합니다.",
+    viewingTips: [
+      "일반적인 패션 백팩과 반려동물 보호 공간이 결합되는 구조를 살펴보세요.",
+      "내부 크기와 패딩을 조절하는 기능이 이동성과 안락함을 어떻게 함께 만드는지 생각해 보세요.",
+    ],
+    keywords: ["반려동물", "백팩", "이동", "보호", "비세토스", "도시 생활", "컴파트먼트", "패딩"],
+    tmi: [
+      "웨어러블 카사의 이동형 집 개념은 사람뿐 아니라 함께 생활하는 소형 반려동물도 포함합니다.",
+      "내부 컴파트먼트와 패딩을 조절해 반려동물의 크기와 이동 상황에 대응합니다.",
+    ],
+    facts: [
+      "소형 반려동물과 함께 이동하는 도시 생활자를 대상으로 합니다.",
+      "MCM 시그니처 비세토스 패턴을 사용합니다.",
+      "내부에는 크기 조절식 컴파트먼트와 조절 가능한 패딩이 있습니다.",
+    ],
+    contents: [
+      "비세토스 패턴 백팩 외피",
+      "크기 조절식 반려동물 컴파트먼트",
+      "이동 중 충격을 줄이는 조절식 패딩",
+    ],
+    displayOrder: 8,
+    source: wearableCasaSource,
+  },
+  {
+    id: "artwork-wearable-casa-mindteaser-chair",
+    exhibitionId: "exhibition-wearable-casa-2024",
+    slug: "mindteaser-chair",
+    title: "Mindteaser Chair",
+    artistName: "Atelier Biagetti",
+    imageUrl: "/artworks/wearable-casa/mindteaser-chair.png",
+    collaborator: "MCM",
+    series: "Mindteaser Chair·Cube·Stool",
+    type: "재구성 가능한 모듈형 가구 작품군",
+    form: "다섯 가지 형태를 조합하는 의자·스툴·커피테이블",
+    material: "패딩 마감 모듈, 내부 구조체",
+    location: "MCM HAUS 5F 미래형 모듈 가구·디지털 공간",
+    summary:
+      "비디오게임과 루빅스 큐브에서 영감을 받은 다섯 가지 형태를 조합해 의자, 스툴과 커피테이블로 사용하는 모듈 가구입니다.",
+    description:
+      "Mindteaser Chair와 Cube·Stool은 서로 다른 다섯 가지 형태를 사용자가 직접 조합하도록 설계됐습니다. 배치와 결합 방법에 따라 앉는 가구와 작은 테이블 등 필요한 기능과 공간 구성이 달라집니다.",
+    titleMeaning:
+      "Mind Teaser는 생각을 자극하는 퍼즐을 뜻합니다. 완성된 형태를 감상하는 대신 사용자가 조합을 고민하고 공간을 직접 구성하도록 유도합니다.",
+    interpretation:
+      "정해진 용도를 가진 하나의 가구 대신 여러 형태와 기능의 가능성을 제공합니다. 사용자가 필요에 따라 공간을 재구성한다는 점에서 디지털 노마드의 변화하는 생활과 게임 속 조립 규칙을 연결합니다.",
+    viewingTips: [
+      "다섯 가지 형태가 각각 어떤 방향으로 결합되는지 퍼즐처럼 살펴보세요.",
+      "같은 모듈이 의자, 스툴과 커피테이블로 바뀔 때 사용자의 행동도 어떻게 달라지는지 상상해 보세요.",
+    ],
+    keywords: ["모듈", "퍼즐", "루빅스 큐브", "비디오게임", "의자", "재구성", "커피테이블", "사용자 참여"],
+    tmi: [
+      "사용자는 완성된 가구를 수동적으로 사용하는 것이 아니라 다섯 가지 형태의 조합을 결정하는 공동 설계자가 됩니다.",
+      "Chair와 Cube·Stool은 별도 형태이지만 하나의 Mind Teaser 작품군으로 같은 조합 원리를 공유합니다.",
+    ],
+    facts: [
+      "Chair와 Stool·Cube 형태로 구성된 모듈형 가구 작품군입니다.",
+      "의자, 스툴과 커피테이블 기능을 수행합니다.",
+      "비디오게임과 루빅스 큐브에서 영감을 받아 다섯 가지 형태를 조합합니다.",
+    ],
+    contents: [
+      "Mindteaser Chair — 재구성 가능한 모듈 의자",
+      "Mindteaser Cube·Stool — 스툴 또는 커피테이블로 사용하는 큐브형 모듈",
+    ],
+    displayOrder: 9,
+    source: wearableCasaSource,
+  },
+  {
+    id: "artwork-berbrick-nobuki-hizume-installation",
+    exhibitionId: "exhibition-berbrick-wonderland-2025",
+    slug: "nobuki-hizume-berbrick-installation",
+    title: "NOBUKI HIZUME BE@RBRICK Installation",
+    artistName: "노부키 히즈메",
+    imageUrl: "/artworks/berbrick-wonderland/nobuki-hizume-installation.jpg",
+    collaborator: "MCM · MEDICOM TOY",
+    series: "BE@RBRICK in MCM Wonderland",
+    type: "오트 쿠튀르 모자·BE@RBRICK 설치",
+    form: "서로 다른 쿠튀르 모자를 쓴 BE@RBRICK 군집 설치",
+    material: "BE@RBRICK 플라스틱, 직물, 수공예 헤드피스",
+    location: "MCM HAUS 입구·1F 쇼윈도와 미러룸",
+    summary:
+      "동일한 BE@RBRICK들이 각기 다른 오트 쿠튀르 모자를 쓰며 런웨이 모델처럼 독립적인 정체성을 얻는 설치 작품입니다.",
+    description:
+      "노부키 히즈메는 자신의 대표 헤드피스 〈Olympia Red〉를 BE@RBRICK의 머리 비율, 둥근 귀와 얼굴 곡선에 맞게 다시 설계했습니다. 중앙의 붉은 BE@RBRICK을 중심으로 흰색, 검정, 투명과 야광 등 서로 다른 색과 형태의 모자를 쓴 인물들이 배열됩니다. 대량생산된 동일 형식과 한 점씩 제작되는 쿠튀르의 차이를 한 장면에서 드러냅니다.",
+    titleMeaning:
+      "작가의 이름과 협업의 기반이 된 BE@RBRICK 형식을 함께 표기해, 쿠튀르 헤드피스가 표준 캐릭터를 각기 다른 인물로 바꾸는 설치임을 드러냅니다.",
+    interpretation:
+      "모자는 착용되는 패션이면서 동시에 독립된 예술 오브제가 될 수 있습니다. 표준화된 캐릭터 위에 액세서리 하나가 더해지는 순간 개별 인물처럼 읽힌다는 점에서 정체성이 무엇으로 만들어지는지 질문합니다.",
+    viewingTips: [
+      "모자를 쓰지 않은 동일한 형식과 모자를 쓴 형식의 인상이 어떻게 달라지는지 비교해 보세요.",
+      "모자의 선이 BE@RBRICK의 귀와 얼굴 곡선을 피하거나 강조하는 방식을 살펴보세요.",
+      "중앙의 붉은 작품과 주변 작품들의 색·재료가 만드는 런웨이 같은 리듬을 관찰해 보세요.",
+    ],
+    keywords: ["오트 쿠튀르", "밀리너리", "정체성", "대량생산", "수공예", "패션 조각", "BE@RBRICK", "Olympia Red"],
+    tmi: [
+      "노부키 히즈메는 2019년 프랑스 최고 장인 MOF의 모자 부문을 수상한 최초의 일본인입니다.",
+      "히즈메는 모자를 실제로 착용하는 패션이자 착용하지 않을 때도 아름다운 독립 오브제로 바라봅니다.",
+      "이번 설치는 히즈메의 〈Olympia Red〉를 BE@RBRICK 비례에 맞춰 재해석한 작업에서 시작했습니다.",
+    ],
+    facts: [
+      "MCM HAUS 입구와 1층에서 관람객을 맞이한 설치입니다.",
+      "중앙의 붉은 BE@RBRICK과 색·재료가 다른 헤드피스 작품군으로 구성됩니다.",
+      "대량생산 캐릭터와 일점 제작 오트 쿠튀르의 대비가 핵심입니다.",
+    ],
+    contents: [
+      "중앙의 붉은 BE@RBRICK — 설치의 시선을 모으는 중심 인물",
+      "오트 쿠튀르 헤드피스 — 색과 재료가 다른 수공예 모자 작품군",
+      "쇼윈도·미러룸 연출 — 캐릭터 군집을 런웨이처럼 확장하는 공간",
+    ],
+    displayOrder: 1,
+    source: berbrickWonderlandSource,
+  },
+  {
+    id: "artwork-berbrick-ken-yashiki-1000",
+    exhibitionId: "exhibition-berbrick-wonderland-2025",
+    slug: "ken-yashiki-1000-berbrick",
+    title: "Ken Yashiki 1000% BE@RBRICK",
+    artistName: "켄 야시키",
+    imageUrl: "/artworks/berbrick-wonderland/ken-yashiki-1000.jpg",
+    collaborator: "MCM · MEDICOM TOY",
+    series: "COSMOS IN BLOOM",
+    type: "직물 기반 대형 BE@RBRICK",
+    form: "키메코미 기법으로 기억의 직물을 입힌 1000% 피규어",
+    material: "아이의 옷, 직물, BE@RBRICK 바디, 키메코미",
+    location: "MCM HAUS 3F COSMOS IN BLOOM",
+    summary:
+      "작가의 아이가 성장하며 입었던 옷을 BE@RBRICK 표면에 키메코미 기법으로 새겨 가족의 시간을 대형 팝 아이콘으로 확장한 작품입니다.",
+    description:
+      "켄 야시키는 입체 표면에 홈을 내고 천을 밀어 넣는 일본의 키메코미 기법을 사용합니다. 2016년 작품 〈PAUSE–Usa Usa〉가 아이의 0세부터 2세까지의 옷에서 출발했다면, 이번 1000% 신작은 이후 약 10년 동안 함께한 옷과 기억을 담았습니다. 작품은 분홍빛 조명과 코스모스 꽃, Usa Usa 패턴이 어우러진 정원 속에 떠 있는 듯 전시됐습니다.",
+    titleMeaning:
+      "1000%는 기본 BE@RBRICK을 약 10배로 확대한 규격을 뜻하며, 작가의 이름은 가족의 기억을 입힌 이 대형 협업 작품의 저자를 나타냅니다.",
+    interpretation:
+      "아주 사적인 가족의 기억이 MCM과 BE@RBRICK이라는 보편적인 언어를 만나 더 많은 사람의 성장과 관계에 대한 이야기로 확장됩니다. 손으로 끼워 넣은 직물 조각은 지나간 시간을 멈추면서도 다음 세대로 이어지는 희망의 표면을 만듭니다.",
+    viewingTips: [
+      "얼굴과 몸의 곡면에서 서로 다른 옷감 조각이 이어지는 경계를 가까이 살펴보세요.",
+      "작품의 Usa Usa 인물 패턴과 실제 코스모스 정원이 만드는 반복을 비교해 보세요.",
+      "대형 조각이 공중에 떠 있는 연출이 개인의 기억을 우주적 풍경으로 바꾸는 방식을 느껴보세요.",
+    ],
+    keywords: ["키메코미", "가족 기억", "아이의 옷", "성장", "COSMOS IN BLOOM", "1000%", "BE@RBRICK", "직물 조각"],
+    tmi: [
+      "키메코미는 입체 표면의 홈에 직물을 밀어 넣어 형태를 완성하는 전통 기법입니다.",
+      "작가는 이 제작 방식을 희망과 소망이 실현되는 과정을 보여주는 방법으로 설명합니다.",
+      "2016년 원작과 이번 신작 사이에는 아이가 성장한 약 10년의 시간이 놓여 있습니다.",
+    ],
+    facts: [
+      "〈PAUSE–Usa Usa〉의 패턴과 제작 철학을 1000% BE@RBRICK으로 확장한 작품입니다.",
+      "아이의 실제 옷과 키메코미 기법이 사용됐습니다.",
+      "MCM HAUS 3층의 COSMOS IN BLOOM 공간에 전시됐습니다.",
+    ],
+    contents: [
+      "1000% BE@RBRICK 바디 — 기억의 직물을 담는 대형 입체 형식",
+      "아이의 옷 조각 — 약 10년의 성장과 가족 기억을 보존한 표면",
+      "부유형 코스모스 연출 — 작품을 우주적 정원처럼 보이게 하는 설치",
+    ],
+    displayOrder: 2,
+    source: berbrickWonderlandSource,
+  },
+  {
+    id: "artwork-berbrick-pause-usa-usa",
+    exhibitionId: "exhibition-berbrick-wonderland-2025",
+    slug: "pause-usa-usa",
+    title: "〈PAUSE–Usa Usa〉",
+    artistName: "켄 야시키",
+    imageUrl: "/artworks/berbrick-wonderland/pause-usa-usa.jpg",
+    series: "PAUSE",
+    type: "직물 회화·부조",
+    form: "토끼와 사람의 얼굴이 반복되는 정사각형 직물 부조",
+    material: "톱밥, 아이들이 입던 옷, 발포 스티로폼, 인조 속눈썹",
+    location: "MCM HAUS 3F COSMOS IN BLOOM",
+    summary:
+      "아이들이 0세부터 2세까지 입었던 옷으로 반복되는 Usa Usa 얼굴을 만든 2016년 작품으로, 전시의 1000%와 100%·400% BE@RBRICK의 출발점입니다.",
+    description:
+      "162×162cm 크기의 화면을 토끼 귀와 사람 얼굴이 결합된 Usa Usa 인물들이 가득 채웁니다. 각 인물의 옷과 표정은 실제 아이들의 옷감으로 구성되어 같은 패턴 안에서도 서로 다른 기억을 품습니다. 원작의 손으로 만든 표면은 1000% 작품에서는 키메코미로, 100%·400% 제품에서는 수전사 프린트로 번역됐습니다.",
+    titleMeaning:
+      "PAUSE는 흘러가는 시간을 잠시 멈추고 기억을 붙잡는 행위를, Usa Usa는 토끼와 사람의 얼굴이 반복되는 작가 고유의 형상을 가리킵니다.",
+    interpretation:
+      "더 이상 입지 못하는 작은 옷은 폐기되는 물건이 아니라 성장의 시간을 보존하는 기록이 됩니다. 하나의 원작이 손공예 대형 조각과 복제 가능한 컬렉터 제품으로 달라지는 과정도 전시의 전통과 대중문화라는 주제를 압축합니다.",
+    viewingTips: [
+      "반복되는 인물 가운데 서로 다른 옷감 무늬와 표정을 찾아보세요.",
+      "실제 원작의 촉감과 1000% BE@RBRICK 표면이 어떻게 번역됐는지 비교해 보세요.",
+      "아래의 코스모스 정원과 화면 속 인물 군집이 만드는 생명감을 함께 보세요.",
+    ],
+    keywords: ["PAUSE", "Usa Usa", "기억", "아이의 옷", "직물 부조", "2016", "키메코미 원작", "가족 서사"],
+    tmi: [
+      "작품의 재료는 작가의 아이들이 0세부터 2세까지 실제로 입었던 옷입니다.",
+      "원작의 소재와 패턴은 이번 협업에서 크기와 제작 방식이 다른 세 종류의 BE@RBRICK으로 번역됐습니다.",
+    ],
+    facts: [
+      "2016년에 제작된 162×162cm 작품입니다.",
+      "톱밥, 아이들이 입던 옷, 발포 스티로폼과 인조 속눈썹으로 구성됩니다.",
+      "이번 전시의 Ken Yashiki BE@RBRICK 작품과 제품의 원작입니다.",
+    ],
+    contents: [
+      "162×162cm 정사각 패널 — 반복 형상을 담는 직물 회화의 기반",
+      "Usa Usa 인물군 — 토끼 귀와 사람 얼굴이 결합된 작가 고유 형상",
+      "아이의 옷감과 인조 속눈썹 — 성장의 기억과 표정을 만드는 재료",
+    ],
+    displayOrder: 3,
+    source: berbrickWonderlandSource,
+  },
+  {
+    id: "artwork-berbrick-inden-ya-1000",
+    exhibitionId: "exhibition-berbrick-wonderland-2025",
+    slug: "inden-ya-1000-berbrick",
+    title: "INDEN-YA 1000% BE@RBRICK",
+    artistName: "INDEN-YA",
+    imageUrl: "/artworks/berbrick-wonderland/inden-ya-1000.jpg",
+    collaborator: "MCM · MEDICOM TOY · IVXJAPAN",
+    series: "BE@RBRICK in MCM Wonderland",
+    type: "전통 가죽공예 대형 BE@RBRICK",
+    form: "고슈 인덴 기법으로 마감한 1000% 피규어",
+    material: "사슴가죽, 옻칠, MCM 비세토스·월계수 모티프",
+    location: "MCM HAUS 5F 새벽의 신비로운 숲",
+    summary:
+      "400년 이상 이어진 고슈 인덴의 사슴가죽과 옻칠 기술을 1000% BE@RBRICK에 적용해 전통과 팝 아이콘을 결합한 작품입니다.",
+    description:
+      "INDEN-YA 장인들은 부드러운 사슴가죽 위에 옻으로 MCM 비세토스와 월계수 문양을 올리고, 이를 거대한 BE@RBRICK 곡면에 맞춰 완성했습니다. 나무와 사슴, 안개로 구성된 5층의 숲은 고요한 새벽처럼 연출됐으며 현장에서는 고슈 인덴 제작 시연도 진행됐습니다.",
+    titleMeaning:
+      "INDEN-YA는 고슈 인덴 전통을 이어 온 공방을, 1000%는 기본 BE@RBRICK을 약 10배로 확대한 대형 규격을 뜻합니다.",
+    interpretation:
+      "오래된 공예가 박물관 안의 과거에 머무르지 않고 세계적인 팝 캐릭터를 통해 새로운 세대와 만납니다. 자연 재료와 옻칠의 미세한 차이는 복제 가능한 동일 형식 안에서도 손으로 만든 유일성을 남깁니다.",
+    viewingTips: [
+      "사슴가죽의 부드러운 결 위에 옻으로 표현된 비세토스와 월계수 문양을 살펴보세요.",
+      "평면 가죽이 BE@RBRICK의 귀, 얼굴과 관절 곡면을 감싸는 제작 난도를 상상해 보세요.",
+      "새벽 숲의 자연 연출과 현대 캐릭터가 만드는 긴장과 조화를 느껴보세요.",
+    ],
+    keywords: ["INDEN-YA", "고슈 인덴", "사슴가죽", "옻칠", "전통 공예", "1000%", "BE@RBRICK", "비세토스"],
+    tmi: [
+      "고슈 인덴은 사슴가죽과 옻칠을 결합해 400년 이상 이어 온 일본 전통 공예입니다.",
+      "대형 곡면에 가죽을 구현하는 과정에는 IVXJAPAN이 협력했습니다.",
+      "전시장에서는 완성 작품뿐 아니라 장인의 고슈 인덴 제작 시연도 볼 수 있었습니다.",
+    ],
+    facts: [
+      "사슴가죽과 옻칠로 제작된 1000% BE@RBRICK입니다.",
+      "MCM 비세토스와 월계수 문양이 고슈 인덴 기법으로 표현됐습니다.",
+      "MCM HAUS 5층의 새벽 숲 콘셉트 공간에 전시됐습니다.",
+    ],
+    contents: [
+      "1000% 가죽 바디 — 고슈 인덴 공예를 담는 대형 캐릭터 형식",
+      "옻칠 문양 — MCM 비세토스와 월계수 모티프를 표현한 표면",
+      "새벽 숲 연출 — 나무·사슴·안개로 전통 공예의 자연성을 확장한 공간",
+    ],
+    displayOrder: 4,
+    source: berbrickWonderlandSource,
   },
 ] satisfies ArtworkSeed[];

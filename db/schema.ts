@@ -1,5 +1,11 @@
 import { sql } from "drizzle-orm";
-import { bigserial, bigint, boolean, char, index, jsonb, pgTable, text, timestamp, uniqueIndex, varchar } from "drizzle-orm/pg-core";
+import { bigserial, bigint, boolean, char, customType, index, jsonb, pgTable, text, timestamp, uniqueIndex, varchar } from "drizzle-orm/pg-core";
+
+const bytea = customType<{ data: Buffer }>({
+  dataType() {
+    return "bytea";
+  },
+});
 
 export const users = pgTable(
   "app_users",
@@ -181,6 +187,8 @@ export const galleryPhotos = pgTable(
     userId: bigint("user_id", { mode: "bigint" }).notNull().references(() => users.id, { onDelete: "cascade" }),
     exhibitionId: bigint("exhibition_id", { mode: "bigint" }).notNull().references(() => exhibitions.id, { onDelete: "cascade" }),
     fileRef: text("file_ref").notNull(),
+    imageData: bytea("image_data"),
+    mimeType: varchar("mime_type", { length: 100 }),
     analysisConsent: boolean("analysis_consent").notNull().default(false),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
@@ -205,6 +213,22 @@ export const docentSources = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [index("docent_sources_artwork_id_idx").on(table.artworkId)],
+);
+
+export const docentConversations = pgTable(
+  "docent_conversations",
+  {
+    id: bigserial("id", { mode: "bigint" }).primaryKey(),
+    userId: bigint("user_id", { mode: "bigint" }).notNull().references(() => users.id, { onDelete: "cascade" }),
+    exhibitionArtworkId: bigint("exhibition_artwork_id", { mode: "bigint" }).notNull().references(() => exhibitionArtworks.id, { onDelete: "cascade" }),
+    // user | assistant
+    role: varchar("role", { length: 20 }).notNull(),
+    content: text("content").notNull(),
+    // 취향 리포트 등 개인화 근거로 이 메시지를 활용해도 되는지 여부 (고객이 대화창에서 선택)
+    sharePersonalization: boolean("share_personalization").notNull().default(false),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [index("docent_conversations_user_artwork_idx").on(table.userId, table.exhibitionArtworkId)],
 );
 
 // ---------------------------------------------------------------------------
@@ -247,6 +271,8 @@ export const contentUnlocks = pgTable(
     contentType: varchar("content_type", { length: 40 }).notNull(),
     unlockAt: timestamp("unlock_at", { withTimezone: true }).notNull(),
     viewedAt: timestamp("viewed_at", { withTimezone: true }),
+    generatedContent: jsonb("generated_content"),
+    generatedAt: timestamp("generated_at", { withTimezone: true }),
   },
   (table) => [uniqueIndex("content_unlocks_user_exhibition_type_unique").on(table.userId, table.exhibitionId, table.contentType)],
 );

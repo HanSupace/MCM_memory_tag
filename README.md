@@ -50,6 +50,30 @@ npm run dev
 npm run build
 ```
 
+## 서버 최초 실행과 DB 자동 초기화
+
+서버에서는 빌드 후 아래 명령으로 실행합니다.
+
+```powershell
+npm run start:standalone
+```
+
+`start:standalone` 실행 직전에 `prestart:standalone`이 자동으로 다음 작업을 수행합니다.
+
+1. `drizzle/`의 PostgreSQL 마이그레이션을 순서대로 적용해 전체 테이블을 생성합니다.
+2. FAM·웨어러블 카사 전시와 작품 기본 데이터를 반영합니다.
+3. 초기화가 성공한 경우에만 애플리케이션 서버를 시작합니다.
+
+이미 마이그레이션된 서버 DB에서는 적용된 마이그레이션을 건너뛰며, 시드 스크립트도 기존 전시와 작품을 중복 생성하지 않습니다. 따라서 같은 시작 명령을 서버 재시작 때 계속 사용할 수 있습니다.
+
+DB만 미리 초기화해야 할 때는 다음 명령을 사용할 수 있습니다.
+
+```powershell
+npm run db:init
+```
+
+> 이 자동 초기화는 빈 서버 DB 또는 Drizzle 마이그레이션으로 관리되는 DB를 대상으로 합니다. 과거에 `drizzle-kit push`로만 만든 기존 DB는 마이그레이션 이력이 없으므로 바로 `db:init`을 실행하지 말고 먼저 백업 및 마이그레이션 기준점 설정이 필요합니다.
+
 ## 협업
 
 브랜치 운영, PR, 데이터베이스 마이그레이션 및 충돌 방지 규칙은 [CONTRIBUTING.md](CONTRIBUTING.md)를 따릅니다.

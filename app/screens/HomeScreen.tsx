@@ -1,19 +1,57 @@
-const exhibitions = [
+import { useEffect, useState } from "react";
+import { ConnectedKeyring, KeyringConnectPanel } from "../components/KeyringConnectPanel";
+
+type FeaturedExhibition = {
+  id: string;
+  title: string;
+  venue: string;
+  heroImageUrl: string | null;
+  startAt: string;
+  endAt: string;
+  status: "upcoming" | "ongoing" | "ended";
+};
+
+const fallbackExhibitions: FeaturedExhibition[] = [
   {
-    title: "공간과 기억 사이",
-    meta: "2025.04.01 – 2025.06.30 · 성수 MCM 하우스",
-    status: "진행 중",
-    art: "art-one",
-    action: "탐색하기",
+    id: "exhibition-berbrick-wonderland-2025",
+    title: "BE@RBRICK in MCM Wonderland",
+    venue: "MCM HAUS 플래그십 스토어",
+    heroImageUrl: "/artworks/berbrick-wonderland/nobuki-hizume-installation.jpg",
+    startAt: "2025-09-03",
+    endAt: "2025-09-30",
+    status: "ended",
   },
   {
-    title: "빛의 잔향",
-    meta: "2025.05.15 – 2025.07.20 · 청담 갤러리",
-    status: "예정",
-    art: "art-two",
-    action: "미리보기",
+    id: "exhibition-fam-2022",
+    title: "F.A.M: Fashion & Art at MCM HAUS",
+    venue: "MCM HAUS 청담",
+    heroImageUrl: null,
+    startAt: "2022-08-31",
+    endAt: "2022-09-30",
+    status: "ended",
+  },
+  {
+    id: "exhibition-wearable-casa-2024",
+    title: "MCM 웨어러블 카사 컬렉션",
+    venue: "MCM HAUS 플래그십 스토어",
+    heroImageUrl: "/artworks/wearable-casa/chatty-sofa.png",
+    startAt: "2024-09-03",
+    endAt: "2024-10-06",
+    status: "ended",
   },
 ];
+
+const fallbackHeroImages: Record<string, string> = {
+  "exhibition-berbrick-wonderland-2025": "/artworks/berbrick-wonderland/nobuki-hizume-installation.jpg",
+  "exhibition-wearable-casa-2024": "/artworks/wearable-casa/chatty-sofa.png",
+};
+
+const statusLabel = { upcoming: "예정", ongoing: "진행 중", ended: "종료" } as const;
+
+function formatDate(value: string) {
+  const date = new Date(value);
+  return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, "0")}.${String(date.getDate()).padStart(2, "0")}`;
+}
 
 const newContents = [
   {
@@ -51,7 +89,50 @@ const recommendations = [
   },
 ];
 
-export function HomeScreen({ announce }: { announce: (message: string) => void }) {
+export function HomeScreen({
+  announce,
+  onExploreExhibitions,
+}: {
+  announce: (message: string) => void;
+  onExploreExhibitions: (exhibitionId?: string) => void;
+}) {
+  const [featuredExhibitions, setFeaturedExhibitions] = useState(fallbackExhibitions);
+  const [keyring, setKeyring] = useState<ConnectedKeyring | null>(null);
+  const [showKeyringPanel, setShowKeyringPanel] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    fetch("/api/exhibitions", { cache: "no-store" })
+      .then(async (response) => {
+        if (!response.ok) return null;
+        const data = await response.json() as { exhibitions?: FeaturedExhibition[] };
+        return data.exhibitions?.slice(0, 3).map((exhibition) => ({
+          ...exhibition,
+          heroImageUrl: exhibition.heroImageUrl ?? fallbackHeroImages[exhibition.id] ?? null,
+        })) ?? null;
+      })
+      .then((exhibitions) => {
+        if (active && exhibitions?.length) setFeaturedExhibitions(exhibitions);
+      })
+      .catch(() => undefined);
+    return () => { active = false; };
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+    fetch("/api/keyrings", { cache: "no-store" })
+      .then(async (response) => {
+        if (!response.ok) return null;
+        const data = await response.json() as { keyring?: ConnectedKeyring | null };
+        return data.keyring ?? null;
+      })
+      .then((value) => {
+        if (active) setKeyring(value);
+      })
+      .catch(() => undefined);
+    return () => { active = false; };
+  }, []);
+
   return (
     <div className="home-content">
       <section className="home-intro">
@@ -66,20 +147,25 @@ export function HomeScreen({ announce }: { announce: (message: string) => void }
       <section className="section-block exhibitions-section">
         <div className="section-heading">
           <div><span className="section-kicker">NOW &amp; NEXT</span><h2>지금 열리는 전시</h2></div>
-          <button type="button" onClick={() => announce("전시 전체 보기는 다음 단계에서 연결됩니다.")}>전체 보기</button>
+          <button type="button" onClick={() => onExploreExhibitions()}>전체 보기</button>
         </div>
         <div className="exhibition-grid">
-          {exhibitions.map((exhibition, index) => (
-            <article className="exhibition-card" key={exhibition.title}>
-              <div className={`exhibition-art ${exhibition.art}`}>
-                <span className="exhibition-number">0{index + 1}</span>
-                <span className={`status-chip ${index === 1 ? "upcoming" : ""}`}>{exhibition.status}</span>
+          {featuredExhibitions.map((exhibition, index) => (
+            <article className="exhibition-card featured-exhibition-card" key={exhibition.id}>
+              <div
+                className="exhibition-art art-fam"
+                style={exhibition.heroImageUrl ? { backgroundImage: `url(${exhibition.heroImageUrl})` } : undefined}
+              >
+                <span className="exhibition-number">{String(index + 1).padStart(2, "0")}</span>
+                <span className={`status-chip ${exhibition.status === "upcoming" ? "upcoming" : ""}`}>
+                  {statusLabel[exhibition.status]}
+                </span>
                 <div className="art-plane plane-a" /><div className="art-plane plane-b" />
               </div>
               <div className="exhibition-card-body">
                 <h3>{exhibition.title}</h3>
-                <p>{exhibition.meta}</p>
-                <button type="button" onClick={() => announce(`${exhibition.title} 전시를 선택했습니다.`)}>{exhibition.action}<span>↗</span></button>
+                <p>{formatDate(exhibition.startAt)} – {formatDate(exhibition.endAt)} · {exhibition.venue}</p>
+                <button type="button" onClick={() => onExploreExhibitions(exhibition.id)}>탐색하기<span>↗</span></button>
               </div>
             </article>
           ))}
@@ -106,10 +192,26 @@ export function HomeScreen({ announce }: { announce: (message: string) => void }
           <span className="section-kicker light">MCM NFC EXPERIENCE</span>
           <h2>기억을 시작하는<br />나만의 키링</h2>
           <p>NFC 키링을 연결하면 전시 방문 인증과 작품 수집이 시작됩니다.</p>
-          <div className="keyring-state"><i />연결된 키링이 없습니다.</div>
-          <button type="button" onClick={() => announce("키링 연결 화면은 다음 단계에서 제공됩니다.")}>키링 연결하기<span>→</span></button>
+          <div className="keyring-state">
+            <i />
+            {keyring ? `연결된 키링: ${keyring.keyringCode}` : "연결된 키링이 없습니다."}
+          </div>
+          <button type="button" onClick={() => setShowKeyringPanel(true)}>
+            {keyring ? "키링 관리" : "키링 연결하기"}<span>→</span>
+          </button>
         </div>
       </section>
+
+      {showKeyringPanel && (
+        <KeyringConnectPanel
+          announce={announce}
+          onClose={() => setShowKeyringPanel(false)}
+          onConnected={(connected) => {
+            setKeyring(connected);
+            setShowKeyringPanel(false);
+          }}
+        />
+      )}
 
       <section className="section-block contents-section">
         <div className="section-heading">

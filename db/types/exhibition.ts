@@ -19,6 +19,7 @@ export type ExhibitionSeed = {
   address: string;
   startDate: string;
   endDate: string;
+  operatingHours?: string;
   status: ExhibitionStatus;
   artists: string[];
   audiences: string[];
@@ -39,6 +40,7 @@ export type ArtworkSeed = {
   slug: string;
   title: string;
   artistName: string;
+  imageUrl?: string;
   collaborator?: string;
   series?: string;
   type: string;
