@@ -1,4 +1,4 @@
-import { type FormEvent, useEffect, useLayoutEffect, useState } from "react";
+import { type CSSProperties, type FormEvent, type UIEvent, useEffect, useLayoutEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { CollectArtworkPanel, type CollectedArtwork } from "../components/CollectArtworkPanel";
 import { DocentConversationSummary } from "../components/DocentConversationSummary";
@@ -9,6 +9,34 @@ import {
   saveCollectionItem,
   type CollectionItem,
 } from "../../lib/collection-storage";
+
+export const PERSONAL_HALL_BACK_EVENT = "mcm-personal-hall-back";
+
+function personalHallBackground(title: string) {
+  const upper = title.toUpperCase();
+  if (upper.includes("F.A.M")) return "/artworks/fam/infinity.png";
+  if (upper.includes("WEARABLE CASA") || title.includes("웨어러블 카사")) return "/artworks/wearable-casa/chatty-sofa.png";
+  if (upper.includes("BE@RBRICK")) return "/artworks/berbrick-wonderland/pause-usa-usa.jpg";
+  return null;
+}
+
+function personalHallTitleLines(title: string) {
+  const upper = title.toUpperCase();
+  if (upper.includes("F.A.M")) return ["F.A.M", "FASHION & ART", "at MCM HAUS"];
+  if (upper.includes("WEARABLE CASA") || title.includes("웨어러블 카사")) return ["WEARABLE CASA", "at MCM HAUS"];
+  if (upper.includes("BE@RBRICK")) return ["BE@RBRICK in", "MCM Wonderland"];
+  return [title];
+}
+
+function cachedHallItems(exhibitionId: string | null) {
+  if (!exhibitionId || typeof window === "undefined") return [];
+  try {
+    const cached = window.sessionStorage.getItem(`mcm-personal-hall:${exhibitionId}`);
+    return cached ? JSON.parse(cached) as CollectionItem[] : [];
+  } catch {
+    return [];
+  }
+}
 
 export function PersonalHallScreen({
   exhibitionId,
@@ -28,6 +56,32 @@ export function PersonalHallScreen({
   const [reviewDraft, setReviewDraft] = useState("");
   const [actionPending, setActionPending] = useState(false);
   const [actionError, setActionError] = useState("");
+  const [activeHallIndex, setActiveHallIndex] = useState(0);
+  const hallRailRef = useRef<HTMLDivElement | null>(null);
+  const hallScrollFrameRef = useRef<number | null>(null);
+  const hallSnapTimeoutRef = useRef<number | null>(null);
+  const hallPointerDownRef = useRef(false);
+  const hallDidDragRef = useRef(false);
+  const hallPointerStartRef = useRef({ x: 0, scrollLeft: 0 });
+
+  useLayoutEffect(() => {
+    const cachedItems = cachedHallItems(exhibitionId);
+    if (cachedItems.length === 0) return;
+    setItems(cachedItems);
+    setLoading(false);
+  }, [exhibitionId]);
+
+  useEffect(() => {
+    const handleHeaderBack = (event: Event) => {
+      if (!selectedId) return;
+      event.preventDefault();
+      setSelectedId(null);
+      setShowReviewForm(false);
+      setActionError("");
+    };
+    window.addEventListener(PERSONAL_HALL_BACK_EVENT, handleHeaderBack);
+    return () => window.removeEventListener(PERSONAL_HALL_BACK_EVENT, handleHeaderBack);
+  }, [selectedId]);
 
   async function loadItems() {
     try {
@@ -49,6 +103,14 @@ export function PersonalHallScreen({
         if (active) {
           setItems(nextItems);
           setError("");
+          try {
+            window.sessionStorage.setItem(
+              `mcm-personal-hall:${exhibitionId ?? "all"}`,
+              JSON.stringify(exhibitionId ? nextItems.filter((item) => item.exhibitionId === exhibitionId) : nextItems),
+            );
+          } catch {
+            // Keep rendering the fetched result if session storage is unavailable.
+          }
         }
       } catch (loadError) {
         if (active) setError(loadError instanceof Error ? loadError.message : "전시회장을 불러오지 못했습니다.");
@@ -77,6 +139,69 @@ export function PersonalHallScreen({
     setShowReviewForm(false);
     setActionError("");
   }
+
+  function centerHallItem(index: number, behavior: ScrollBehavior = "smooth") {
+    const rail = hallRailRef.current;
+    if (!rail) return;
+    const cards = rail.querySelectorAll<HTMLElement>(".artwork-card");
+    const card = cards.item(index);
+    if (!card) return;
+    const left = card.offsetLeft + card.offsetWidth / 2 - rail.clientWidth / 2;
+    rail.scrollTo({ left: Math.max(0, left), behavior });
+  }
+
+  function settleHallRail(delay = 150) {
+    if (hallSnapTimeoutRef.current !== null) window.clearTimeout(hallSnapTimeoutRef.current);
+    hallSnapTimeoutRef.current = window.setTimeout(() => {
+      if (hallPointerDownRef.current) return;
+      const rail = hallRailRef.current;
+      if (!rail) return;
+      const cards = Array.from(rail.querySelectorAll<HTMLElement>(".artwork-card"));
+      if (cards.length === 0) return;
+      const railCenter = rail.scrollLeft + rail.clientWidth / 2;
+      let nearestIndex = 0;
+      let nearestDistance = Number.POSITIVE_INFINITY;
+      cards.forEach((card, index) => {
+        const distance = Math.abs(card.offsetLeft + card.offsetWidth / 2 - railCenter);
+        if (distance < nearestDistance) {
+          nearestDistance = distance;
+          nearestIndex = index;
+        }
+      });
+      setActiveHallIndex(nearestIndex);
+      centerHallItem(nearestIndex);
+    }, delay);
+  }
+
+  function handleHallScroll(event: UIEvent<HTMLDivElement>) {
+    const rail = event.currentTarget;
+    if (hallPointerDownRef.current && Math.abs(rail.scrollLeft - hallPointerStartRef.current.scrollLeft) > 5) {
+      hallDidDragRef.current = true;
+    }
+    if (hallScrollFrameRef.current !== null) window.cancelAnimationFrame(hallScrollFrameRef.current);
+    hallScrollFrameRef.current = window.requestAnimationFrame(() => {
+      const cards = Array.from(rail.querySelectorAll<HTMLElement>(".artwork-card"));
+      if (cards.length === 0) return;
+      const railCenter = rail.scrollLeft + rail.clientWidth / 2;
+      let nearestIndex = 0;
+      let nearestDistance = Number.POSITIVE_INFINITY;
+      cards.forEach((card, index) => {
+        const distance = Math.abs(card.offsetLeft + card.offsetWidth / 2 - railCenter);
+        if (distance < nearestDistance) {
+          nearestDistance = distance;
+          nearestIndex = index;
+        }
+      });
+      setActiveHallIndex((current) => current === nearestIndex ? current : nearestIndex);
+      hallScrollFrameRef.current = null;
+    });
+    settleHallRail();
+  }
+
+  useEffect(() => () => {
+    if (hallScrollFrameRef.current !== null) window.cancelAnimationFrame(hallScrollFrameRef.current);
+    if (hallSnapTimeoutRef.current !== null) window.clearTimeout(hallSnapTimeoutRef.current);
+  }, []);
 
   async function handleReviewSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -148,6 +273,13 @@ export function PersonalHallScreen({
   const selectedItem = exhibitionItems.find((item) => item.id === selectedId) ?? null;
   const exhibitionTitle = exhibitionItems[0]?.exhibitionTitle ?? "현재 전시";
 
+  useLayoutEffect(() => {
+    if (exhibitionItems.length === 0 || selectedId) return;
+    const nextIndex = Math.min(activeHallIndex, exhibitionItems.length - 1);
+    const frame = window.requestAnimationFrame(() => centerHallItem(nextIndex, "auto"));
+    return () => window.cancelAnimationFrame(frame);
+  }, [exhibitionItems.length, exhibitionId, selectedId]);
+
   if (selectedItem) {
     return (
       <div className="home-content">
@@ -184,7 +316,7 @@ export function PersonalHallScreen({
 
           <header className="personal-hall-detail-title">
             <span className="section-kicker">SELECTED ARTWORK</span>
-            <h2>{selectedItem.artworkTitle}</h2>
+            <div className="personal-hall-title-row"><h2>{selectedItem.artworkTitle}</h2></div>
             <p>{selectedItem.artistName ?? "작가 미상"}</p>
             <small>{selectedItem.exhibitionTitle}</small>
           </header>
@@ -255,13 +387,21 @@ export function PersonalHallScreen({
 
   return (
     <div className="home-content">
-      <section className="personal-hall-screen">
+      <section className={`personal-hall-screen${exhibitionItems.length > 0 ? " has-artworks personal-hall-stage-fixed" : ""}`}>
+        {exhibitionItems.length > 0 && personalHallBackground(exhibitionTitle) && (
+          <div className="personal-hall-background" style={{ backgroundImage: `url(${personalHallBackground(exhibitionTitle)})` }} aria-hidden="true" />
+        )}
         <header className="personal-hall-heading">
           <button type="button" className="round-back-button" onClick={onBack} aria-label="전시 작품으로 돌아가기">←</button>
           <div>
+            {exhibitionItems.length > 0 && (
+              <p className="personal-hall-exhibition-title">
+                {personalHallTitleLines(exhibitionTitle).map((line) => <span key={line}>{line}</span>)}
+              </p>
+            )}
             <span className="section-kicker">MY EXHIBITION HALL</span>
             <h1>나만의 전시회장</h1>
-            <p>{exhibitionTitle}에서 마음에 담은 작품과 기록을 모았습니다.</p>
+            <p className="personal-hall-description">{exhibitionTitle}에서 마음에 담은 작품과 기록을 모았습니다.</p>
             <button
               type="button"
               className="personal-hall-collect-button"
@@ -284,17 +424,56 @@ export function PersonalHallScreen({
           </div>
         ) : !loading && !error ? (
           <>
-            <div className="artwork-section-heading personal-hall-count">
-              <h2>작품 {exhibitionItems.length}점</h2>
-              <span>카드를 눌러 기록 보기</span>
+            <div className="personal-hall-lamp" aria-hidden="true">
+              <Image src="/personal-hall-lamp.png" alt="" width={935} height={689} priority />
+              <span />
             </div>
-            <div className="artwork-card-grid">
+            <div className="artwork-section-heading personal-hall-count">
+              <h2>담은 작품 목록</h2>
+              <span>더보기</span>
+            </div>
+            <div
+              ref={hallRailRef}
+              className="artwork-card-grid"
+              onScroll={handleHallScroll}
+              onPointerDown={(event) => {
+                hallPointerDownRef.current = true;
+                hallDidDragRef.current = false;
+                hallPointerStartRef.current = { x: event.clientX, scrollLeft: event.currentTarget.scrollLeft };
+                if (hallSnapTimeoutRef.current !== null) window.clearTimeout(hallSnapTimeoutRef.current);
+              }}
+              onPointerMove={(event) => {
+                if (hallPointerDownRef.current && Math.abs(event.clientX - hallPointerStartRef.current.x) > 5) {
+                  hallDidDragRef.current = true;
+                }
+              }}
+              onPointerUp={() => {
+                hallPointerDownRef.current = false;
+                settleHallRail(90);
+              }}
+              onPointerCancel={() => {
+                hallPointerDownRef.current = false;
+                settleHallRail(90);
+              }}
+            >
               {exhibitionItems.map((item, index) => (
                 <button
                   type="button"
-                  className="artwork-card"
+                  className={`artwork-card${index === activeHallIndex ? " active" : ""}`}
+                  style={{ "--hall-index": index } as CSSProperties}
                   key={item.id}
-                  onClick={() => openItem(item)}
+                  onClick={() => {
+                    if (hallDidDragRef.current) {
+                      hallDidDragRef.current = false;
+                      return;
+                    }
+                    if (index !== activeHallIndex) {
+                      centerHallItem(index);
+                      setActiveHallIndex(index);
+                      return;
+                    }
+                    openItem(item);
+                  }}
                 >
                   <span className={`artwork-image${item.imageUrl ? " has-image" : ` artwork-image-${(index % 4) + 1}`}`}>
                     {item.imageUrl && (

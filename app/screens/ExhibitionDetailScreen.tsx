@@ -3,7 +3,7 @@ import Image from "next/image";
 import { AiDocentPanel } from "../components/AiDocentPanel";
 import { ArtworkQrScanner } from "../components/ArtworkQrScanner";
 import { ArrowLeftIcon, ArrowRightIcon, BookmarkIcon } from "../components/MomenteIcons";
-import { getCollectionItem, saveCollectionItem } from "../../lib/collection-storage";
+import { getCollectionItem, listCollectionItems, saveCollectionItem } from "../../lib/collection-storage";
 import { VisitVerificationPanel } from "../components/VisitVerificationPanel";
 
 type ExhibitionStatus = "upcoming" | "ongoing" | "ended";
@@ -116,6 +116,24 @@ export function ExhibitionDetailScreen({
     };
   }, [exhibitionId]);
 
+  useEffect(() => {
+    let active = true;
+    listCollectionItems()
+      .then((items) => {
+        if (!active) return;
+        const exhibitionItems = items.filter((item) => item.exhibitionId === exhibitionId);
+        try {
+          window.sessionStorage.setItem(`mcm-personal-hall:${exhibitionId}`, JSON.stringify(exhibitionItems));
+        } catch {
+          // The hall still works when private browsing blocks session storage.
+        }
+      })
+      .catch(() => {
+        // Entering the hall still works; it will request the collection again.
+      });
+    return () => { active = false; };
+  }, [exhibitionId, isCollected]);
+
   useLayoutEffect(() => {
     if (!selectedArtworkId) return;
 
@@ -161,11 +179,6 @@ export function ExhibitionDetailScreen({
 
   function openAllArtworks() {
     setShowAllArtworksScreen(true);
-  }
-
-  function closeAllArtworks() {
-    setShowAllArtworksScreen(false);
-    window.requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "auto" }));
   }
 
   useEffect(() => {
@@ -395,9 +408,6 @@ export function ExhibitionDetailScreen({
     return (
       <div className="momente-all-artworks-screen">
         <header className="momente-all-artworks-header">
-          <button type="button" onClick={closeAllArtworks} aria-label="전시 상세로 돌아가기">
-            <ArrowLeftIcon />
-          </button>
           <div>
             <span>ARTWORKS</span>
             <h1>전체 작품 목록</h1>
@@ -434,7 +444,7 @@ export function ExhibitionDetailScreen({
         </section>
 
         <div className="momente-detail-actions-row">
-          <button type="button" className="momente-personal-hall-button" onClick={() => onOpenPersonalHall(exhibition.id)}>
+          <button type="button" className="momente-personal-hall-button" onClick={() => onOpenPersonalHall(exhibitionId)}>
             <span>담은 전시 보기</span>
             <ArrowRightIcon />
           </button>

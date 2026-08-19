@@ -6,7 +6,7 @@ import { BrandMark } from "./components/BrandMark";
 import { LoginScreen } from "./screens/LoginScreen";
 import { MomenteHomeScreen } from "./screens/MomenteHomeScreen";
 import { ExhibitionListScreen } from "./screens/ExhibitionListScreen";
-import { PersonalHallScreen } from "./screens/PersonalHallScreen";
+import { PERSONAL_HALL_BACK_EVENT, PersonalHallScreen } from "./screens/PersonalHallScreen";
 import { ProductCurationScreen } from "./screens/ProductCurationScreen";
 import { TimedContentScreen } from "./screens/TimedContentScreen";
 import { MyPageScreen } from "./screens/MyPageScreen";
@@ -239,14 +239,23 @@ function MainShell({ user, onLogout }: { user: AuthUser; onLogout: () => Promise
   return (
     <main className={`home-shell${hideBottomNav ? " detail-route" : ""}`}>
       <header className="home-header">
-        {(activeNav === "전시" || activeNav === "사진첩") && (
+        {(activeNav === "전시" || activeNav === "사진첩" || activeNav === "전시회장") && (
           <button
             className="header-back-button"
             type="button"
-            aria-label={activeNav === "사진첩"
+            aria-label={activeNav === "전시회장"
+              ? "전시 상세로 돌아가기"
+              : activeNav === "사진첩"
               ? route.exhibitionId ? "사진첩 목록으로 돌아가기" : "홈으로 돌아가기"
               : route.artworkId ? "전시 상세로 돌아가기" : route.exhibitionId ? "전시 목록으로 돌아가기" : "홈으로 돌아가기"}
             onClick={() => {
+              if (activeNav === "전시회장") {
+                const hallBackEvent = new Event(PERSONAL_HALL_BACK_EVENT, { cancelable: true });
+                window.dispatchEvent(hallBackEvent);
+                if (hallBackEvent.defaultPrevented) return;
+                router.push(route.exhibitionId ? `/exhibitions/${route.exhibitionId}` : "/exhibitions");
+                return;
+              }
               if (activeNav === "사진첩") {
                 router.push(route.exhibitionId ? "/gallery" : "/home");
                 return;
