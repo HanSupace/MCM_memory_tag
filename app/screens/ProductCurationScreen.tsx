@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import type { McmProduct } from "../../lib/mcm-product-catalog";
+import { ArrowRightIcon, SparkleIcon } from "../components/MomenteIcons";
 
 type Recommendation = { product: McmProduct; reason: string; generatedAt: string };
 
@@ -59,43 +60,43 @@ export function ProductCurationScreen({ announce }: { announce: (message: string
 
   return (
     <div className="home-content">
-      <section className="curation-screen">
-        <header className="curation-heading">
-          <div><span className="section-kicker">AI CURATED FOR YOU · MCM ONLY</span><h1>기억에서 이어진<br />MCM 셀렉션</h1></div>
-          <p>내 수집 작품, 감상과 취향 리포트를 AI가 함께 읽고 MCM 공식 상품 안에서 나에게 맞는 것만 골랐습니다.</p>
+      <section className="curation-screen mcm-reco-page">
+        <header className="mcm-reco-header">
+          <div className="mcm-reco-title">
+            <span>AI CURATED FOR YOU</span>
+            <h1>MCM Curated for You</h1>
+            <p>나의 전시 기억과 취향에서 이어진 단 하나의 MCM 셀렉션</p>
+          </div>
         </header>
 
-        <section className="curation-context">
-          <span className="section-kicker">YOUR PERSONAL CURATION</span>
-          <div><h2>{loading || regenerating ? "AI가 취향의 연결점을 찾고 있어요" : "내 관람 기록에서 찾은 세 가지 선택"}</h2><p>추천 이유는 같은 상품이라도 계정의 작품 수집과 감상 기록에 따라 다르게 작성됩니다.</p></div>
-          <button className="curation-refresh" type="button" disabled={loading || regenerating} onClick={() => generateRecommendations(true)}>
-            {regenerating ? "분석 중…" : "AI 추천 다시 받기"}
+        <section className="mcm-reco-intro">
+          <div><h2>{loading || regenerating ? "취향의 연결점을 찾는 중" : "나의 기억을 닮은 MCM"}</h2><p>수집한 작품과 감상 기록을 바탕으로, 지금의 취향과 가장 가까운 상품을 골랐어요.</p></div>
+          <button className="mcm-reco-refresh" type="button" disabled={loading || regenerating} onClick={() => generateRecommendations(true)}>
+            <SparkleIcon size={22} />{regenerating ? "분석 중…" : "추천 새로 받기"}
           </button>
         </section>
 
-        {error && <p className="curation-error" role="alert">{error}</p>}
+        {error && <p className="mcm-reco-error" role="alert">{error}</p>}
         {(loading || regenerating) && recommendations.length === 0 ? (
-          <div className="curation-loading" aria-live="polite"><i /><strong>나의 전시 기록을 분석하는 중</strong><span>수집 작품의 색, 소재와 감상에서 MCM 상품과의 연결점을 찾고 있습니다.</span></div>
+          <div className="mcm-reco-loading" aria-live="polite"><i /><strong>나의 전시 기록을 분석하는 중</strong><span>수집 작품의 색, 소재와 감상에서 MCM 상품과의 연결점을 찾고 있습니다.</span></div>
         ) : (
-          <section className="mcm-curation-grid" aria-label="AI MCM 맞춤 추천 상품">
-            {recommendations.map(({ product, reason }, index) => (
-              <article className={`mcm-curation-card ${index === 0 ? "featured" : ""}`} key={product.id}>
-                <div className="mcm-product-visual">
-                  <div className="mcm-product-label"><span>AI PICK · {product.kind}</span><b>{String(index + 1).padStart(2, "0")}</b></div>
-                  <Image className="mcm-product-image" src={product.image} alt={product.name} fill sizes="(max-width: 640px) 100vw, 50vw" />
-                  {index === 0 && <em>가장 높은 연결</em>}
+          <section className="mcm-reco-list" aria-label="AI MCM 맞춤 추천 상품">
+            {recommendations.map(({ product, reason }) => (
+              <article className="mcm-reco-card" key={product.id}>
+                <div className="mcm-reco-visual">
+                  <Image className="mcm-reco-image" src={product.image} alt={product.name} fill sizes="(max-width: 480px) calc(100vw - 84px), 345px" />
                 </div>
-                <div className="mcm-product-copy">
-                  <small>{product.kind}</small><h3>{product.name}</h3><p>{product.description}</p>
-                  <blockquote><span>AI가 찾은 나와의 연결</span>{reason}</blockquote>
-                  <a href={product.officialUrl} target="_blank" rel="noreferrer" onClick={() => announce("MCM 공식 스토어에서 상품을 확인합니다.")}>MCM 공식몰에서 보기 <span>↗</span></a>
+                <div className="mcm-reco-copy">
+                  <small>Exhibition Collection</small><h3>{product.name}</h3>
+                  <blockquote><span><SparkleIcon size={14} /> AI CURATION NOTE</span><p>{product.description}</p>{reason}</blockquote>
+                  <a href={product.officialUrl} target="_blank" rel="noreferrer" onClick={() => announce("MCM 공식 스토어에서 상품을 확인합니다.")}>MCM 공식몰에서 보기 <ArrowRightIcon size={18} /></a>
                 </div>
               </article>
             ))}
           </section>
         )}
 
-        <footer className="curation-disclaimer">
+        <footer className="mcm-reco-disclaimer">
           <span>MCM VERIFIED · AI PERSONALIZED</span>
           <p>{generatedAt ? `${generatedAt}의 계정 기록을 기준으로 저장된 추천입니다. ` : ""}AI는 MCM 공식 카탈로그에 등록된 상품만 선택하며, 가격과 재고는 공식몰에서 최신 정보를 확인해 주세요.</p>
         </footer>

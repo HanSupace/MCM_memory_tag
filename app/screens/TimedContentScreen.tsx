@@ -95,6 +95,8 @@ export function TimedContentScreen({
   const [savedByExhibition, setSavedByExhibition] = useState<Record<string, Generated>>({});
   const [pickerOpen, setPickerOpen] = useState(false);
   const [activeMomentIndex, setActiveMomentIndex] = useState(0);
+  const [stickerExpanded, setStickerExpanded] = useState(false);
+  const [letterOpened, setLetterOpened] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -129,6 +131,7 @@ export function TimedContentScreen({
     setError(null);
     setPickerOpen(false);
     setActiveMomentIndex(0);
+    setLetterOpened(false);
   }
 
   async function handleAction(key: ContentKey) {
@@ -138,6 +141,7 @@ export function TimedContentScreen({
     }
     if (openContent === key) {
       setOpenContent(null);
+      if (key === "invitation") setLetterOpened(false);
       return;
     }
     setError(null);
@@ -245,12 +249,14 @@ export function TimedContentScreen({
                     <div>
                   {isOpen && content.key === "summary" && summary && (
                     <div className="visit-summary-content">
-                      <section className="summary-hero">
-                        {selectedExhibitionHero && <Image className="summary-hero-image" src={selectedExhibitionHero} alt={`${selectedExhibition?.title || "전시회"} 대표 이미지`} fill sizes="(max-width: 760px) 90vw, 620px" />}
-                        <div className="summary-hero-shade" />
-                        <div className="summary-hero-copy">
-                          <span>MY EXHIBITION MOMENT</span><h3>{summary.headline}</h3><p>{summary.narrative}</p>
-                          <div className="summary-moods">{summary.moodKeywords.map((keyword) => <em key={keyword}>#{keyword}</em>)}</div>
+                      <section className="summary-editorial-hero">
+                        {selectedExhibitionHero && <Image className="summary-editorial-image" src={selectedExhibitionHero} alt={`${selectedExhibition?.title || "전시회"} 대표 이미지`} fill sizes="(max-width: 760px) 90vw, 620px" />}
+                        <div className="summary-editorial-overlay" />
+                        <div className="summary-editorial-copy">
+                          <span>EXHIBITION JOURNAL</span>
+                          <h3>{summary.headline}</h3>
+                          <p>{summary.narrative}</p>
+                          <div className="summary-editorial-tags">{summary.moodKeywords.map((keyword) => <em key={keyword}>#{keyword}</em>)}</div>
                         </div>
                       </section>
                       <section className="summary-moments">
@@ -283,35 +289,76 @@ export function TimedContentScreen({
                   {isOpen && content.key === "sticker" && stickers && (
                     <div className="sticker-result">
                       <h3>{stickers.title}</h3><p>{stickers.description}</p>
-                      <div className="sticker-sheet-frame">
-                        <Image className="sticker-sheet-image" src={stickers.imageDataUrl} alt="AI가 내 수집 작품과 감상으로 만든 다이컷 전시 스티커 시트" fill sizes="(max-width: 760px) 80vw, 560px" unoptimized />
+                      <div className="sticker-sheet-wrap">
+                        <button className="sticker-sheet-frame" type="button" onClick={() => setStickerExpanded(true)} aria-label="스티커 이미지 전체 화면으로 보기">
+                          <Image className="sticker-sheet-image" src={stickers.imageDataUrl} alt="AI가 내 수집 작품과 감상으로 만든 다이컷 전시 스티커 시트" width={768} height={1280} sizes="(max-width: 760px) 80vw, 560px" unoptimized />
+                        </button>
+                        <a className="sticker-save-icon" href={stickers.imageDataUrl} download="momente-exhibition-stickers.png" aria-label="스티커 이미지 저장">
+                          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0 4-4m-4 4-4-4M5 16v4h14v-4" /></svg>
+                        </a>
                       </div>
-                      <small>이미지를 길게 눌러 저장할 수 있어요.</small>
+                      <small>이미지를 누르면 전체 크기로 볼 수 있어요.</small>
                     </div>
                   )}
 
                   {isOpen && content.key === "taste" && <TasteReportPanel key={selectedExhibitionId} exhibitionId={selectedExhibitionId} />}
 
                   {isOpen && content.key === "invitation" && letter && (
-                    <article className="exhibition-letter">
-                      <header className="exhibition-letter-header">
-                        <div><MailIcon size={18} /><small>{letter.eyebrow || "Invitation to the MCM Exhibition"}</small></div>
-                        <span className="exhibition-letter-stamp" aria-hidden="true"><b>MCM</b><i>SEOUL</i></span>
-                      </header>
-                      <h3>{letter.title}</h3>
-                      <div className="exhibition-letter-date">FROM THE EXHIBITION · MOMENTE ARCHIVE</div>
-                      <strong className="exhibition-letter-greeting">{letter.greeting}</strong>
-                      <p className="exhibition-letter-body">{letter.body}</p>
-                      <blockquote>{letter.reason}</blockquote>
-                      <p className="letter-closing">{letter.closing}</p>
-                      {letter.recommendedExhibition && (
-                        <div className="letter-exhibition">
-                          <span>INVITATION</span><b>{letter.recommendedExhibition.title}</b>
-                          <small>{letter.recommendedExhibition.venue}</small>
+                    <div className={`exhibition-letter-experience${letterOpened ? " opened" : ""}`}>
+                      <div className="exhibition-envelope">
+                        <div className="exhibition-envelope-back" />
+                        <div className="exhibition-envelope-note"><span>MOMENTE</span><small>A letter from your exhibition</small></div>
+                        <div className="exhibition-envelope-front">
+                          <Image src="/letter-envelope/front.png" alt="" fill sizes="430px" />
                         </div>
-                      )}
-                      <footer className="exhibition-letter-footer"><span>MCM EXHIBITION LETTER</span><i aria-hidden="true">M</i></footer>
-                    </article>
+                        <div className="exhibition-envelope-flap">
+                          <Image src="/letter-envelope/flap.png" alt="" fill sizes="430px" />
+                        </div>
+                        <div className="exhibition-envelope-seal" aria-hidden="true">
+                          <Image className="exhibition-wax-image" src="/letter-envelope/wax-seal.png" alt="" fill sizes="58px" />
+                          <Image className="exhibition-wax-logo" src="/mcm-entry-logo.png" alt="" width={28} height={28} />
+                        </div>
+                        <button type="button" onClick={() => setLetterOpened((opened) => !opened)}>
+                          <MailIcon size={16} />{letterOpened ? "편지 접기" : "편지 보기"}
+                        </button>
+                      </div>
+
+                      <div className="exhibition-letter-sheet" aria-hidden={!letterOpened}>
+                        <div>
+                          <article className="exhibition-letter">
+                            <section className="exhibition-letter-hero">
+                              {selectedExhibitionHero && <Image src={selectedExhibitionHero} alt="" fill sizes="(max-width: 760px) 90vw, 620px" />}
+                              <span className="exhibition-letter-hero-shade" />
+                              <div><small>MOMENTE · MCM ARCHIVE</small><p className="exhibition-letter-feature-title">{selectedExhibition?.title}</p></div>
+                            </section>
+                            <div className="exhibition-letter-ornament" aria-hidden="true">❦　❦　❦</div>
+                            <div className="exhibition-letter-paper-body">
+                              <header className="exhibition-letter-header">
+                                <div><MailIcon size={18} /><small>{letter.eyebrow || "Invitation to the MCM Exhibition"}</small></div>
+                                <span className="exhibition-letter-stamp" aria-hidden="true"><b>MCM</b><i>SEOUL</i></span>
+                              </header>
+                              <div className="exhibition-letter-date">FROM THE EXHIBITION · MOMENTE ARCHIVE</div>
+                              <strong className="exhibition-letter-greeting">{letter.greeting}</strong>
+                              <p className="exhibition-letter-body">{letter.body}</p>
+                              <blockquote>{letter.reason}</blockquote>
+                              <p className="letter-closing">{letter.closing}</p>
+                              {letter.recommendedExhibition && (
+                                <div className="letter-next-invitation">
+                                  <header><span>NEXT EXHIBITION</span><small>MOMENTE SELECTION</small></header>
+                                  <b>{letter.recommendedExhibition.title}</b>
+                                  <p>{letter.recommendedExhibition.venue}</p>
+                                </div>
+                              )}
+                              <footer className="letter-paper-footer">
+                                <span>MOMENTE</span>
+                                <Image src="/mcm-entry-logo.png" alt="MCM" width={46} height={46} />
+                                <small>FROM YOUR EXHIBITION MEMORY</small>
+                              </footer>
+                            </div>
+                          </article>
+                        </div>
+                      </div>
+                    </div>
                   )}
                     </div>
                   </div>
@@ -324,6 +371,17 @@ export function TimedContentScreen({
           })}
         </div>
       </section>
+      {stickerExpanded && stickers && (
+        <div className="sticker-lightbox" role="dialog" aria-modal="true" aria-label="스티커 이미지 전체 보기" onMouseDown={(event) => {
+          if (event.target === event.currentTarget) setStickerExpanded(false);
+        }}>
+          <div className="sticker-lightbox-content">
+            <button className="sticker-lightbox-close" type="button" onClick={() => setStickerExpanded(false)} aria-label="전체 보기 닫기">×</button>
+            <Image src={stickers.imageDataUrl} alt="AI가 만든 전시 스티커 시트 전체 이미지" width={768} height={1280} unoptimized />
+            <a href={stickers.imageDataUrl} download="momente-exhibition-stickers.png">이미지 저장</a>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

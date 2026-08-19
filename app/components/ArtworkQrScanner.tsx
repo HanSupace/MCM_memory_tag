@@ -151,14 +151,28 @@ export function ArtworkQrScanner({
 
         <p className="qr-scanner-message" role="status">{message}</p>
 
+        <button
+          className={`qr-scan-action${cameraReady ? " ready" : ""}`}
+          type="button"
+          onClick={() => {
+            videoRef.current?.focus();
+            setMessage(cameraReady
+              ? "작품 옆 QR이 사각형 안에 들어오도록 비춰 주세요."
+              : "카메라를 준비하고 있습니다…");
+          }}
+        >
+          <span className="qr-scan-action-icon" aria-hidden="true" />
+          <span>Scan QR Code</span>
+        </button>
+
         <form className="qr-manual-form" onSubmit={submitManualCode}>
-          <label htmlFor="artwork-qr-code">카메라가 안 되면 작품 코드 입력</label>
+          <label htmlFor="artwork-qr-code">작품 코드 입력</label>
           <div>
             <input
               id="artwork-qr-code"
               value={manualCode}
               onChange={(event) => setManualCode(event.target.value)}
-              placeholder="작품 코드 또는 QR 주소"
+              placeholder="작품 코드를 입력하세요."
             />
             <button type="submit" disabled={!manualCode.trim()}>찾기</button>
           </div>

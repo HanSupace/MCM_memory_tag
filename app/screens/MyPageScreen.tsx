@@ -35,6 +35,7 @@ export function MyPageScreen({ user, onLogout }: { user: AuthUser; onLogout: () 
   const [loadingConsents, setLoadingConsents] = useState(true);
   const [savingConsent, setSavingConsent] = useState<keyof ConsentPreferences | null>(null);
   const [message, setMessage] = useState("");
+  const [loggingOut, setLoggingOut] = useState(false);
   const displayName = user.displayName?.trim() || user.username;
   const initials = displayName.slice(0, 2).toUpperCase();
 
@@ -89,7 +90,7 @@ export function MyPageScreen({ user, onLogout }: { user: AuthUser; onLogout: () 
             ) : <span>{initials}</span>}
           </div>
           <div className="profile-copy">
-            <span className="profile-status">✦ MCM MEMORY MEMBER</span>
+            <span className="profile-status">MY MCM</span>
             <h2>{displayName}</h2>
             <p>@{user.username}</p>
           </div>
@@ -133,7 +134,17 @@ export function MyPageScreen({ user, onLogout }: { user: AuthUser; onLogout: () 
 
         <section className="account-actions">
           <div><h2>계정 관리</h2><p>현재 기기에서 안전하게 로그아웃합니다.</p></div>
-          <button type="button" onClick={() => void onLogout()}>로그아웃</button>
+          <button
+            type="button"
+            className={loggingOut ? "logging-out" : ""}
+            disabled={loggingOut}
+            onClick={() => {
+              setLoggingOut(true);
+              void onLogout();
+            }}
+          >
+            {loggingOut ? "로그아웃 중" : "로그아웃"}
+          </button>
         </section>
       </section>
     </div>
