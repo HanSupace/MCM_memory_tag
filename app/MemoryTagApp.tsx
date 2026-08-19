@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import Link from "next/link";
 import { BrandMark } from "./components/BrandMark";
 import { LoginScreen } from "./screens/LoginScreen";
 import { MomenteHomeScreen } from "./screens/MomenteHomeScreen";
@@ -98,7 +97,9 @@ function EntryScreen() {
         <img src="/mcm-entry-logo.png" alt="MCM" />
         <h1>MOMENTE</h1>
       </div>
-      <Link href="/home">Enter Exhibition »</Link>
+      {/* A full navigation avoids the vinext client router stalling on this entry route. */}
+      {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
+      <a href="/home">Enter Exhibition »</a>
     </main>
   );
 }

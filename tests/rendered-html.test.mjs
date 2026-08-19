@@ -44,7 +44,8 @@ test("keeps entry navigation connected to the authenticated app route", async ()
   ]);
 
   assert.match(app, /if \(pathname === "\/"\) \{\s*return <EntryScreen \/>;\s*\}/);
-  assert.match(app, /<Link href="\/home">Enter Exhibition »<\/Link>/);
+  assert.match(app, /<a href="\/home">Enter Exhibition »<\/a>/);
+  assert.doesNotMatch(app, /from "next\/link"/);
   assert.match(app, /홈:\s*"\/home"/);
   assert.match(rootPage, /<MemoryTagApp \/>/);
   assert.match(catchAllPage, /<MemoryTagApp \/>/);
