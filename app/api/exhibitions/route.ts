@@ -13,37 +13,53 @@ type ExhibitionListRow = {
   start_at: string;
   end_at: string;
   status: string;
+  representative_artists: string[] | null;
 };
+
+function displayExhibitionTitle(title: string) {
+  return title.toUpperCase().includes("WEARABLE CASA") || title.includes("웨어러블 카사")
+    ? "WEARABLE CASA at MCM HAUS"
+    : title;
+}
 
 export async function GET() {
   const typeScriptExhibitions = seedExhibitions.map((exhibition) => ({
     id: exhibition.id,
-    title: exhibition.title,
+    title: displayExhibitionTitle(exhibition.title),
     venue: exhibition.venue,
     heroImageUrl: null,
     startAt: exhibition.startDate,
     endAt: exhibition.endDate,
     status: exhibition.status,
+    representativeArtists: exhibition.artists,
   }));
 
   try {
     const result = await getDb().query<ExhibitionListRow>(
-      `SELECT id::text, title, venue, hero_image_url, start_at, end_at, status
-       FROM exhibitions
-       WHERE published = true
+      `SELECT e.id::text, e.title, e.venue, e.hero_image_url, e.start_at, e.end_at, e.status,
+              ARRAY(
+                SELECT a.name
+                FROM exhibition_artists ea
+                JOIN artists a ON a.id = ea.artist_id
+                WHERE ea.exhibition_id = e.id
+                ORDER BY ea.artist_id
+              ) AS representative_artists
+       FROM exhibitions e
+       WHERE e.published = true
        ORDER BY
-         CASE status WHEN 'ongoing' THEN 0 WHEN 'upcoming' THEN 1 ELSE 2 END,
-         start_at DESC`,
+         CASE e.status WHEN 'ongoing' THEN 0 WHEN 'upcoming' THEN 1 ELSE 2 END,
+         e.start_at DESC`,
     );
 
     const databaseExhibitions = result.rows.map((row) => ({
       id: row.id,
-      title: row.title,
+      title: displayExhibitionTitle(row.title),
       venue: row.venue,
       heroImageUrl: row.hero_image_url,
       startAt: row.start_at,
       endAt: row.end_at,
       status: row.status,
+      representativeArtists: row.representative_artists ?? [],
     }));
     const databaseTitles = new Set(databaseExhibitions.map((exhibition) => exhibition.title));
     const exhibitions = [

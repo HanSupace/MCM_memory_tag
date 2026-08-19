@@ -1,8 +1,20 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
-import { BrandMark } from "../components/BrandMark";
 import type { AuthUser } from "../types";
 
 type AuthMode = "login" | "signup";
+
+function PasswordEye({ open }: { open: boolean }) {
+  return open ? (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M2.3 12s3.5-6 9.7-6 9.7 6 9.7 6-3.5 6-9.7 6S2.3 12 2.3 12Z" />
+      <circle cx="12" cy="12" r="2.7" />
+    </svg>
+  ) : (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="m3 3 18 18M10.6 6.1A10 10 0 0 1 12 6c6.2 0 9.7 6 9.7 6a16 16 0 0 1-3.1 3.7M6.2 6.2C3.7 8 2.3 12 2.3 12s3.5 6 9.7 6c1.4 0 2.7-.3 3.8-.7M9.9 9.9a3 3 0 0 0 4.2 4.2" />
+    </svg>
+  );
+}
 
 export function LoginScreen({ onAuthenticated }: { onAuthenticated: (user: AuthUser) => void }) {
   const [mode, setMode] = useState<AuthMode>("login");
@@ -119,28 +131,25 @@ export function LoginScreen({ onAuthenticated }: { onAuthenticated: (user: AuthU
   }
 
   return (
-    <main className="login-shell">
+    <main className={`login-shell login-mode-${mode}`}>
+      <header className="login-page-title">
+        <h1>{mode === "login" ? "Login" : "Sign Up"}</h1>
+      </header>
       <section className="login-panel">
         <div className="login-panel-inner">
-          <BrandMark />
-          <div className="login-heading">
-            <p className="eyebrow">MCM MEMORY TAG</p>
-            <h1>{mode === "login" ? "로그인" : "회원가입"}</h1>
-            <p>
-              {mode === "login"
-                ? "아이디와 비밀번호를 입력해 주세요."
-                : "사용할 아이디와 비밀번호를 정해 주세요."}
-            </p>
+          <div className="login-brand-lockup">
+            <img src="/mcm-entry-logo.png" alt="MCM" />
+            <h2>MOMENTE</h2>
           </div>
 
           <form className="login-form" onSubmit={submit} noValidate>
             <label>
-              <span>아이디</span>
+              <span>Name</span>
               <input
                 type="text"
                 value={username}
                 onChange={(event) => setUsername(event.target.value)}
-                placeholder="아이디를 입력해 주세요"
+                placeholder="User name"
                 autoComplete="username"
                 minLength={3}
                 maxLength={20}
@@ -148,13 +157,13 @@ export function LoginScreen({ onAuthenticated }: { onAuthenticated: (user: AuthU
               />
             </label>
             <label>
-              <span>비밀번호</span>
+              <span>Password</span>
               <div className="password-field">
                 <input
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
-                  placeholder="비밀번호를 입력해 주세요"
+                  placeholder="*******"
                   autoComplete={mode === "login" ? "current-password" : "new-password"}
                   minLength={8}
                   maxLength={72}
@@ -166,7 +175,7 @@ export function LoginScreen({ onAuthenticated }: { onAuthenticated: (user: AuthU
                   onClick={() => setShowPassword((value) => !value)}
                   aria-label={showPassword ? "비밀번호 숨기기" : "비밀번호 보기"}
                 >
-                  {showPassword ? "숨김" : "보기"}
+                  <PasswordEye open={showPassword} />
                 </button>
               </div>
             </label>
@@ -215,35 +224,36 @@ export function LoginScreen({ onAuthenticated }: { onAuthenticated: (user: AuthU
               </fieldset>
             ) : null}
             <span id="login-error" className="form-error" aria-live="polite">{error}</span>
-            <button className="primary-button" type="submit" disabled={!canSubmit || loading}>
+            <button className="primary-button login-submit-button" type="submit" disabled={!canSubmit || loading}>
               {loading ? (
                 <span className="spinner" aria-label="처리 중" />
               ) : mode === "login" ? (
-                "로그인"
+                "Log In"
               ) : (
-                "회원가입"
+                "Sign Up"
               )}
             </button>
           </form>
-          <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "22px 0", color: "#8b877e", fontSize: 11 }}>
-            <span style={{ height: 1, flex: 1, background: "#d8d3c8" }} />
-            또는 소셜 계정으로
-            <span style={{ height: 1, flex: 1, background: "#d8d3c8" }} />
+          <div className="login-divider">
+            <span />
+            Or
+            <span />
           </div>
-          <div style={{ display: "grid", gap: 10 }}>
+          <div className="social-login-area">
             <button
               type="button"
+              className="kakao-login-button"
               onClick={() => void startKakaoLogin()}
               disabled={socialLoading}
-              style={{ height: 50, border: 0, background: "#fee500", color: "#191919", cursor: "pointer", fontWeight: 700 }}
             >
-              {socialLoading ? "Kakao 연결 중..." : `카카오로 ${mode === "login" ? "로그인" : "회원가입"}`}
+              <span className="kakao-bubble" aria-hidden="true" />
+              {socialLoading ? "카카오 연결 중..." : `카카오 ${mode === "login" ? "로그인" : "회원가입"}`}
             </button>
           </div>
           <p className="signup-copy">
-            {mode === "login" ? "계정이 없으신가요?" : "이미 계정이 있으신가요?"}
+            {mode === "login" ? "Don’t have an account?" : "Already have an account?"}
             <button type="button" onClick={() => changeMode(mode === "login" ? "signup" : "login")}>
-              {mode === "login" ? "회원가입" : "로그인"}
+              {mode === "login" ? "Sign Up" : "Log In"}
             </button>
           </p>
         </div>
