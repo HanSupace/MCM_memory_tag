@@ -1,6 +1,6 @@
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { ConnectedKeyring, KeyringConnectPanel } from "../components/KeyringConnectPanel";
-import { ArrowRightIcon, BookmarkIcon, ChevronRightIcon, LandmarkIcon, PencilIcon } from "../components/MomenteIcons";
+import { ArrowRightIcon, ChevronRightIcon } from "../components/MomenteIcons";
 
 type Exhibition = {
   id: string;
@@ -13,7 +13,6 @@ type Exhibition = {
 };
 
 type HomeSummary = {
-  counts: { exhibitions: number; artworks: number; notes: number };
   recentExhibition: Exhibition | null;
 };
 
@@ -67,10 +66,6 @@ function formatDate(value: string) {
   return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, "0")}.${String(date.getDate()).padStart(2, "0")}`;
 }
 
-function formatCount(value: number) {
-  return String(value).padStart(2, "0");
-}
-
 export function MomenteHomeScreen({
   announce,
   onExploreExhibitions,
@@ -80,7 +75,6 @@ export function MomenteHomeScreen({
 }) {
   const [exhibitions, setExhibitions] = useState(fallbackExhibitions);
   const [summary, setSummary] = useState<HomeSummary>({
-    counts: { exhibitions: 0, artworks: 0, notes: 0 },
     recentExhibition: null,
   });
   const [keyring, setKeyring] = useState<ConnectedKeyring | null>(null);
@@ -221,15 +215,6 @@ export function MomenteHomeScreen({
         </div>
         <div className="momente-rail-indicators" aria-label={`${activeExhibition + 1}번째 전시`}>
           {exhibitions.map((exhibition, index) => <i key={exhibition.id} className={index === activeExhibition ? "active" : ""} />)}
-        </div>
-      </section>
-
-      <section className="momente-record-section">
-        <h2>나의 방문 기록</h2>
-        <div className="momente-record-grid">
-          <div><strong>{formatCount(summary.counts.exhibitions)}</strong><span>방문한 전시</span><small>EXHIBITIONS</small><i><LandmarkIcon size={15} /></i></div>
-          <div><strong>{formatCount(summary.counts.artworks)}</strong><span>수집한 작품</span><small>COLLECTED</small><i><BookmarkIcon size={14} /></i></div>
-          <div><strong>{formatCount(summary.counts.notes)}</strong><span>한줄평</span><small>NOTES</small><i><PencilIcon size={14} /></i></div>
         </div>
       </section>
 

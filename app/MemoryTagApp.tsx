@@ -16,7 +16,6 @@ import { CameraCaptureButton } from "./components/CameraCaptureButton";
 import { ArtworkQrScanner } from "./components/ArtworkQrScanner";
 import {
   ArrowLeftIcon,
-  BellIcon,
   GalleryIcon,
   HomeIcon,
   LandmarkIcon,
@@ -265,9 +264,6 @@ function MainShell({ user, onLogout }: { user: AuthUser; onLogout: () => Promise
           <img src="/mcm-entry-logo.png" alt="MCM" />
         </button>
         <div className="header-actions">
-          <button className="notification-button" type="button" aria-label="알림" onClick={() => announce("새 알림이 3개 있어요.")}>
-            <BellIcon /><i>3</i>
-          </button>
           <button className="avatar-button" type="button" aria-label={`${user.username} 마이 페이지`} onClick={() => router.push("/my")}>
             <UserIcon />
           </button>

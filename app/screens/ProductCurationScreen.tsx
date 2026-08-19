@@ -65,12 +65,6 @@ export function ProductCurationScreen({ announce }: { announce: (message: string
           <p>내 수집 작품, 감상과 취향 리포트를 AI가 함께 읽고 MCM 공식 상품 안에서 나에게 맞는 것만 골랐습니다.</p>
         </header>
 
-        <section className="curation-proof" aria-label="추천 기준">
-          <div><span>01</span><strong>내 기록 AI 분석</strong><small>계정별 추천 결과</small></div>
-          <div><span>02</span><strong>MCM 공식 상품</strong><small>승인된 카탈로그만 선택</small></div>
-          <div><span>03</span><strong>계정에 결과 저장</strong><small>다른 계정과 완전 분리</small></div>
-        </section>
-
         <section className="curation-context">
           <span className="section-kicker">YOUR PERSONAL CURATION</span>
           <div><h2>{loading || regenerating ? "AI가 취향의 연결점을 찾고 있어요" : "내 관람 기록에서 찾은 세 가지 선택"}</h2><p>추천 이유는 같은 상품이라도 계정의 작품 수집과 감상 기록에 따라 다르게 작성됩니다.</p></div>
