@@ -6,6 +6,12 @@ import { artworks as seedArtworks, exhibitions as seedExhibitions } from "../../
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+function displayExhibitionTitle(title: string) {
+  return title.toUpperCase().includes("WEARABLE CASA") || title.includes("웨어러블 카사")
+    ? "WEARABLE CASA at MCM HAUS"
+    : title;
+}
+
 const productOnlyCollectIdentifiers = [
   "mcm-berbrick-ken-yashiki-100-400-set",
   "mcm-berbrick-inden-ya-400",
@@ -64,7 +70,7 @@ function getTypeScriptExhibition(id: string) {
 
   return {
     id: exhibition.id,
-    title: exhibition.title,
+    title: displayExhibitionTitle(exhibition.title),
     description: exhibition.description,
     heroImageUrl: null,
     venue: exhibition.venue,
@@ -203,7 +209,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       {
         exhibition: {
           id: exhibition.id,
-          title: exhibition.title,
+          title: displayExhibitionTitle(exhibition.title),
           description: exhibition.description,
           heroImageUrl: exhibition.hero_image_url,
           venue: exhibition.venue,

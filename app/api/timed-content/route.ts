@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
 
 type ContentType = "summary" | "stickers" | "invitation";
 type TimelineExhibitionRow = {
-  id: string; title: string; venue: string; reference_at: string; reference_type: "visit" | "collection";
+  id: string; title: string; venue: string; hero_image_url: string | null; reference_at: string; reference_type: "visit" | "collection";
 };
 type StoredContentRow = { exhibition_id: string; content_type: ContentType; generated_content: unknown };
 type VisitRow = {
@@ -53,16 +53,16 @@ export async function GET(request: NextRequest) {
   try {
     const [result, storedResult] = await Promise.all([
       getDb().query<TimelineExhibitionRow>(
-        `SELECT e.id::text, e.title, e.venue,
-              COALESCE(MAX(v.visited_at), MIN(c.collected_at))::text AS reference_at,
-              CASE WHEN MAX(v.visited_at) IS NOT NULL THEN 'visit' ELSE 'collection' END AS reference_type
+        `SELECT e.id::text, e.title, e.venue, e.hero_image_url,
+              COALESCE(MIN(v.visited_at), MIN(c.collected_at))::text AS reference_at,
+              CASE WHEN MIN(v.visited_at) IS NOT NULL THEN 'visit' ELSE 'collection' END AS reference_type
        FROM exhibitions e
        LEFT JOIN visits v ON v.exhibition_id = e.id AND v.user_id = $1
        LEFT JOIN exhibition_artworks ea ON ea.exhibition_id = e.id
        LEFT JOIN collections c ON c.exhibition_artwork_id = ea.id AND c.user_id = $1
        WHERE v.id IS NOT NULL OR c.id IS NOT NULL
-       GROUP BY e.id, e.title, e.venue
-       ORDER BY COALESCE(MAX(v.visited_at), MIN(c.collected_at)) DESC`,
+       GROUP BY e.id, e.title, e.venue, e.hero_image_url
+       ORDER BY COALESCE(MIN(v.visited_at), MIN(c.collected_at)) DESC`,
         [user.id],
       ),
       getDb().query<StoredContentRow>(
@@ -231,6 +231,7 @@ export async function POST(request: NextRequest) {
         exhibition: latestVisit ? { title: latestVisit.title, venue: latestVisit.venue, visitedAt: latestVisit.visited_at } : null,
         counts: { exhibitions: 1, artworks: artworksResult.rows.length, notes: notesResult.rows.length },
         artworkImages: Object.fromEntries(artworksResult.rows.map((artwork) => [artwork.title, artwork.image_url])),
+        artworkArtists: Object.fromEntries(artworksResult.rows.map((artwork) => [artwork.title, artwork.artist_name || "작가 미상"])),
       };
       await saveGeneratedContent(user.id, exhibitionId, body.type, content);
       return NextResponse.json({ content });

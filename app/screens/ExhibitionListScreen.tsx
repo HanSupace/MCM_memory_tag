@@ -11,19 +11,13 @@ type ExhibitionSummary = {
   startAt: string;
   endAt: string;
   status: ExhibitionStatus;
+  representativeArtists: string[];
 };
 
-const STATUS_LABEL: Record<ExhibitionStatus, string> = {
-  ongoing: "진행 중",
-  upcoming: "예정",
-  ended: "종료",
-};
-
-const FILTERS: Array<{ key: "all" | ExhibitionStatus; label: string }> = [
-  { key: "all", label: "전체" },
-  { key: "ongoing", label: "진행 중" },
-  { key: "upcoming", label: "예정" },
-  { key: "ended", label: "종료" },
+const exhibitionFallbackImages = [
+  { test: (title: string) => title.toUpperCase().includes("F.A.M"), url: "/artworks/fam/infinity.png" },
+  { test: (title: string) => title.toUpperCase().includes("WEARABLE") || title.includes("웨어러블"), url: "/artworks/wearable-casa/chatty-sofa.png" },
+  { test: (title: string) => title.toUpperCase().includes("BE@RBRICK"), url: "/artworks/berbrick-wonderland/pause-usa-usa.jpg" },
 ];
 
 function formatDateRange(startAt: string, endAt: string) {
@@ -32,6 +26,16 @@ function formatDateRange(startAt: string, endAt: string) {
     return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, "0")}.${String(date.getDate()).padStart(2, "0")}`;
   };
   return `${format(startAt)} – ${format(endAt)}`;
+}
+
+function getExhibitionImage(exhibition: ExhibitionSummary) {
+  return exhibition.heroImageUrl ?? exhibitionFallbackImages.find((item) => item.test(exhibition.title))?.url ?? null;
+}
+
+function formatArtists(artists: string[]) {
+  if (artists.length === 0) return "대표 아티스트 미정";
+  if (artists.length === 1) return artists[0];
+  return `${artists[0]} 외 ${artists.length - 1}인`;
 }
 
 export function ExhibitionListScreen({
@@ -51,8 +55,6 @@ export function ExhibitionListScreen({
 }) {
   const [exhibitions, setExhibitions] = useState<ExhibitionSummary[] | null>(null);
   const [error, setError] = useState("");
-  const [filter, setFilter] = useState<"all" | ExhibitionStatus>("all");
-  const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(initialExhibitionId);
 
   useEffect(() => {
@@ -96,84 +98,37 @@ export function ExhibitionListScreen({
     );
   }
 
-  const filtered = (exhibitions ?? []).filter((exhibition) => {
-    const matchesFilter = filter === "all" || exhibition.status === filter;
-    const normalizedQuery = query.trim().toLocaleLowerCase("ko");
-    const matchesQuery = normalizedQuery.length === 0
-      || exhibition.title.toLocaleLowerCase("ko").includes(normalizedQuery)
-      || exhibition.venue.toLocaleLowerCase("ko").includes(normalizedQuery);
-    return matchesFilter && matchesQuery;
-  });
-
   return (
-    <div className="home-content">
-      <section className="exhibition-explore-section">
-        <div className="explore-titlebar">
-          <div>
-            <span className="section-kicker">EXHIBITION</span>
-            <h1>전시 탐색</h1>
-          </div>
-          <button type="button" className="qr-header-button" onClick={() => announce("QR 스캔 기능은 다음 단계에서 연결됩니다.")}>
-            <span aria-hidden="true">▦</span> QR
-          </button>
-        </div>
-
-        <label className="explore-search">
-          <span aria-hidden="true" className="search-symbol" />
-          <span className="sr-only">전시 검색</span>
-          <input
-            type="search"
-            placeholder="전시명, 장소로 검색"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-          />
-        </label>
-
-        <div className="filter-row">
-          {FILTERS.map((item) => (
-            <button
-              key={item.key}
-              type="button"
-              className={`filter-chip${filter === item.key ? " active" : ""}`}
-              onClick={() => setFilter(item.key)}
-            >
-              {item.label}
-            </button>
-          ))}
-        </div>
-
+    <div className="home-content momente-exhibition-list-page">
+      <section className="momente-exhibition-list-section">
+        <h1>Exhibition List</h1>
         {error && <p className="form-error">{error}</p>}
         {!error && exhibitions === null && <p>전시를 불러오는 중입니다…</p>}
-        {!error && exhibitions !== null && filtered.length === 0 && <p>조건에 맞는 전시가 없습니다.</p>}
+        {!error && exhibitions !== null && exhibitions.length === 0 && <p>등록된 전시가 없습니다.</p>}
 
-        <div className="exhibition-list-grid explore-card-grid">
-          {filtered.map((exhibition) => (
+        <div className="momente-exhibition-list">
+          {(exhibitions ?? []).map((exhibition) => {
+            const imageUrl = getExhibitionImage(exhibition);
+            return (
             <button
               type="button"
-              className="exhibition-card exhibition-list-card"
+              className="momente-exhibition-list-card"
               key={exhibition.id}
               onClick={() => {
                 setSelectedId(exhibition.id);
                 onActiveExhibitionChange?.(exhibition.id);
               }}
+              style={imageUrl ? { backgroundImage: `url(${imageUrl})` } : undefined}
             >
-              <div
-                className={`exhibition-art${exhibition.heroImageUrl ? "" : " art-placeholder"}`}
-                style={exhibition.heroImageUrl ? { backgroundImage: `url(${exhibition.heroImageUrl})` } : undefined}
-              >
-                <span className={`status-chip${exhibition.status === "upcoming" ? " upcoming" : ""}`}>
-                  {STATUS_LABEL[exhibition.status]}
-                </span>
-              </div>
-              <div className="exhibition-card-body">
-                <h3>{exhibition.title}</h3>
-                <p>
-                  {exhibition.venue} · {formatDateRange(exhibition.startAt, exhibition.endAt)}
-                </p>
-                <span className="explore-card-action">전시 작품 보기 <b>↗</b></span>
-              </div>
+              <span className="momente-exhibition-list-copy">
+                <strong>{exhibition.title}</strong>
+                <small>{formatDateRange(exhibition.startAt, exhibition.endAt)}</small>
+                <small>{exhibition.venue}</small>
+                <small>대표 아티스트 · {formatArtists(exhibition.representativeArtists)}</small>
+              </span>
             </button>
-          ))}
+            );
+          })}
         </div>
       </section>
     </div>

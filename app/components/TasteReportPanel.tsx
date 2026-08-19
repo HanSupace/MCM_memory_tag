@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { ReportIcon, SparkleIcon } from "./MomenteIcons";
 
 type TasteReport = {
   exhibitionId?: string;
@@ -74,31 +75,40 @@ export function TasteReportPanel({ exhibitionId }: { exhibitionId?: string }) {
 
   const totalSources = Object.values(report.sourceCounts).reduce((sum, count) => sum + count, 0);
   return (
-    <section className="taste-report-card">
-      <span className="section-kicker">YOUR MCM TASTE · AI REPORT</span>
-      <h2>{report.title}</h2>
-      <div className="taste-report-tags">{report.keywords.map((keyword) => <span key={keyword}>#{keyword}</span>)}</div>
-      <p className="taste-report-summary">{report.summary}</p>
-      <div className="taste-report-meta">
-        <span>신뢰도 {Math.round(report.confidence * 100)}%</span>
-        <span>{totalSources}개의 기록 분석</span>
-      </div>
-      {expanded && (
-        <div className="taste-report-details">
-          <h3>이렇게 발견했어요</h3>
-          <ul>{report.evidence.map((item) => <li key={item}>{item}</li>)}</ul>
-          <h3>당신을 위한 다음 제안</h3>
-          <ul>{report.recommendations.map((item) => <li key={item}>{item}</li>)}</ul>
+    <section className="taste-report-card taste-report-ready">
+      <header className="taste-report-band">MCM Taste / AI Report</header>
+      <div className="taste-report-document">
+        <h2>관람 취향 리포트</h2>
+        <div className="taste-report-tags">{report.keywords.map((keyword) => <span key={keyword}>#{keyword}</span>)}</div>
+        <section className="taste-report-overview">
+          <div><span>AI가 발견한 나의 취향</span><h3>{report.title}</h3><p>{report.summary}</p></div>
+          {report.evidence.slice(0, 2).map((item, index) => (
+            <div key={item}><span>관람 패턴 {String(index + 1).padStart(2, "0")}</span><p>{item}</p></div>
+          ))}
+        </section>
+        <div className="taste-report-meta">
+          <span>✓ 신뢰도 {Math.round(report.confidence * 100)}%</span>
+          <span><ReportIcon size={16} /> {totalSources}개의 기록 분석</span>
         </div>
-      )}
-      {error && <p className="taste-report-error" role="alert">{error}</p>}
-      <div className="taste-report-actions">
-        <button type="button" className="secondary" onClick={() => setExpanded((value) => !value)}>
-          {expanded ? "리포트 접기" : "분석 근거 보기"}
-        </button>
-        <button type="button" onClick={generate} disabled={generating}>
-          {generating ? "업데이트 중…" : "리포트 업데이트"}
-        </button>
+        <div className={`taste-report-details-reveal${expanded ? " open" : ""}`} aria-hidden={!expanded}>
+          <div>
+            <div className="taste-report-details">
+              <h3>분석 근거</h3>
+              <ul>{report.evidence.map((item) => <li key={item}>{item}</li>)}</ul>
+              <h3>당신을 위한 다음 제안</h3>
+              <ul>{report.recommendations.map((item) => <li key={item}>{item}</li>)}</ul>
+            </div>
+          </div>
+        </div>
+        {error && <p className="taste-report-error" role="alert">{error}</p>}
+        <div className="taste-report-actions">
+          <button type="button" className="report-evidence-button" aria-expanded={expanded} onClick={() => setExpanded((value) => !value)}>
+            <SparkleIcon size={17} /> {expanded ? "분석 근거 접기" : "분석 근거 보기"}
+          </button>
+          <button type="button" className="report-update-button" onClick={generate} disabled={generating}>
+            {generating ? "업데이트 중…" : "리포트 업데이트"}
+          </button>
+        </div>
       </div>
     </section>
   );

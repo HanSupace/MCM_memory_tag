@@ -1,16 +1,27 @@
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { listGalleryPhotos, type GalleryPhoto } from "../../lib/gallery-storage";
+import { GalleryIcon } from "../components/MomenteIcons";
 
 type ExhibitionOption = {
   id: string;
   title: string;
   venue: string;
+  heroImageUrl?: string | null;
 };
 
 type GalleryAlbum = ExhibitionOption & {
   photos: GalleryPhoto[];
 };
+
+function albumHeroImage(album: GalleryAlbum) {
+  if (album.heroImageUrl) return album.heroImageUrl;
+  const title = album.title.toUpperCase();
+  if (title.includes("F.A.M")) return "/artworks/fam/infinity.png";
+  if (title.includes("WEARABLE")) return "/artworks/wearable-casa/chatty-sofa.png";
+  if (title.includes("BE@RBRICK")) return "/artworks/berbrick-wonderland/pause-usa-usa.jpg";
+  return null;
+}
 
 export function GalleryScreen({
   onOpenCamera,
@@ -72,8 +83,7 @@ export function GalleryScreen({
       .map((exhibition) => ({
         ...exhibition,
         photos: photos.filter((photo) => photo.exhibitionId === exhibition.id),
-      }))
-      .filter((album) => album.photos.length > 0);
+      }));
     const knownIds = new Set(exhibitions.map((exhibition) => exhibition.id));
     const photoOnlyAlbums = photos.reduce<GalleryAlbum[]>((groups, photo) => {
       if (knownIds.has(photo.exhibitionId)) return groups;
@@ -92,33 +102,19 @@ export function GalleryScreen({
     onSelectedExhibitionChange(exhibitionId);
   }
 
-  function closeAlbum() {
-    setSelectedExhibitionId(null);
-    onSelectedExhibitionChange(null);
-  }
-
   return (
     <div className="home-content">
-      <section className="gallery-screen">
+      <section className={`gallery-screen${selectedAlbum ? " album-open" : " album-list"}`}>
         <header className="gallery-heading">
           {selectedAlbum ? (
-            <>
-              <div className="gallery-selected-heading">
-                <button type="button" className="round-back-button" onClick={closeAlbum} aria-label="전시별 사진첩으로 돌아가기">←</button>
-                <div>
-                  <span className="section-kicker">EXHIBITION ALBUM</span>
-                  <h1>{selectedAlbum.title}</h1>
-                  <p>{selectedAlbum.venue || "전시에서 기록한 순간"} · 사진 {selectedAlbum.photos.length}장</p>
-                </div>
+            <div className="gallery-selected-heading">
+              <div>
+                <h1>{selectedAlbum.title}</h1>
+                <p>Photo List · 사진 {selectedAlbum.photos.length}장</p>
               </div>
-              <button type="button" onClick={onOpenCamera}>사진 추가</button>
-            </>
-          ) : (
-            <div>
-              <span className="section-kicker">MY ARCHIVE</span>
-              <h1>나만의 사진첩</h1>
-              <p>전시를 선택하면 그곳에서 기록한 사진을 볼 수 있어요.</p>
             </div>
+          ) : (
+            <div><h1>Exhibition photo album</h1></div>
           )}
         </header>
 
@@ -127,7 +123,7 @@ export function GalleryScreen({
 
         {!loading && !error && !selectedAlbum && albums.length === 0 && (
           <div className="gallery-empty-state">
-            <span className="gallery-empty-icon" aria-hidden="true" />
+            <span className="gallery-empty-icon" aria-hidden="true"><GalleryIcon size={40} /></span>
             <h2>아직 기록한 사진이 없어요</h2>
             <p>전시 화면에서 전시를 선택하고 카메라 버튼으로 첫 순간을 남겨보세요.</p>
           </div>
@@ -135,13 +131,17 @@ export function GalleryScreen({
 
         {!loading && !error && !selectedAlbum && albums.length > 0 && (
           <div className="gallery-album-grid">
-            {albums.map((album, index) => (
+            {albums.map((album) => (
               <button type="button" className="gallery-album-button" key={album.id} onClick={() => selectAlbum(album.id)}>
-                <span className="gallery-album-number">{String(index + 1).padStart(2, "0")}</span>
+                {albumHeroImage(album) && (
+                  <span className="gallery-album-image" aria-hidden="true">
+                    <Image src={albumHeroImage(album) as string} alt="" fill sizes="(max-width: 760px) 100vw, 760px" />
+                  </span>
+                )}
+                <span className="gallery-album-shade" aria-hidden="true" />
                 <span className="gallery-album-symbol" aria-hidden="true" />
                 <span className="gallery-album-copy">
                   <strong>{album.title}</strong>
-                  <small>{album.venue || "전시 기록"}</small>
                 </span>
                 <span className="gallery-album-count">사진 {album.photos.length}장 <b>→</b></span>
               </button>
@@ -151,7 +151,7 @@ export function GalleryScreen({
 
         {!loading && !error && selectedAlbum && selectedAlbum.photos.length === 0 && (
           <div className="gallery-empty-state">
-            <span className="gallery-empty-icon" aria-hidden="true" />
+            <span className="gallery-empty-icon" aria-hidden="true"><GalleryIcon size={40} /></span>
             <h2>아직 기록한 사진이 없어요</h2>
             <p>화면 오른쪽 아래 카메라 버튼으로 첫 순간을 남겨보세요.</p>
             <button type="button" onClick={onOpenCamera}>첫 사진 추가하기</button>
@@ -160,19 +160,22 @@ export function GalleryScreen({
 
         {!loading && !error && selectedAlbum && selectedAlbum.photos.length > 0 && (
           <div className="gallery-photo-grid gallery-selected-photo-grid">
-            {selectedAlbum.photos.map((photo) => (
-              <figure key={photo.id}>
-                <span className="gallery-photo-frame">
-                  <Image
-                    src={photo.imageUrl}
-                    alt={`${photo.exhibitionTitle}에서 촬영한 사진`}
-                    fill
-                    unoptimized
-                    sizes="(max-width: 640px) 50vw, 33vw"
-                  />
-                </span>
-                <figcaption>{new Intl.DateTimeFormat("ko-KR", { dateStyle: "medium", timeStyle: "short" }).format(new Date(photo.createdAt))}</figcaption>
-              </figure>
+            {[0, 1].map((column) => (
+              <div className="gallery-photo-column" key={column}>
+                {selectedAlbum.photos.map((photo, index) => index % 2 === column && (
+                  <figure className={`gallery-photo-item photo-shape-${index % 5}`} key={photo.id}>
+                    <span className="gallery-photo-frame">
+                      <Image
+                        src={photo.imageUrl}
+                        alt={`${photo.exhibitionTitle}에서 촬영한 사진`}
+                        fill
+                        unoptimized
+                        sizes="(max-width: 640px) 50vw, 360px"
+                      />
+                    </span>
+                  </figure>
+                ))}
+              </div>
             ))}
           </div>
         )}
