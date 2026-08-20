@@ -139,7 +139,7 @@ export function MomenteHomeScreen({
       <h1 className="momente-home-title">Home</h1>
 
       <button className="momente-connect-button" type="button" onClick={() => setShowJoinPanel(true)}>
-        <span>NFC/ QR 연결하기</span>
+        <span>전시 참가하기</span>
         <span className="momente-double-chevron" aria-hidden="true"><ChevronRightIcon /><ChevronRightIcon /></span>
       </button>
 
