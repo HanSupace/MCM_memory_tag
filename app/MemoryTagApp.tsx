@@ -274,6 +274,9 @@ function MainShell({ user, onLogout }: { user: AuthUser; onLogout: () => Promise
           <img src="/mcm-entry-logo.png" alt="MCM" />
         </button>
         <div className="header-actions">
+          <button className="header-qr-button" type="button" aria-label="작품 QR 스캔" onClick={() => setShowGlobalQrScanner(true)}>
+            <ScanQrIcon />
+          </button>
           <button className="avatar-button" type="button" aria-label={`${user.username} 마이 페이지`} onClick={() => router.push("/my")}>
             <UserIcon />
           </button>
@@ -307,6 +310,7 @@ function MainShell({ user, onLogout }: { user: AuthUser; onLogout: () => Promise
         })}
         <button className="bottom-nav-qr" type="button" aria-label="작품 QR 스캔" onClick={() => setShowGlobalQrScanner(true)}>
           <ScanQrIcon />
+          <small>QR</small>
         </button>
         {navItems.slice(3).map((key) => {
           const Icon = navIcons[key];
