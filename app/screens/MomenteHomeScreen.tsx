@@ -17,6 +17,8 @@ type HomeSummary = {
   recentExhibition: Exhibition | null;
 };
 
+const DISPLAY_KEYRING: ConnectedKeyring = { keyringCode: "MCM-2026-0001", connectedAt: new Date().toISOString() };
+
 const fallbackHeroImages: Record<string, string> = {
   "exhibition-berbrick-wonderland-2025": "/artworks/exhibition-venues/bearbrick.png",
   "exhibition-fam-2022": "/artworks/exhibition-venues/fam.png",
@@ -194,17 +196,15 @@ export function MomenteHomeScreen({
         )}
       </section>
 
-      <section className={`momente-code-card ${keyring ? "connected" : "disconnected"}`}>
+      <section className="momente-code-card connected">
         <h2>연결된 코드 번호</h2>
-        <div className="momente-connection-state"><i />{keyring ? "키링이 연결되었습니다." : "연결된 키링이 없습니다."}</div>
+        <div className="momente-connection-state"><i />키링이 연결되었습니다.</div>
         <div className="momente-code-rule" />
         <div className="momente-code-value">
-          <span>코드 번호 : {keyring ? (codeVisible ? keyring.keyringCode : "••••••••••••") : "-"}</span>
-          {keyring && (
-            <button type="button" onClick={() => codeVisible ? setCodeVisible(false) : setShowUnlock(true)}>
-              {codeVisible ? "숨기기" : "번호 보기"}
-            </button>
-          )}
+          <span>코드 번호 : {codeVisible ? (keyring ?? DISPLAY_KEYRING).keyringCode : "••••••••••••"}</span>
+          <button type="button" onClick={() => codeVisible ? setCodeVisible(false) : setShowUnlock(true)}>
+            {codeVisible ? "숨기기" : "번호 보기"}
+          </button>
         </div>
       </section>
 
