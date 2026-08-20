@@ -9,17 +9,17 @@ export async function generateMetadata(): Promise<Metadata> {
   const origin = `${protocol}://${host}`;
 
   return {
-    title: "MCM Memory Tag — 나의 전시 기억",
+    title: "MCM Momente — 나의 전시 기억",
     description: "전시의 순간을 기록하고 취향을 발견하는 디지털 아카이브",
     openGraph: {
-      title: "MCM Memory Tag",
+      title: "MCM Momente",
       description: "전시의 순간을 기록하고 취향을 발견하는 디지털 아카이브",
       type: "website",
-      images: [{ url: `${origin}/og.png`, width: 1200, height: 630, alt: "MCM Memory Tag" }],
+      images: [{ url: `${origin}/og.png`, width: 1200, height: 630, alt: "MCM Momente" }],
     },
     twitter: {
       card: "summary_large_image",
-      title: "MCM Memory Tag",
+      title: "MCM Momente",
       description: "전시의 순간을 기록하고 취향을 발견하는 디지털 아카이브",
       images: [`${origin}/og.png`],
     },
