@@ -6027,6 +6027,19 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--gold); outl
   background: #ad8c65;
 }
 
+.momente-empty-exhibitions {
+  margin: 8px 20px 0;
+  padding: 24px 18px;
+  border: 1px dashed rgba(76, 57, 40, .3);
+  border-radius: 10px;
+  color: #74685d;
+  background: rgba(255, 255, 255, .28);
+  font-size: 12px;
+  line-height: 1.65;
+  text-align: center;
+  word-break: keep-all;
+}
+
 .momente-record-section {
   margin-top: 24px;
 }

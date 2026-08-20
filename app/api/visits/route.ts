@@ -44,24 +44,10 @@ export async function POST(request: NextRequest) {
     if (existingRow) {
       return NextResponse.json({ visited: true, visitedAt: existingRow.visited_at, alreadyVisited: true });
     }
-
-    try {
-      const inserted = await db.query<VisitRow>(
-        `INSERT INTO visits (user_id, exhibition_id) VALUES ($1, $2)
-         RETURNING visited_at`,
-        [user.id, exhibitionId],
-      );
-      return NextResponse.json({ visited: true, visitedAt: inserted.rows[0].visited_at });
-    } catch (error) {
-      if ((error as { code?: string }).code === "23505") {
-        const row = await db.query<VisitRow>(
-          "SELECT visited_at FROM visits WHERE user_id = $1 AND exhibition_id = $2",
-          [user.id, exhibitionId],
-        );
-        return NextResponse.json({ visited: true, visitedAt: row.rows[0]?.visited_at, alreadyVisited: true });
-      }
-      throw error;
-    }
+    return NextResponse.json(
+      { error: "홈에서 NFC/QR/코드로 이 전시를 먼저 추가해 주세요." },
+      { status: 403 },
+    );
   } catch (error) {
     console.error("방문 인증 실패", error);
     return NextResponse.json({ error: "방문 인증을 처리하지 못했습니다." }, { status: 500 });

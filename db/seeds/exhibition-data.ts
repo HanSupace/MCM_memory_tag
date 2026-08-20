@@ -21,6 +21,7 @@ const berbrickWonderlandSource = {
 export const exhibitions = [
   {
     id: "exhibition-fam-2022",
+    entryCode: "code1",
     slug: "fam-fashion-art-at-mcm-haus",
     title: "F.A.M: Fashion & Art at MCM HAUS",
     shortTitle: "F.A.M",
@@ -82,6 +83,7 @@ export const exhibitions = [
   },
   {
     id: "exhibition-wearable-casa-2024",
+    entryCode: "code2",
     slug: "mcm-wearable-casa-2024",
     title: "MCM 웨어러블 카사 컬렉션",
     shortTitle: "웨어러블 카사",
@@ -142,6 +144,7 @@ export const exhibitions = [
   },
   {
     id: "exhibition-berbrick-wonderland-2025",
+    entryCode: "code3",
     slug: "berbrick-in-mcm-wonderland-2025",
     title: "BE@RBRICK in MCM Wonderland",
     shortTitle: "BE@RBRICK Wonderland",

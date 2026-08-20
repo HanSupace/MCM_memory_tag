@@ -67,6 +67,7 @@ export const artists = pgTable("artists", {
 
 export const exhibitions = pgTable("exhibitions", {
   id: bigserial("id", { mode: "bigint" }).primaryKey(),
+  entryCode: varchar("entry_code", { length: 64 }).unique(),
   title: varchar("title", { length: 120 }).notNull(),
   description: text("description"),
   heroImageUrl: text("hero_image_url"),

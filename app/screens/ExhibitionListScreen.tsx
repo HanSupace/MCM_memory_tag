@@ -104,7 +104,7 @@ export function ExhibitionListScreen({
         <h1>Exhibition List</h1>
         {error && <p className="form-error">{error}</p>}
         {!error && exhibitions === null && <p>전시를 불러오는 중입니다…</p>}
-        {!error && exhibitions !== null && exhibitions.length === 0 && <p>등록된 전시가 없습니다.</p>}
+        {!error && exhibitions !== null && exhibitions.length === 0 && <p>아직 추가한 전시가 없습니다. 홈에서 NFC, QR 또는 전시 코드를 연결해 주세요.</p>}
 
         <div className="momente-exhibition-list">
           {(exhibitions ?? []).map((exhibition) => {

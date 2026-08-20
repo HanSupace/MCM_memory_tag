@@ -1,6 +1,6 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { getUserBySessionToken, SESSION_COOKIE_NAME } from "../../../lib/auth";
 import { getDb } from "../../../lib/db";
-import { exhibitions as seedExhibitions } from "../../../db/seeds";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -22,17 +22,10 @@ function displayExhibitionTitle(title: string) {
     : title;
 }
 
-export async function GET() {
-  const typeScriptExhibitions = seedExhibitions.map((exhibition) => ({
-    id: exhibition.id,
-    title: displayExhibitionTitle(exhibition.title),
-    venue: exhibition.venue,
-    heroImageUrl: null,
-    startAt: exhibition.startDate,
-    endAt: exhibition.endDate,
-    status: exhibition.status,
-    representativeArtists: exhibition.artists,
-  }));
+export async function GET(request: NextRequest) {
+  const token = request.cookies.get(SESSION_COOKIE_NAME)?.value;
+  const user = token ? await getUserBySessionToken(token) : null;
+  if (!user) return NextResponse.json({ error: "로그인이 필요합니다." }, { status: 401 });
 
   try {
     const result = await getDb().query<ExhibitionListRow>(
@@ -44,14 +37,16 @@ export async function GET() {
                 WHERE ea.exhibition_id = e.id
                 ORDER BY ea.artist_id
               ) AS representative_artists
-       FROM exhibitions e
-       WHERE e.published = true
+       FROM visits v
+       JOIN exhibitions e ON e.id = v.exhibition_id
+       WHERE v.user_id = $1 AND e.published = true
        ORDER BY
          CASE e.status WHEN 'ongoing' THEN 0 WHEN 'upcoming' THEN 1 ELSE 2 END,
-         e.start_at DESC`,
+         v.visited_at DESC`,
+      [user.id],
     );
 
-    const databaseExhibitions = result.rows.map((row) => ({
+    const exhibitions = result.rows.map((row) => ({
       id: row.id,
       title: displayExhibitionTitle(row.title),
       venue: row.venue,
@@ -61,18 +56,10 @@ export async function GET() {
       status: row.status,
       representativeArtists: row.representative_artists ?? [],
     }));
-    const databaseTitles = new Set(databaseExhibitions.map((exhibition) => exhibition.title));
-    const exhibitions = [
-      ...typeScriptExhibitions.filter((exhibition) => !databaseTitles.has(exhibition.title)),
-      ...databaseExhibitions,
-    ];
 
     return NextResponse.json({ exhibitions }, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
     console.error("전시 목록 조회 실패", error);
-    return NextResponse.json(
-      { exhibitions: typeScriptExhibitions },
-      { headers: { "Cache-Control": "no-store" } },
-    );
+    return NextResponse.json({ error: "전시 목록을 불러오지 못했습니다." }, { status: 500 });
   }
 }

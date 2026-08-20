@@ -71,6 +71,13 @@ export async function POST(request: NextRequest) {
         { status: 409 },
       );
     }
+    const joined = await db.query(
+      "SELECT 1 FROM visits WHERE user_id = $1 AND exhibition_id = $2 LIMIT 1",
+      [user.id, exhibitionId],
+    );
+    if ((joined.rowCount ?? 0) === 0) {
+      return NextResponse.json({ error: "먼저 NFC/QR/코드로 해당 전시를 추가해 주세요." }, { status: 403 });
+    }
     const count = await db.query<{ count: string }>(
       "SELECT count(*)::text AS count FROM gallery_photos WHERE user_id = $1 AND exhibition_id = $2",
       [user.id, exhibitionId],

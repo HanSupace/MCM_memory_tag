@@ -91,6 +91,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "작품을 찾을 수 없습니다. 코드를 다시 확인해 주세요." }, { status: 404 });
     }
 
+    const joined = await db.query(
+      "SELECT 1 FROM visits WHERE user_id = $1 AND exhibition_id = $2 LIMIT 1",
+      [user.id, artworkRow.exhibition_id],
+    );
+    if ((joined.rowCount ?? 0) === 0) {
+      return NextResponse.json({ error: "먼저 NFC/QR/코드로 해당 전시를 추가해 주세요." }, { status: 403 });
+    }
+
     const existing = await db.query(
       "SELECT 1 FROM collections WHERE user_id = $1 AND exhibition_artwork_id = $2",
       [user.id, artworkRow.exhibition_artwork_id],

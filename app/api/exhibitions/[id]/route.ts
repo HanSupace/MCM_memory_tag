@@ -48,70 +48,43 @@ type ArtworkRow = {
   appreciation_points: string | null;
 };
 
-function getTypeScriptExhibition(id: string) {
-  const exhibition = seedExhibitions.find((item) => item.id === id);
-  if (!exhibition) return null;
-
-  const artworks = seedArtworks
-    .filter((artwork) => artwork.exhibitionId === exhibition.id)
-    .sort((left, right) => left.displayOrder - right.displayOrder)
-    .map((artwork) => ({
-      id: artwork.id,
-      exhibitionArtworkId: artwork.id,
-      collectIdentifier: artwork.slug,
-      title: artwork.title,
-      artistName: artwork.artistName,
-      productionYear: null,
-      material: artwork.material ?? artwork.type,
-      imageUrl: artwork.imageUrl ?? null,
-      description: artwork.description,
-      appreciationPoints: [artwork.interpretation, ...artwork.viewingTips].join("\n"),
-    }));
-
-  return {
-    id: exhibition.id,
-    title: displayExhibitionTitle(exhibition.title),
-    description: exhibition.description,
-    heroImageUrl: null,
-    venue: exhibition.venue,
-    startAt: exhibition.startDate,
-    endAt: exhibition.endDate,
-    operatingHours: null,
-    status: exhibition.status,
-    artists: exhibition.artists.map((name, index) => ({ id: `${exhibition.id}-artist-${index + 1}`, name })),
-    artworks,
-    totalArtworks: artworks.length,
-    visited: false,
-    collectedCount: 0,
-  };
-}
-
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const typeScriptExhibition = getTypeScriptExhibition(id);
-  if (typeScriptExhibition) {
-    return NextResponse.json(
-      { exhibition: typeScriptExhibition },
-      { headers: { "Cache-Control": "no-store" } },
-    );
-  }
-
-  if (!/^\d+$/.test(id)) {
-    return NextResponse.json({ error: "잘못된 전시 ID입니다." }, { status: 400 });
-  }
+  const token = request.cookies.get(SESSION_COOKIE_NAME)?.value;
+  const user = token ? await getUserBySessionToken(token) : null;
+  if (!user) return NextResponse.json({ error: "로그인이 필요합니다." }, { status: 401 });
 
   try {
     const db = getDb();
+    let databaseId = id;
+    if (!/^\d+$/.test(databaseId)) {
+      const legacySeed = seedExhibitions.find((item) => item.id === id);
+      if (!legacySeed) return NextResponse.json({ error: "잘못된 전시 ID입니다." }, { status: 400 });
+      const legacyResult = await db.query<{ id: string }>(
+        "SELECT id::text FROM exhibitions WHERE title = $1 AND published = true LIMIT 1",
+        [legacySeed.title],
+      );
+      databaseId = legacyResult.rows[0]?.id ?? "";
+      if (!databaseId) return NextResponse.json({ error: "전시를 찾을 수 없습니다." }, { status: 404 });
+    }
 
     const exhibitionResult = await db.query<ExhibitionRow>(
       `SELECT id::text, title, description, hero_image_url, venue, start_at, end_at, operating_hours, status
        FROM exhibitions
        WHERE id = $1 AND published = true`,
-      [id],
+      [databaseId],
     );
     const exhibition = exhibitionResult.rows[0];
     if (!exhibition) {
       return NextResponse.json({ error: "전시를 찾을 수 없습니다." }, { status: 404 });
+    }
+
+    const visitResult = await db.query(
+      "SELECT 1 FROM visits WHERE user_id = $1 AND exhibition_id = $2 LIMIT 1",
+      [user.id, databaseId],
+    );
+    if ((visitResult.rowCount ?? 0) === 0) {
+      return NextResponse.json({ error: "먼저 NFC/QR/코드로 이 전시를 추가해 주세요." }, { status: 403 });
     }
 
     const artistsResult = await db.query<ArtistRow>(
@@ -120,7 +93,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
        JOIN artists a ON a.id = ea.artist_id
        WHERE ea.exhibition_id = $1
        ORDER BY a.name`,
-      [id],
+      [databaseId],
     );
 
     const artworksResult = await db.query<ArtworkRow>(
@@ -144,7 +117,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
            OR exhibition_artworks.collect_identifier <> ALL($2::text[])
          )
        ORDER BY exhibition_artworks.id`,
-      [id, productOnlyCollectIdentifiers],
+      [databaseId, productOnlyCollectIdentifiers],
     );
     const databaseArtworks = artworksResult.rows.map((row) => ({
       id: row.id,
@@ -179,31 +152,16 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     const exhibitionArtworks = databaseArtworks.length > 0 ? databaseArtworks : fallbackArtworks;
     const totalArtworks = exhibitionArtworks.length;
 
-    let visited = false;
-    let collectedCount = 0;
-
-    const sessionToken = request.cookies.get(SESSION_COOKIE_NAME)?.value;
-    if (sessionToken) {
-      const user = await getUserBySessionToken(sessionToken);
-      if (user) {
-        const visitResult = await db.query(
-          "SELECT 1 FROM visits WHERE user_id = $1 AND exhibition_id = $2 LIMIT 1",
-          [user.id, id],
-        );
-        visited = (visitResult.rowCount ?? 0) > 0;
-
-        const collectedResult = await db.query<{ count: string }>(
-          `SELECT count(*)::text AS count
-           FROM collections c
-           JOIN exhibition_artworks ea ON ea.id = c.exhibition_artwork_id
-           WHERE c.user_id = $1
-             AND ea.exhibition_id = $2
-             AND (ea.collect_identifier IS NULL OR ea.collect_identifier <> ALL($3::text[]))`,
-          [user.id, id, productOnlyCollectIdentifiers],
-        );
-        collectedCount = Number(collectedResult.rows[0]?.count ?? "0");
-      }
-    }
+    const collectedResult = await db.query<{ count: string }>(
+      `SELECT count(*)::text AS count
+       FROM collections c
+       JOIN exhibition_artworks ea ON ea.id = c.exhibition_artwork_id
+       WHERE c.user_id = $1
+         AND ea.exhibition_id = $2
+         AND (ea.collect_identifier IS NULL OR ea.collect_identifier <> ALL($3::text[]))`,
+      [user.id, databaseId, productOnlyCollectIdentifiers],
+    );
+    const collectedCount = Number(collectedResult.rows[0]?.count ?? "0");
 
     return NextResponse.json(
       {
@@ -220,7 +178,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
           artists: artistsResult.rows.map((row) => ({ id: row.id, name: row.name })),
           artworks: exhibitionArtworks,
           totalArtworks,
-          visited,
+          visited: true,
           collectedCount,
         },
       },
