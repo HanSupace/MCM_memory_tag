@@ -361,6 +361,29 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--gold); outl
   display: none;
 }
 
+.mcm-reco-indicators {
+  height: 18px;
+  margin: 14px 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.mcm-reco-indicators i {
+  width: 19px;
+  height: 19px;
+  display: block;
+  border-radius: 50%;
+  background: #d7dadd;
+}
+
+.mcm-reco-indicators i.active {
+  width: 68px;
+  border-radius: 99px;
+  background: #ab8d6b;
+}
+
 .mcm-reco-card {
   flex: 0 0 calc(100% - 8px);
   width: calc(100% - 8px);
@@ -1575,6 +1598,68 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--gold); outl
   color: #fff;
   background: #8e392f;
   box-shadow: none;
+}
+
+/* MOMENTE page-title system — final overrides */
+:root {
+  --momente-title-font: "Bodoni MT", Didot, Georgia, Gulim, "굴림", sans-serif;
+  --momente-title-size: clamp(31px, 8.8vw, 42px);
+}
+
+.momente-home-title,
+.momente-exhibition-section h2,
+.momente-record-section > h2,
+.momente-exhibition-list-section > h1,
+.gallery-screen.album-list .gallery-heading h1,
+.momente-recent-copy h2,
+.gallery-screen.album-list .gallery-album-copy strong,
+.timed-content-heading h1,
+.mcm-reco-title h1,
+.momente-curation .curation-heading h1,
+.my-page-heading h1 {
+  margin: 18px 0 3px;
+  font-family: var(--momente-title-font);
+  font-size: var(--momente-title-size);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -.045em;
+}
+
+.my-page-heading h1 {
+  font-family: Gulim, "굴림", sans-serif;
+  font-weight: 700;
+  letter-spacing: -.05em;
+}
+
+.momente-recent-card {
+  border: 0;
+  border-radius: 10px;
+}
+
+/* MOMENTE Korean/English title consistency */
+:root {
+  --momente-title-font: Arial, "Helvetica Neue", Gulim, "굴림", sans-serif;
+}
+
+.momente-home-title,
+.momente-exhibition-section h2,
+.momente-record-section > h2,
+.momente-exhibition-list-section > h1,
+.gallery-screen.album-list .gallery-heading h1,
+.momente-recent-copy h2,
+.gallery-screen.album-list .gallery-album-copy strong {
+  font-family: var(--momente-title-font);
+  font-weight: 700;
+}
+
+.momente-recent-copy small {
+  font-family: Gulim, "굴림", sans-serif;
+  font-weight: 700;
+}
+
+.momente-recent-card {
+  border: 0;
+  border-radius: 10px;
 }
 
 /* Exhibition journal — editorial summary hero */
@@ -5227,10 +5312,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--gold); outl
 }
 
 .momente-all-artworks-header {
-  display: grid;
-  grid-template-columns: 44px minmax(0, 1fr);
-  align-items: start;
-  gap: 15px;
+  display: block;
 }
 
 .momente-all-artworks-header > button {
@@ -5526,7 +5608,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--gold); outl
 }
 
 .login-mode-login .login-submit-button {
-  margin-top: 91px;
+  margin-top: 12px;
 }
 
 .login-submit-button {
@@ -5652,7 +5734,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--gold); outl
   }
 
   .login-mode-login .login-submit-button {
-    margin-top: 62px;
+    margin-top: 8px;
   }
 
   .login-divider {
@@ -5716,6 +5798,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--gold); outl
 }
 
 .notification-button,
+.header-qr-button,
 .avatar-button {
   width: 36px;
   height: 36px;
@@ -5725,6 +5808,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--gold); outl
 }
 
 .notification-button svg,
+.header-qr-button svg,
 .avatar-button svg {
   width: 25px;
   height: 25px;
@@ -5738,6 +5822,21 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--gold); outl
 .avatar-button {
   border: 1px solid rgba(23, 18, 12, .34);
   background: rgba(255, 255, 255, .5);
+}
+
+.header-qr-button {
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid rgba(23, 18, 12, .34);
+  border-radius: 9px;
+  background: rgba(255, 255, 255, .5);
+  cursor: pointer;
+}
+
+.header-qr-button:hover,
+.header-qr-button:focus-visible {
+  background: rgba(255, 255, 255, .82);
 }
 
 .avatar-button svg {
@@ -6013,6 +6112,19 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--gold); outl
   background: #ad8c65;
 }
 
+.momente-empty-exhibitions {
+  margin: 8px 20px 0;
+  padding: 24px 18px;
+  border: 1px dashed rgba(76, 57, 40, .3);
+  border-radius: 10px;
+  color: #74685d;
+  background: rgba(255, 255, 255, .28);
+  font-size: 12px;
+  line-height: 1.65;
+  text-align: center;
+  word-break: keep-all;
+}
+
 .momente-record-section {
   margin-top: 24px;
 }
@@ -6271,7 +6383,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--gold); outl
   padding: 0 10px max(4px, env(safe-area-inset-bottom));
   overflow: visible;
   display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   align-items: center;
   border: 0;
   border-top: 1px solid rgba(112, 88, 65, .18);
@@ -6285,9 +6397,9 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--gold); outl
 .bottom-nav::after {
   content: "";
   position: absolute;
-  left: calc((100% / 7) * var(--nav-active-index) + 9px);
+  left: calc((100% / 6) * var(--nav-active-index) + 9px);
   top: 0;
-  width: calc(100% / 7 - 18px);
+  width: calc(100% / 6 - 18px);
   height: 3px;
   border-radius: 0 0 3px 3px;
   background: #9d7557;
@@ -6295,18 +6407,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--gold); outl
 }
 
 .bottom-nav::before {
-  content: "";
-  position: absolute;
-  z-index: -1;
-  left: 50%;
-  top: -38px;
-  width: 88px;
-  height: 88px;
-  transform: translateX(-50%);
-  border: 1px solid rgba(112, 88, 65, .18);
-  border-bottom-color: transparent;
-  border-radius: 50%;
-  background: #efe6da;
+  content: none;
 }
 
 .bottom-nav > button {
@@ -6365,29 +6466,34 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--gold); outl
 }
 
 .bottom-nav > button.bottom-nav-qr {
-  z-index: 2;
-  width: 60px;
-  height: 60px;
-  align-self: start;
-  justify-self: center;
-  transform: translateY(-24px);
-  border-radius: 50%;
-  background: #987153;
-  color: #fff;
-  box-shadow: 0 0 0 6px #efe6da;
-  transition: transform .28s cubic-bezier(.22, .8, .24, 1), background-color .25s ease, box-shadow .25s ease;
+  z-index: auto;
+  width: 100%;
+  height: 100%;
+  align-self: stretch;
+  justify-self: stretch;
+  transform: none;
+  border-radius: 0;
+  background: transparent;
+  color: #8f674a;
+  box-shadow: none;
 }
 
 .bottom-nav > button.bottom-nav-qr:hover,
 .bottom-nav > button.bottom-nav-qr:focus-visible {
-  transform: translateY(-27px) scale(1.035);
-  background: #896348;
+  transform: none;
+  background: transparent;
 }
 
 .bottom-nav > button.bottom-nav-qr > svg {
-  width: 36px;
-  height: 36px;
-  stroke-width: 1.55;
+  width: 29px;
+  height: 29px;
+  stroke-width: 1.65;
+  transform: translateY(-7px) scale(1.06);
+}
+
+.bottom-nav > button.bottom-nav-qr > small {
+  opacity: 1;
+  transform: translate(-50%, 0);
 }
 
 .toast {
@@ -6398,13 +6504,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--gold); outl
   .bottom-nav {
     height: 70px;
     padding-inline: 5px;
-    grid-template-columns: repeat(7, minmax(0, 1fr));
-  }
-
-  .bottom-nav::before {
-    width: 82px;
-    height: 82px;
-    top: -35px;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
   }
 
   .bottom-nav > button {
@@ -6421,20 +6521,20 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--gold); outl
   }
 
   .bottom-nav > button.bottom-nav-qr {
-    width: 50px;
-    height: 50px;
-    transform: translateY(-19px);
-    box-shadow: 0 0 0 5px #efe6da;
+    width: 100%;
+    height: 100%;
+    transform: none;
+    box-shadow: none;
   }
 
   .bottom-nav > button.bottom-nav-qr > svg {
-    width: 29px;
-    height: 29px;
+    width: 26px;
+    height: 26px;
   }
 
   .bottom-nav > button.bottom-nav-qr:hover,
   .bottom-nav > button.bottom-nav-qr:focus-visible {
-    transform: translateY(-22px) scale(1.03);
+    transform: none;
   }
 }
 
@@ -6505,7 +6605,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--gold); outl
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
 }
-.momente-detail-actions-row { margin: clamp(112px, 15vh, 145px) 26px 0; }
+.momente-detail-actions-row { margin: 32px 26px 0; }
 .momente-personal-hall-button {
   width: auto;
   min-width: 210px;
@@ -6525,9 +6625,38 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--gold); outl
   text-decoration: underline;
   text-underline-offset: 3px;
 }
-.momente-artwork-rail { padding: 0 26px 10px; gap: 10px; }
-.momente-artwork-card { width: 170px; flex-basis: 170px; border-radius: 10px; background: #e5d0b0; }
-.momente-artwork-image { height: 226px; }
+.momente-artwork-rail {
+  padding: 0 26px 10px;
+  gap: 10px;
+  scroll-snap-type: none;
+}
+.momente-artwork-card {
+  width: 170px;
+  flex-basis: 170px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  border-radius: 10px;
+  background: #e5d0b0;
+}
+.momente-artwork-rail .momente-artwork-image {
+  width: 100%;
+  height: 226px;
+  margin: 0;
+  padding: 0;
+}
+.momente-artwork-rail .momente-artwork-image img {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  object-position: center;
+}
+.momente-artwork-rail .momente-artwork-card:hover .momente-artwork-image img,
+.momente-artwork-rail .momente-artwork-card:focus-visible .momente-artwork-image img {
+  transform: scale(1.035);
+}
 .momente-artwork-copy { min-height: 82px; padding: 11px 10px 13px; }
 .momente-artwork-copy strong { font-size: 22px; }
 
@@ -6538,7 +6667,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--gold); outl
   .momente-detail-title h1 { font-size: clamp(33px, 9.7vw, 44px); }
   .momente-detail-title h1 > .lead-line { font-size: 1.55em; }
   .momente-detail-info { margin-top: 50px; }
-  .momente-detail-actions-row { margin-top: clamp(105px, 14vh, 132px); }
+  .momente-detail-actions-row { margin-top: 28px; }
   .momente-artwork-card { width: 170px; flex-basis: 170px; }
 }
 
@@ -9802,6 +9931,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--gold); outl
   position: relative;
   z-index: 3;
   padding: 0 calc(50% - min(22vw, 95px)) 24px;
+  overflow-y: hidden;
   gap: 12px;
   align-items: center;
   scroll-padding-inline: calc(50% - min(22vw, 95px));
@@ -10047,4 +10177,40 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--gold); outl
   color: #fff;
   background: #8e392f;
   box-shadow: none;
+}
+
+/* MOMENTE page-title system — final overrides */
+:root {
+  --momente-title-font: "Bodoni MT", Didot, Georgia, Gulim, "굴림", sans-serif;
+  --momente-title-size: clamp(31px, 8.8vw, 42px);
+}
+
+.momente-home-title,
+.momente-exhibition-section h2,
+.momente-record-section > h2,
+.momente-exhibition-list-section > h1,
+.gallery-screen.album-list .gallery-heading h1,
+.momente-recent-copy h2,
+.gallery-screen.album-list .gallery-album-copy strong,
+.timed-content-heading h1,
+.mcm-reco-title h1,
+.momente-curation .curation-heading h1,
+.my-page-heading h1 {
+  margin: 18px 0 3px;
+  font-family: var(--momente-title-font);
+  font-size: var(--momente-title-size);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -.045em;
+}
+
+.my-page-heading h1 {
+  font-family: Gulim, "굴림", sans-serif;
+  font-weight: 700;
+  letter-spacing: -.05em;
+}
+
+.momente-recent-card {
+  border: 0;
+  border-radius: 10px;
 }

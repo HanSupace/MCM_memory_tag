@@ -39,6 +39,36 @@ async function getAuthenticatedUser(request: NextRequest) {
   return sessionToken ? getUserBySessionToken(sessionToken) : null;
 }
 
+async function hasExhibitionAccess(userId: string, exhibitionArtworkId: string) {
+  const db = getDb();
+  if (/^\d+$/.test(exhibitionArtworkId)) {
+    const result = await db.query(
+      `SELECT 1
+       FROM exhibition_artworks ea
+       JOIN visits v ON v.exhibition_id = ea.exhibition_id AND v.user_id = $1
+       WHERE ea.id = $2
+       LIMIT 1`,
+      [userId, exhibitionArtworkId],
+    );
+    return (result.rowCount ?? 0) > 0;
+  }
+
+  const seedArtwork = seedArtworks.find((artwork) => artwork.id === exhibitionArtworkId);
+  const seedExhibition = seedArtwork
+    ? seedExhibitions.find((exhibition) => exhibition.id === seedArtwork.exhibitionId)
+    : null;
+  if (!seedExhibition) return false;
+  const result = await db.query(
+    `SELECT 1
+     FROM visits v
+     JOIN exhibitions e ON e.id = v.exhibition_id
+     WHERE v.user_id = $1 AND e.title = $2
+     LIMIT 1`,
+    [userId, seedExhibition.title],
+  );
+  return (result.rowCount ?? 0) > 0;
+}
+
 function buildSystemPrompt(artwork: ArtworkRow, sources: SourceRow[]) {
   const sourceText = sources.length
     ? sources.map((source, index) => `[근거 ${index + 1} · ${source.source_type}] ${source.body}`).join("\n\n")
@@ -173,6 +203,9 @@ export async function GET(request: NextRequest) {
     if (!exhibitionArtworkId || (!/^\d+$/.test(exhibitionArtworkId) && !loadSeedArtworkContext(exhibitionArtworkId))) {
       return NextResponse.json({ error: "작품 정보가 올바르지 않습니다." }, { status: 400 });
     }
+    if (!(await hasExhibitionAccess(user.id, exhibitionArtworkId))) {
+      return NextResponse.json({ error: "먼저 NFC/QR/코드로 해당 전시를 추가해 주세요." }, { status: 403 });
+    }
 
     if (loadSeedArtworkContext(exhibitionArtworkId)) {
       return NextResponse.json({ messages: [] }, { headers: { "Cache-Control": "no-store" } });
@@ -220,6 +253,9 @@ export async function POST(request: NextRequest) {
 
     if (!exhibitionArtworkId || (!/^\d+$/.test(exhibitionArtworkId) && !loadSeedArtworkContext(exhibitionArtworkId))) {
       return NextResponse.json({ error: "작품 정보가 올바르지 않습니다." }, { status: 400 });
+    }
+    if (!(await hasExhibitionAccess(user.id, exhibitionArtworkId))) {
+      return NextResponse.json({ error: "먼저 NFC/QR/코드로 해당 전시를 추가해 주세요." }, { status: 403 });
     }
     if (!question) {
       return NextResponse.json({ error: "질문을 입력해 주세요." }, { status: 400 });
@@ -288,6 +324,9 @@ export async function DELETE(request: NextRequest) {
     const exhibitionArtworkId = request.nextUrl.searchParams.get("exhibitionArtworkId");
     if (!exhibitionArtworkId || (!/^\d+$/.test(exhibitionArtworkId) && !loadSeedArtworkContext(exhibitionArtworkId))) {
       return NextResponse.json({ error: "작품 정보가 올바르지 않습니다." }, { status: 400 });
+    }
+    if (!(await hasExhibitionAccess(user.id, exhibitionArtworkId))) {
+      return NextResponse.json({ error: "먼저 NFC/QR/코드로 해당 전시를 추가해 주세요." }, { status: 403 });
     }
 
     if (loadSeedArtworkContext(exhibitionArtworkId)) {

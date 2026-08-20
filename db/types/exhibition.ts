@@ -8,6 +8,7 @@ export type ContentSource = {
 
 export type ExhibitionSeed = {
   id: string;
+  entryCode: string;
   slug: string;
   title: string;
   shortTitle: string;

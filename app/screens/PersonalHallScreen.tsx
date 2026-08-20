@@ -430,7 +430,6 @@ export function PersonalHallScreen({
             </div>
             <div className="artwork-section-heading personal-hall-count">
               <h2>담은 작품 목록</h2>
-              <span>더보기</span>
             </div>
             <div
               ref={hallRailRef}

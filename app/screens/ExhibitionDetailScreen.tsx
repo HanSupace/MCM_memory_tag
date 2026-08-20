@@ -100,15 +100,15 @@ export function ExhibitionDetailScreen({
 
     fetch(`/api/exhibitions/${exhibitionId}`, { cache: "no-store" })
       .then(async (response) => {
-        if (!response.ok) throw new Error("failed");
-        const data = (await response.json()) as { exhibition: ExhibitionDetail };
+        const data = (await response.json()) as { exhibition?: ExhibitionDetail; error?: string };
+        if (!response.ok || !data.exhibition) throw new Error(data.error ?? "전시 정보를 불러오지 못했습니다.");
         return data.exhibition;
       })
       .then((detail) => {
         if (active) setExhibition(detail);
       })
-      .catch(() => {
-        if (active) setError("전시 정보를 불러오지 못했습니다.");
+      .catch((fetchError) => {
+        if (active) setError(fetchError instanceof Error ? fetchError.message : "전시 정보를 불러오지 못했습니다.");
       });
 
     return () => {
