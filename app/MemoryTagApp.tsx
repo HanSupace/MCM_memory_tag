@@ -111,7 +111,7 @@ function MainShell({ user, onLogout }: { user: AuthUser; onLogout: () => Promise
   const route = parseAppRoute(pathname);
   const activeNav = route.screen;
   const navActiveIndex = activeNav === "전시회장" ? 1 : navItems.indexOf(activeNav);
-  const bottomNavActiveIndex = navActiveIndex >= 3 ? navActiveIndex + 1 : Math.max(navActiveIndex, 0);
+  const bottomNavActiveIndex = Math.max(navActiveIndex, 0);
   const [cameraOpenRequest, setCameraOpenRequest] = useState(0);
   const [showGlobalQrScanner, setShowGlobalQrScanner] = useState(false);
   const [joinCode, setJoinCode] = useState<string | null>(route.visitExhibitionId);
@@ -277,10 +277,6 @@ function MainShell({ user, onLogout }: { user: AuthUser; onLogout: () => Promise
             </button>
           );
         })}
-        <button className="bottom-nav-qr" type="button" aria-label="작품 QR 스캔" onClick={() => setShowGlobalQrScanner(true)}>
-          <ScanQrIcon />
-          <small>QR</small>
-        </button>
         {navItems.slice(3).map((key) => {
           const Icon = navIcons[key];
           return (
