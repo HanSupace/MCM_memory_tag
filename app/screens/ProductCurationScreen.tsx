@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import type { McmProduct } from "../../lib/mcm-product-catalog";
 import { ArrowRightIcon, SparkleIcon } from "../components/MomenteIcons";
@@ -18,6 +18,8 @@ export function ProductCurationScreen({ announce }: { announce: (message: string
   const [loading, setLoading] = useState(true);
   const [regenerating, setRegenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [activeRecommendation, setActiveRecommendation] = useState(0);
+  const recommendationListRef = useRef<HTMLElement>(null);
 
   const generateRecommendations = useCallback(async (notify = false) => {
     setRegenerating(true);
@@ -54,6 +56,30 @@ export function ProductCurationScreen({ announce }: { announce: (message: string
     return () => { active = false; };
   }, [generateRecommendations]);
 
+  function updateActiveRecommendation() {
+    const list = recommendationListRef.current;
+    if (!list) return;
+    const cards = Array.from(list.querySelectorAll<HTMLElement>("[data-recommendation-card]"));
+    const center = list.scrollLeft + list.clientWidth / 2;
+    let nearestIndex = 0;
+    let nearestDistance = Number.POSITIVE_INFINITY;
+    cards.forEach((card, index) => {
+      const distance = Math.abs(card.offsetLeft + card.offsetWidth / 2 - center);
+      if (distance < nearestDistance) {
+        nearestDistance = distance;
+        nearestIndex = index;
+      }
+    });
+    setActiveRecommendation(nearestIndex);
+  }
+
+  function selectRecommendation(index: number) {
+    const list = recommendationListRef.current;
+    const card = list?.querySelectorAll<HTMLElement>("[data-recommendation-card]")[index];
+    card?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+    setActiveRecommendation(index);
+  }
+
   const generatedAt = recommendations[0]?.generatedAt
     ? new Intl.DateTimeFormat("ko-KR", { month: "long", day: "numeric" }).format(new Date(recommendations[0].generatedAt))
     : null;
@@ -81,9 +107,9 @@ export function ProductCurationScreen({ announce }: { announce: (message: string
           <div className="mcm-reco-loading" aria-live="polite"><i /><strong>나의 전시 기록을 분석하는 중</strong><span>수집 작품의 색, 소재와 감상에서 MCM 상품과의 연결점을 찾고 있습니다.</span></div>
         ) : (
           <>
-          <section className="mcm-reco-list" aria-label="AI MCM 맞춤 추천 상품">
+          <section className="mcm-reco-list" ref={recommendationListRef} onScroll={updateActiveRecommendation} aria-label="AI MCM 맞춤 추천 상품">
             {recommendations.map(({ product, reason }) => (
-              <article className="mcm-reco-card" key={product.id}>
+              <article className="mcm-reco-card" data-recommendation-card key={product.id}>
                 <div className="mcm-reco-visual">
                   <Image className="mcm-reco-image" src={product.image} alt={product.name} fill sizes="(max-width: 480px) calc(100vw - 84px), 345px" />
                 </div>
@@ -95,8 +121,17 @@ export function ProductCurationScreen({ announce }: { announce: (message: string
               </article>
             ))}
           </section>
-          <div className="mcm-reco-indicators" aria-label="추천 상품 위치" aria-hidden="true">
-            {Array.from({ length: 5 }, (_, index) => <i className={index === 0 ? "active" : ""} key={index} />)}
+          <div className="mcm-reco-indicators" aria-label="추천 상품 위치">
+            {recommendations.map((recommendation, index) => (
+              <button
+                type="button"
+                className={index === activeRecommendation ? "active" : ""}
+                aria-label={`${index + 1}번째 추천 상품 보기`}
+                aria-current={index === activeRecommendation ? "true" : undefined}
+                onClick={() => selectRecommendation(index)}
+                key={recommendation.product.id}
+              />
+            ))}
           </div>
           </>
         )}
