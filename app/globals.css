@@ -3501,6 +3501,10 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--gold); outl
 }
 
 .personal-hall-detail-screen .personal-review-card blockquote {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
   margin: 0;
   padding: 15px 18px;
   border-left: 2px solid #d2b07c;
@@ -3511,7 +3515,9 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--gold); outl
   font-weight: 500;
   line-height: 1.5;
   text-align: center;
-  word-break: keep-all;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .personal-hall-detail-screen .personal-ai-history-card {
