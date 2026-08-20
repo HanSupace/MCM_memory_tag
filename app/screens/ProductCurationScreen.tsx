@@ -80,6 +80,7 @@ export function ProductCurationScreen({ announce }: { announce: (message: string
         {(loading || regenerating) && recommendations.length === 0 ? (
           <div className="mcm-reco-loading" aria-live="polite"><i /><strong>나의 전시 기록을 분석하는 중</strong><span>수집 작품의 색, 소재와 감상에서 MCM 상품과의 연결점을 찾고 있습니다.</span></div>
         ) : (
+          <>
           <section className="mcm-reco-list" aria-label="AI MCM 맞춤 추천 상품">
             {recommendations.map(({ product, reason }) => (
               <article className="mcm-reco-card" key={product.id}>
@@ -94,6 +95,10 @@ export function ProductCurationScreen({ announce }: { announce: (message: string
               </article>
             ))}
           </section>
+          <div className="mcm-reco-indicators" aria-label="추천 상품 위치" aria-hidden="true">
+            {Array.from({ length: 5 }, (_, index) => <i className={index === 0 ? "active" : ""} key={index} />)}
+          </div>
+          </>
         )}
 
         <footer className="mcm-reco-disclaimer">

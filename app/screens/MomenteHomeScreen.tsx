@@ -18,17 +18,17 @@ type HomeSummary = {
 };
 
 const fallbackHeroImages: Record<string, string> = {
-  "exhibition-berbrick-wonderland-2025": "/artworks/berbrick-wonderland/nobuki-hizume-installation.jpg",
-  "exhibition-fam-2022": "/artworks/fam/infinity.png",
-  "exhibition-wearable-casa-2024": "/artworks/wearable-casa/chatty-sofa.png",
+  "exhibition-berbrick-wonderland-2025": "/artworks/exhibition-venues/bearbrick.png",
+  "exhibition-fam-2022": "/artworks/exhibition-venues/fam.png",
+  "exhibition-wearable-casa-2024": "/artworks/exhibition-venues/wearable-casa.png",
 };
 
 function fallbackHeroFor(exhibition: Pick<Exhibition, "id" | "title">) {
   if (fallbackHeroImages[exhibition.id]) return fallbackHeroImages[exhibition.id];
   const title = exhibition.title.toUpperCase();
-  if (title.includes("BE@RBRICK")) return "/artworks/berbrick-wonderland/nobuki-hizume-installation.jpg";
-  if (title.includes("F.A.M")) return "/artworks/fam/infinity.png";
-  if (title.includes("WEARABLE") || title.includes("웨어러블")) return "/artworks/wearable-casa/chatty-sofa.png";
+  if (title.includes("BE@RBRICK")) return "/artworks/exhibition-venues/bearbrick.png";
+  if (title.includes("F.A.M")) return "/artworks/exhibition-venues/fam.png";
+  if (title.includes("WEARABLE") || title.includes("웨어러블")) return "/artworks/exhibition-venues/wearable-casa.png";
   return null;
 }
 

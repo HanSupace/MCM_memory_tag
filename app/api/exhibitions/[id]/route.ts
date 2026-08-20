@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 
 function displayExhibitionTitle(title: string) {
   return title.toUpperCase().includes("WEARABLE CASA") || title.includes("웨어러블 카사")
-    ? "WEARABLE CASA at MCM HAUS"
+    ? "WEARABLE CASA"
     : title;
 }
 

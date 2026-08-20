@@ -15,9 +15,9 @@ type ExhibitionSummary = {
 };
 
 const exhibitionFallbackImages = [
-  { test: (title: string) => title.toUpperCase().includes("F.A.M"), url: "/artworks/fam/infinity.png" },
-  { test: (title: string) => title.toUpperCase().includes("WEARABLE") || title.includes("웨어러블"), url: "/artworks/wearable-casa/chatty-sofa.png" },
-  { test: (title: string) => title.toUpperCase().includes("BE@RBRICK"), url: "/artworks/berbrick-wonderland/pause-usa-usa.jpg" },
+  { test: (title: string) => title.toUpperCase().includes("F.A.M"), url: "/artworks/exhibition-venues/fam.png" },
+  { test: (title: string) => title.toUpperCase().includes("WEARABLE") || title.includes("웨어러블"), url: "/artworks/exhibition-venues/wearable-casa.png" },
+  { test: (title: string) => title.toUpperCase().includes("BE@RBRICK"), url: "/artworks/exhibition-venues/bearbrick.png" },
 ];
 
 function formatDateRange(startAt: string, endAt: string) {

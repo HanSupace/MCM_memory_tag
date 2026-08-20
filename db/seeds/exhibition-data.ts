@@ -85,8 +85,8 @@ export const exhibitions = [
     id: "exhibition-wearable-casa-2024",
     entryCode: "code2",
     slug: "mcm-wearable-casa-2024",
-    title: "MCM 웨어러블 카사 컬렉션",
-    shortTitle: "웨어러블 카사",
+    title: "WEARABLE CASA",
+    shortTitle: "WEARABLE CASA",
     theme: "입을 수 있는 집 — 이동하는 삶을 위한 새로운 패션과 리빙",
     summary:
       "언제 어디서나 이동하고 착용할 수 있는 이중 용도 오브제를 통해 디지털 노마드 시대의 집과 가구를 새롭게 해석한 전시입니다.",

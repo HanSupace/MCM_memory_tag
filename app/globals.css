@@ -361,6 +361,29 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--gold); outl
   display: none;
 }
 
+.mcm-reco-indicators {
+  height: 18px;
+  margin: 14px 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.mcm-reco-indicators i {
+  width: 19px;
+  height: 19px;
+  display: block;
+  border-radius: 50%;
+  background: #d7dadd;
+}
+
+.mcm-reco-indicators i.active {
+  width: 68px;
+  border-radius: 99px;
+  background: #ab8d6b;
+}
+
 .mcm-reco-card {
   flex: 0 0 calc(100% - 8px);
   width: calc(100% - 8px);
@@ -1575,6 +1598,68 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--gold); outl
   color: #fff;
   background: #8e392f;
   box-shadow: none;
+}
+
+/* MOMENTE page-title system — final overrides */
+:root {
+  --momente-title-font: "Bodoni MT", Didot, Georgia, Gulim, "굴림", sans-serif;
+  --momente-title-size: clamp(31px, 8.8vw, 42px);
+}
+
+.momente-home-title,
+.momente-exhibition-section h2,
+.momente-record-section > h2,
+.momente-exhibition-list-section > h1,
+.gallery-screen.album-list .gallery-heading h1,
+.momente-recent-copy h2,
+.gallery-screen.album-list .gallery-album-copy strong,
+.timed-content-heading h1,
+.mcm-reco-title h1,
+.momente-curation .curation-heading h1,
+.my-page-heading h1 {
+  margin: 18px 0 3px;
+  font-family: var(--momente-title-font);
+  font-size: var(--momente-title-size);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -.045em;
+}
+
+.my-page-heading h1 {
+  font-family: Gulim, "굴림", sans-serif;
+  font-weight: 700;
+  letter-spacing: -.05em;
+}
+
+.momente-recent-card {
+  border: 0;
+  border-radius: 10px;
+}
+
+/* MOMENTE Korean/English title consistency */
+:root {
+  --momente-title-font: Arial, "Helvetica Neue", Gulim, "굴림", sans-serif;
+}
+
+.momente-home-title,
+.momente-exhibition-section h2,
+.momente-record-section > h2,
+.momente-exhibition-list-section > h1,
+.gallery-screen.album-list .gallery-heading h1,
+.momente-recent-copy h2,
+.gallery-screen.album-list .gallery-album-copy strong {
+  font-family: var(--momente-title-font);
+  font-weight: 700;
+}
+
+.momente-recent-copy small {
+  font-family: Gulim, "굴림", sans-serif;
+  font-weight: 700;
+}
+
+.momente-recent-card {
+  border: 0;
+  border-radius: 10px;
 }
 
 /* Exhibition journal — editorial summary hero */
@@ -10092,4 +10177,40 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--gold); outl
   color: #fff;
   background: #8e392f;
   box-shadow: none;
+}
+
+/* MOMENTE page-title system — final overrides */
+:root {
+  --momente-title-font: "Bodoni MT", Didot, Georgia, Gulim, "굴림", sans-serif;
+  --momente-title-size: clamp(31px, 8.8vw, 42px);
+}
+
+.momente-home-title,
+.momente-exhibition-section h2,
+.momente-record-section > h2,
+.momente-exhibition-list-section > h1,
+.gallery-screen.album-list .gallery-heading h1,
+.momente-recent-copy h2,
+.gallery-screen.album-list .gallery-album-copy strong,
+.timed-content-heading h1,
+.mcm-reco-title h1,
+.momente-curation .curation-heading h1,
+.my-page-heading h1 {
+  margin: 18px 0 3px;
+  font-family: var(--momente-title-font);
+  font-size: var(--momente-title-size);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -.045em;
+}
+
+.my-page-heading h1 {
+  font-family: Gulim, "굴림", sans-serif;
+  font-weight: 700;
+  letter-spacing: -.05em;
+}
+
+.momente-recent-card {
+  border: 0;
+  border-radius: 10px;
 }
