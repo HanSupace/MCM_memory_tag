@@ -4,9 +4,19 @@ import type { IScannerControls } from "@zxing/browser";
 export function ArtworkQrScanner({
   onClose,
   onDetected,
+  kicker = "ARTWORK QR",
+  title = "작품 QR 스캔",
+  cameraMessage = "작품 옆 QR이 사각형 안에 들어오도록 비춰 주세요.",
+  manualLabel = "작품 코드 입력",
+  manualPlaceholder = "작품 코드를 입력하세요.",
 }: {
   onClose: () => void;
   onDetected: (value: string) => string | null;
+  kicker?: string;
+  title?: string;
+  cameraMessage?: string;
+  manualLabel?: string;
+  manualPlaceholder?: string;
 }) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const callbacksRef = useRef({ onClose, onDetected });
@@ -80,7 +90,7 @@ export function ArtworkQrScanner({
         setVideoDevices(devices);
         setCurrentDeviceId(stream.getVideoTracks()[0]?.getSettings().deviceId ?? requestedDeviceId);
         setCameraReady(true);
-        setMessage("작품 옆 QR이 사각형 안에 들어오도록 비춰 주세요.");
+        setMessage(cameraMessage);
       } catch (error) {
         const denied = error instanceof DOMException && (error.name === "NotAllowedError" || error.name === "SecurityError");
         setMessage(denied
@@ -95,7 +105,7 @@ export function ArtworkQrScanner({
       controls?.stop();
       stream?.getTracks().forEach((track) => track.stop());
     };
-  }, [requestedDeviceId]);
+  }, [cameraMessage, requestedDeviceId]);
 
   function submitManualCode(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -116,8 +126,8 @@ export function ArtworkQrScanner({
       <section className="qr-scanner-modal" role="dialog" aria-modal="true" aria-labelledby="qr-scanner-title">
         <header>
           <div>
-            <span className="section-kicker">ARTWORK QR</span>
-            <h2 id="qr-scanner-title">작품 QR 스캔</h2>
+            <span className="section-kicker">{kicker}</span>
+            <h2 id="qr-scanner-title">{title}</h2>
           </div>
           <button type="button" className="qr-scanner-close" onClick={onClose} aria-label="QR 스캐너 닫기">×</button>
         </header>
@@ -157,7 +167,7 @@ export function ArtworkQrScanner({
           onClick={() => {
             videoRef.current?.focus();
             setMessage(cameraReady
-              ? "작품 옆 QR이 사각형 안에 들어오도록 비춰 주세요."
+              ? cameraMessage
               : "카메라를 준비하고 있습니다…");
           }}
         >
@@ -166,13 +176,13 @@ export function ArtworkQrScanner({
         </button>
 
         <form className="qr-manual-form" onSubmit={submitManualCode}>
-          <label htmlFor="artwork-qr-code">작품 코드 입력</label>
+          <label htmlFor="artwork-qr-code">{manualLabel}</label>
           <div>
             <input
               id="artwork-qr-code"
               value={manualCode}
               onChange={(event) => setManualCode(event.target.value)}
-              placeholder="작품 코드를 입력하세요."
+              placeholder={manualPlaceholder}
             />
             <button type="submit" disabled={!manualCode.trim()}>찾기</button>
           </div>

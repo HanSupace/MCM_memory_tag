@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { BrandMark } from "./components/BrandMark";
 import { LoginScreen } from "./screens/LoginScreen";
@@ -13,6 +13,7 @@ import { MyPageScreen } from "./screens/MyPageScreen";
 import { GalleryScreen } from "./screens/GalleryScreen";
 import { CameraCaptureButton } from "./components/CameraCaptureButton";
 import { ArtworkQrScanner } from "./components/ArtworkQrScanner";
+import { ExhibitionJoinPanel } from "./components/ExhibitionJoinPanel";
 import {
   ArrowLeftIcon,
   GalleryIcon,
@@ -49,7 +50,7 @@ function parseAppRoute(pathname: string): AppRoute {
   const exhibitionId = segments[0] === "exhibitions" ? routeId(segments[1]) : null;
 
   if (segments[0] === "visit" && routeId(segments[1])) {
-    return { screen: "전시", exhibitionId: routeId(segments[1]), artworkId: null, visitExhibitionId: routeId(segments[1]) };
+    return { screen: "홈", exhibitionId: null, artworkId: null, visitExhibitionId: routeId(segments[1]) };
   }
   if (segments[0] === "exhibitions") {
     if (exhibitionId && segments[2] === "hall") {
@@ -113,8 +114,8 @@ function MainShell({ user, onLogout }: { user: AuthUser; onLogout: () => Promise
   const bottomNavActiveIndex = navActiveIndex >= 3 ? navActiveIndex + 1 : Math.max(navActiveIndex, 0);
   const [cameraOpenRequest, setCameraOpenRequest] = useState(0);
   const [showGlobalQrScanner, setShowGlobalQrScanner] = useState(false);
+  const [joinCode, setJoinCode] = useState<string | null>(route.visitExhibitionId);
   const [notice, setNotice] = useState("");
-  const handledVisitLinkRef = useRef<string | null>(null);
 
   function announce(message: string) {
     setNotice(message);
@@ -141,38 +142,6 @@ function MainShell({ user, onLogout }: { user: AuthUser; onLogout: () => Promise
       .catch((error) => announce(error instanceof Error ? error.message : "QR을 처리하지 못했습니다."));
     return null;
   }
-
-  // NFC 태그·QR이 여는 "/visit/<exhibitionId>" 링크를 처리한다.
-  // 기존에 발급한 "/?visit=<exhibitionId>" 주소도 계속 지원한다.
-  // 실물 태그는 이 주소를 열기만 하면 되므로(OS/카메라가 URL을 열어줌),
-  // 여기서 파라미터를 감지해 방문 인증 후 해당 전시로 바로 이동시킨다.
-  useEffect(() => {
-    const legacyExhibitionId = new URLSearchParams(window.location.search).get("visit");
-    const exhibitionId = route.visitExhibitionId ?? legacyExhibitionId;
-    if (!exhibitionId) return;
-    if (handledVisitLinkRef.current === exhibitionId) return;
-    handledVisitLinkRef.current = exhibitionId;
-
-    fetch("/api/visits", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ exhibitionId }),
-    })
-      .then(async (response) => {
-        const data = (await response.json()) as { visitedAt?: string; alreadyVisited?: boolean; error?: string };
-        if (!response.ok || !data.visitedAt) {
-          announce(data.error ?? "전시를 찾을 수 없습니다.");
-          return;
-        }
-        announce(data.alreadyVisited ? "이미 방문 인증된 전시입니다." : "방문 인증이 완료되었습니다.");
-      })
-      .catch(() => {
-        announce("네트워크 오류로 방문 인증에 실패했습니다.");
-      })
-      .finally(() => {
-        router.replace(`/exhibitions/${exhibitionId}`);
-      });
-  }, [route.visitExhibitionId, router]);
 
   const screen = activeNav === "홈" ? (
     <MomenteHomeScreen
@@ -322,6 +291,20 @@ function MainShell({ user, onLogout }: { user: AuthUser; onLogout: () => Promise
         })}
       </nav>
       {showGlobalQrScanner && <ArtworkQrScanner onClose={() => setShowGlobalQrScanner(false)} onDetected={handleGlobalQrDetected} />}
+      {joinCode && (
+        <ExhibitionJoinPanel
+          initialCode={joinCode}
+          onClose={() => {
+            setJoinCode(null);
+            if (route.visitExhibitionId) router.replace("/home");
+          }}
+          onJoined={(exhibition, alreadyJoined) => {
+            setJoinCode(null);
+            announce(alreadyJoined ? "이미 추가한 전시입니다." : "전시를 추가했습니다.");
+            router.replace(`/exhibitions/${exhibition.id}`);
+          }}
+        />
+      )}
       <div className={`toast ${notice ? "visible" : ""}`} role="status">{notice}</div>
     </main>
   );

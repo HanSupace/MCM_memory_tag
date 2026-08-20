@@ -74,6 +74,7 @@ erDiagram
 | 컬럼 | 타입 | 설명 |
 |---|---|---|
 | id | bigserial PK | |
+| entry_code | varchar(64) nullable unique | NFC/QR/직접 입력으로 전시를 찾는 참가 코드 |
 | title | varchar(120) | |
 | description | text | |
 | hero_image_url | text | |
@@ -147,7 +148,7 @@ erDiagram
 | keyring_code | varchar(64) unique | 실물 키링 식별값 |
 | connected_at | timestamptz | |
 
-### `visits` (방문 인증)
+### `visits` (전시 참가 및 방문 인증)
 | 컬럼 | 타입 | 설명 |
 |---|---|---|
 | id | bigserial PK | |
@@ -155,6 +156,8 @@ erDiagram
 | exhibition_id | bigint FK → exhibitions | cascade |
 | visited_at | timestamptz | |
 | — | unique(user_id, exhibition_id) | 전시당 방문 인증 1회 |
+
+홈에서 참가 코드를 확인한 뒤 사용자가 `전시 추가하기`를 누르면 생성된다. 이 기록이 있는 전시만 해당 사용자의 홈과 전시 목록에 노출된다.
 
 ### `collections` (작품 수집 기록)
 | 컬럼 | 타입 | 설명 |

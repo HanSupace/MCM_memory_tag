@@ -77,13 +77,17 @@ async function findOrCreateArtist(db: Pool, name: string): Promise<string> {
 
 async function findOrCreateExhibition(db: Pool, seed: ExhibitionSeed): Promise<{ id: string; created: boolean }> {
   const existing = await db.query<{ id: string }>("SELECT id FROM exhibitions WHERE title = $1", [seed.title]);
-  if (existing.rows[0]) return { id: existing.rows[0].id, created: false };
+  if (existing.rows[0]) {
+    await db.query("UPDATE exhibitions SET entry_code = $2 WHERE id = $1", [existing.rows[0].id, seed.entryCode]);
+    return { id: existing.rows[0].id, created: false };
+  }
 
   const inserted = await db.query<{ id: string }>(
-    `INSERT INTO exhibitions (title, description, venue, start_at, end_at, operating_hours, status, published)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, true)
+    `INSERT INTO exhibitions (entry_code, title, description, venue, start_at, end_at, operating_hours, status, published)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, true)
      RETURNING id`,
     [
+      seed.entryCode,
       seed.title,
       buildExhibitionDescription(seed),
       seed.venue,

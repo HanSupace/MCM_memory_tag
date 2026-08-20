@@ -1,5 +1,6 @@
 import { FormEvent, useEffect, useRef, useState } from "react";
-import { ConnectedKeyring, KeyringConnectPanel } from "../components/KeyringConnectPanel";
+import type { ConnectedKeyring } from "../components/KeyringConnectPanel";
+import { ExhibitionJoinPanel } from "../components/ExhibitionJoinPanel";
 import { ArrowRightIcon, ChevronRightIcon } from "../components/MomenteIcons";
 
 type Exhibition = {
@@ -15,36 +16,6 @@ type Exhibition = {
 type HomeSummary = {
   recentExhibition: Exhibition | null;
 };
-
-const fallbackExhibitions: Exhibition[] = [
-  {
-    id: "exhibition-berbrick-wonderland-2025",
-    title: "BE@RBRICK in MCM Wonderland",
-    venue: "MCM HAUS 플래그십 스토어",
-    heroImageUrl: "/artworks/berbrick-wonderland/nobuki-hizume-installation.jpg",
-    startAt: "2025-09-03",
-    endAt: "2025-09-30",
-    status: "ended",
-  },
-  {
-    id: "exhibition-fam-2022",
-    title: "F.A.M: Fashion & Art at MCM HAUS",
-    venue: "MCM HAUS 청담",
-    heroImageUrl: "/artworks/fam/infinity.png",
-    startAt: "2022-08-31",
-    endAt: "2022-09-30",
-    status: "ended",
-  },
-  {
-    id: "exhibition-wearable-casa-2024",
-    title: "WEARABLE CASA at MCM HAUS",
-    venue: "MCM HAUS 플래그십 스토어",
-    heroImageUrl: "/artworks/wearable-casa/chatty-sofa.png",
-    startAt: "2024-09-03",
-    endAt: "2024-10-06",
-    status: "ended",
-  },
-];
 
 const fallbackHeroImages: Record<string, string> = {
   "exhibition-berbrick-wonderland-2025": "/artworks/berbrick-wonderland/nobuki-hizume-installation.jpg",
@@ -73,12 +44,13 @@ export function MomenteHomeScreen({
   announce: (message: string) => void;
   onExploreExhibitions: (exhibitionId?: string) => void;
 }) {
-  const [exhibitions, setExhibitions] = useState(fallbackExhibitions);
+  const [exhibitions, setExhibitions] = useState<Exhibition[]>([]);
   const [summary, setSummary] = useState<HomeSummary>({
     recentExhibition: null,
   });
   const [keyring, setKeyring] = useState<ConnectedKeyring | null>(null);
-  const [showKeyringPanel, setShowKeyringPanel] = useState(false);
+  const [showJoinPanel, setShowJoinPanel] = useState(false);
+  const [refreshVersion, setRefreshVersion] = useState(0);
   const [activeExhibition, setActiveExhibition] = useState(0);
   const [showUnlock, setShowUnlock] = useState(false);
   const [codeVisible, setCodeVisible] = useState(false);
@@ -92,7 +64,7 @@ export function MomenteHomeScreen({
     fetch("/api/exhibitions", { cache: "no-store" })
       .then(async (response) => response.ok ? response.json() as Promise<{ exhibitions?: Exhibition[] }> : null)
       .then((data) => {
-        if (!active || !data?.exhibitions?.length) return;
+        if (!active || !data?.exhibitions) return;
         setExhibitions(data.exhibitions.map((exhibition) => ({
           ...exhibition,
           heroImageUrl: exhibition.heroImageUrl ?? fallbackHeroFor(exhibition),
@@ -100,7 +72,7 @@ export function MomenteHomeScreen({
       })
       .catch(() => undefined);
     return () => { active = false; };
-  }, []);
+  }, [refreshVersion]);
 
   useEffect(() => {
     let active = true;
@@ -115,7 +87,7 @@ export function MomenteHomeScreen({
       })
       .catch(() => undefined);
     return () => { active = false; };
-  }, []);
+  }, [refreshVersion]);
 
   function updateActiveExhibition() {
     const rail = exhibitionRailRef.current;
@@ -166,7 +138,7 @@ export function MomenteHomeScreen({
     <div className="home-content momente-home">
       <h1 className="momente-home-title">Home</h1>
 
-      <button className="momente-connect-button" type="button" onClick={() => setShowKeyringPanel(true)}>
+      <button className="momente-connect-button" type="button" onClick={() => setShowJoinPanel(true)}>
         <span>NFC/ QR 연결하기</span>
         <span className="momente-double-chevron" aria-hidden="true"><ChevronRightIcon /><ChevronRightIcon /></span>
       </button>
@@ -213,9 +185,13 @@ export function MomenteHomeScreen({
             </button>
           ))}
         </div>
-        <div className="momente-rail-indicators" aria-label={`${activeExhibition + 1}번째 전시`}>
-          {exhibitions.map((exhibition, index) => <i key={exhibition.id} className={index === activeExhibition ? "active" : ""} />)}
-        </div>
+        {exhibitions.length === 0 ? (
+          <p className="momente-empty-exhibitions">NFC, QR 또는 전시 코드를 연결하면 참가한 전시가 여기에 표시됩니다.</p>
+        ) : (
+          <div className="momente-rail-indicators" aria-label={`${activeExhibition + 1}번째 전시`}>
+            {exhibitions.map((exhibition, index) => <i key={exhibition.id} className={index === activeExhibition ? "active" : ""} />)}
+          </div>
+        )}
       </section>
 
       <section className={`momente-code-card ${keyring ? "connected" : "disconnected"}`}>
@@ -232,14 +208,14 @@ export function MomenteHomeScreen({
         </div>
       </section>
 
-      {showKeyringPanel && (
-        <KeyringConnectPanel
-          announce={announce}
-          onClose={() => setShowKeyringPanel(false)}
-          onConnected={(connected) => {
-            setKeyring(connected);
-            setCodeVisible(false);
-            setShowKeyringPanel(false);
+      {showJoinPanel && (
+        <ExhibitionJoinPanel
+          onClose={() => setShowJoinPanel(false)}
+          onJoined={(exhibition, alreadyJoined) => {
+            setShowJoinPanel(false);
+            setRefreshVersion((version) => version + 1);
+            announce(alreadyJoined ? "이미 추가한 전시입니다." : "전시를 추가했습니다.");
+            onExploreExhibitions(exhibition.id);
           }}
         />
       )}
