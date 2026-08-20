@@ -1,0 +1,63 @@
+name: Keep Render awake
+
+# Render 무료 플랜은 15분간 요청이 없으면 인스턴스를 잠재우고,
+# 다음 요청에서 약 1분의 콜드스타트가 발생한다. 활동 시간대에만 주기적으로
+# 헬스 엔드포인트를 호출해 슬립을 막는다.
+
+on:
+  schedule:
+    # 5분 간격. 정시(:00) 러너 혼잡을 피하려고 2분 오프셋을 뒀다.
+    # 시간 필드는 UTC 기준이며 23,00-16 UTC == 08:00-01:59 KST(활동 시간대)에만 실행된다.
+    - cron: "2,7,12,17,22,27,32,37,42,47,52,57 0-16,23 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: keep-awake
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      # 저장소 Variables에 KEEPALIVE_URL을 등록하면 그 값이 우선한다.
+      TARGET_URL: ${{ vars.KEEPALIVE_URL || 'https://momente.onrender.com' }}
+      HEALTH_PATH: /api/health
+      # 이 날짜가 지나면 핑을 멈춘다. 워크플로 삭제를 잊어도 무한정 돌지 않게 하는 안전장치.
+      END_DATE: "2026-09-10"
+    steps:
+      - name: Ping health endpoint
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          today="$(date -u +%F)"
+          if [[ "$today" > "$END_DATE" ]]; then
+            echo "::notice::${END_DATE} 이후이므로 핑을 건너뜁니다. 이 워크플로를 삭제하거나 END_DATE를 연장하세요."
+            exit 0
+          fi
+
+          url="${TARGET_URL%/}${HEALTH_PATH}"
+          echo "Pinging ${url}"
+
+          code=000
+          # 슬립 상태였다면 첫 요청이 콜드스타트를 기다리므로 타임아웃을 넉넉히 잡고 재시도한다.
+          for attempt in 1 2 3; do
+            code="$(curl --silent --show-error --location \
+              --max-time 90 --output /dev/null --write-out '%{http_code}' \
+              "$url")" || true
+            code="${code:-000}"
+            echo "attempt ${attempt}: HTTP ${code}"
+            if [[ "$code" == "200" ]]; then
+              exit 0
+            fi
+            if [[ "$attempt" != "3" ]]; then
+              sleep 15
+            fi
+          done
+
+          echo "::error::${url} 이 3회 모두 정상 응답하지 않았습니다 (마지막 코드: ${code})."
+          exit 1
