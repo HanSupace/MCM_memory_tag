@@ -1,8 +1,8 @@
 services:
   - type: web
-    name: mcm-memory-tag
+    name: momente
     runtime: node
-    plan: starter
+    plan: free
     region: singapore
     buildCommand: npm install --include=dev && npm run build
     startCommand: npm run start:standalone
@@ -36,5 +36,5 @@ services:
 
 databases:
   - name: mcm-memory-tag-db
-    plan: starter
+    plan: free
     region: singapore

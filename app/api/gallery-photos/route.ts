@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getUserBySessionToken, SESSION_COOKIE_NAME } from "../../../lib/auth";
-import { resolveExhibitionId, seedExhibitionFor } from "../../../lib/catalog-db";
+import { resolveExhibitionId } from "../../../lib/catalog-db";
 import { ensureGallerySchema, getDb } from "../../../lib/db";
 
 export const runtime = "nodejs";
@@ -17,10 +17,9 @@ async function currentUser(request: NextRequest) {
 }
 
 function serialize(row: PhotoRow) {
-  const seed = seedExhibitionFor(row.exhibition_title);
   return {
     id: row.id,
-    exhibitionId: seed?.id ?? row.exhibition_id,
+    exhibitionId: row.exhibition_id,
     exhibitionTitle: row.exhibition_title,
     imageUrl: `/api/gallery-photos/${row.id}/image`,
     createdAt: row.created_at,

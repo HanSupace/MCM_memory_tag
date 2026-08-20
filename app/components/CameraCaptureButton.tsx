@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import { saveGalleryPhoto } from "../../lib/gallery-storage";
+import { ArrowLeftIcon, BellIcon, GalleryIcon, UserIcon } from "./MomenteIcons";
 
 type ExhibitionOption = {
   id: string;
@@ -20,6 +21,8 @@ export function CameraCaptureButton({
   const [selectedExhibitionId, setSelectedExhibitionId] = useState(activeExhibitionId ?? "");
   const [cameraError, setCameraError] = useState("");
   const [isCameraReady, setIsCameraReady] = useState(false);
+  const [capturedPhoto, setCapturedPhoto] = useState<Blob | null>(null);
+  const [capturedPhotoUrl, setCapturedPhotoUrl] = useState("");
   const videoRef = useRef<HTMLVideoElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -32,7 +35,22 @@ export function CameraCaptureButton({
 
   function closeCamera() {
     stopCamera();
+    clearCapturedPhoto();
     setIsOpen(false);
+    setCameraError("");
+  }
+
+  function clearCapturedPhoto() {
+    if (capturedPhotoUrl) URL.revokeObjectURL(capturedPhotoUrl);
+    setCapturedPhoto(null);
+    setCapturedPhotoUrl("");
+  }
+
+  function setPhotoPreview(blob: Blob) {
+    if (capturedPhotoUrl) URL.revokeObjectURL(capturedPhotoUrl);
+    stopCamera();
+    setCapturedPhoto(blob);
+    setCapturedPhotoUrl(URL.createObjectURL(blob));
     setCameraError("");
   }
 
@@ -56,6 +74,7 @@ export function CameraCaptureButton({
     }
 
     try {
+      clearCapturedPhoto();
       stopCamera();
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: { ideal: "environment" } },
@@ -99,14 +118,14 @@ export function CameraCaptureButton({
     canvas.height = video.videoHeight;
     canvas.getContext("2d")?.drawImage(video, 0, 0, canvas.width, canvas.height);
     canvas.toBlob((blob) => {
-      if (blob) void storePhoto(blob);
+      if (blob) setPhotoPreview(blob);
       else setCameraError("사진을 만들지 못했습니다. 다시 촬영해 주세요.");
     }, "image/jpeg", 0.9);
   }
 
   async function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
-    if (file) await storePhoto(file);
+    if (file) setPhotoPreview(file);
     event.target.value = "";
   }
 
@@ -126,6 +145,10 @@ export function CameraCaptureButton({
     streamRef.current?.getTracks().forEach((track) => track.stop());
   }, []);
 
+  useEffect(() => () => {
+    if (capturedPhotoUrl) URL.revokeObjectURL(capturedPhotoUrl);
+  }, [capturedPhotoUrl]);
+
   return (
     <>
       <button
@@ -142,47 +165,71 @@ export function CameraCaptureButton({
       </button>
 
       {isOpen && (
-        <div className="camera-panel-backdrop" role="presentation" onMouseDown={(event) => {
-          if (event.target === event.currentTarget) closeCamera();
-        }}>
+        <div className="camera-panel-backdrop" role="presentation">
           <section className="camera-panel" role="dialog" aria-modal="true" aria-labelledby="camera-panel-title">
-            <header>
-              <div>
-                <span className="section-kicker">CAPTURE</span>
-                <h2 id="camera-panel-title">전시의 순간 기록하기</h2>
+            <header className="camera-screen-header">
+              <button type="button" onClick={closeCamera} aria-label="카메라 화면 닫기"><ArrowLeftIcon /></button>
+              <span className="camera-screen-logo" role="img" aria-label="MCM" />
+              <div className="camera-screen-header-actions" aria-hidden="true">
+                <BellIcon />
+                <UserIcon />
               </div>
-              <button type="button" onClick={closeCamera} aria-label="카메라 닫기">×</button>
             </header>
 
-            <label className="camera-exhibition-select">
-              <span>사진을 저장할 전시회</span>
+            <div className="camera-screen-body">
+              <div className="camera-screen-title">
+                <h2 id="camera-panel-title">Exhibition photo</h2>
+                <p>전시회 목록</p>
+              </div>
+
+              <label className="camera-exhibition-select">
+              <span className="sr-only">사진을 저장할 전시회</span>
               <select value={selectedExhibitionId} onChange={(event) => {
+                const exhibitionId = event.target.value;
                 stopCamera();
-                setSelectedExhibitionId(event.target.value);
+                clearCapturedPhoto();
+                setSelectedExhibitionId(exhibitionId);
                 setCameraError("");
+                if (exhibitionId) window.setTimeout(() => void startCamera(exhibitionId), 0);
               }}>
                 <option value="">전시회를 선택해 주세요</option>
                 {exhibitions.map((exhibition) => (
                   <option key={exhibition.id} value={exhibition.id}>{exhibition.title}</option>
                 ))}
               </select>
-            </label>
+              </label>
 
-            <div className={`camera-preview${isCameraReady ? " ready" : ""}`}>
-              <video ref={videoRef} muted playsInline aria-label="카메라 미리보기" />
-              {!isCameraReady && <p>전시회를 선택한 뒤 카메라를 켜주세요.</p>}
-            </div>
+              <div
+                className={`camera-preview${isCameraReady ? " ready" : ""}${capturedPhotoUrl ? " captured" : ""}`}
+                style={capturedPhotoUrl ? { backgroundImage: `url(${capturedPhotoUrl})` } : undefined}
+              >
+                <video ref={videoRef} muted playsInline aria-label="카메라 미리보기" />
+                {!isCameraReady && !capturedPhotoUrl && <p>카메라 화면</p>}
+              </div>
 
-            {cameraError && <p className="camera-error" role="alert">{cameraError}</p>}
+              {cameraError && <p className="camera-error" role="alert">{cameraError}</p>}
 
-            <div className="camera-panel-actions">
-              {isCameraReady ? (
-                <button type="button" className="camera-shutter" onClick={capturePhoto} aria-label="사진 촬영"><span /></button>
-              ) : (
-                <button type="button" className="camera-start-button" onClick={() => void startCamera()}>카메라 켜기</button>
-              )}
-              <button type="button" className="camera-file-button" onClick={() => fileInputRef.current?.click()}>기기 사진 선택</button>
-              <input ref={fileInputRef} type="file" accept="image/*" capture="environment" onChange={(event) => void handleFileChange(event)} hidden />
+              <div className="camera-panel-actions">
+                <button type="button" className="camera-file-button" onClick={() => fileInputRef.current?.click()}>
+                  <GalleryIcon /> 사진 선택
+                </button>
+                <button
+                  type="button"
+                  className={`camera-shutter${capturedPhoto ? " retake" : ""}`}
+                  onClick={capturedPhoto ? () => void startCamera() : capturePhoto}
+                  disabled={!capturedPhoto && !isCameraReady}
+                  aria-label={capturedPhoto ? "다시 촬영" : "사진 촬영"}
+                ><span /></button>
+                <button
+                  type="button"
+                  className="camera-save-button"
+                  disabled={!capturedPhoto}
+                  onClick={() => capturedPhoto && void storePhoto(capturedPhoto)}
+                >
+                  <span aria-hidden="true" /> 사진 담기
+                </button>
+                <input ref={fileInputRef} type="file" accept="image/*" onChange={(event) => void handleFileChange(event)} hidden />
+              </div>
             </div>
           </section>
         </div>
