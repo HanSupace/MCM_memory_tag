@@ -6298,7 +6298,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--gold); outl
   padding: 0 10px max(4px, env(safe-area-inset-bottom));
   overflow: visible;
   display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   align-items: center;
   border: 0;
   border-top: 1px solid rgba(112, 88, 65, .18);
@@ -6312,9 +6312,9 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--gold); outl
 .bottom-nav::after {
   content: "";
   position: absolute;
-  left: calc((100% / 7) * var(--nav-active-index) + 9px);
+  left: calc((100% / 6) * var(--nav-active-index) + 9px);
   top: 0;
-  width: calc(100% / 7 - 18px);
+  width: calc(100% / 6 - 18px);
   height: 3px;
   border-radius: 0 0 3px 3px;
   background: #9d7557;
@@ -6419,7 +6419,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--gold); outl
   .bottom-nav {
     height: 70px;
     padding-inline: 5px;
-    grid-template-columns: repeat(7, minmax(0, 1fr));
+    grid-template-columns: repeat(6, minmax(0, 1fr));
   }
 
   .bottom-nav > button {
